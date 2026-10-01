@@ -17,6 +17,7 @@ Install Chromium once with `pnpm exec playwright install chromium` (Linux CI use
 | `pnpm build`        | Production compilation and static generation             |
 | `pnpm test:e2e`     | Fresh production server, desktop/mobile Chromium         |
 | `pnpm check`        | All gates, ending in production browser checks           |
+| `pnpm verify:pages` | Verify the Pages static export after its build           |
 
 Run `pnpm build` before standalone `pnpm test:e2e`; `pnpm check` does this for
 you. Playwright starts its own server on loopback port 3100 and refuses to reuse
@@ -38,6 +39,21 @@ navigation and close-on-selection, destination focus, keyboard skip navigation,
 runtime errors, layout overflow from 320px through wide desktop at 200% text
 scaling, reduced motion and axe WCAG A/AA rules. Desktop and mobile projects
 both use Chromium; this is not Safari or Firefox coverage.
+
+To validate the GitHub Pages output locally on PowerShell:
+
+```powershell
+$env:GITHUB_PAGES = "true"
+$env:NEXT_PUBLIC_BASE_PATH = "/Celenas-SMP"
+pnpm build
+pnpm verify:pages
+Remove-Item Env:GITHUB_PAGES
+Remove-Item Env:NEXT_PUBLIC_BASE_PATH
+```
+
+The Pages verifier checks `out/index.html`, the project-prefixed Next.js
+assets, the canonical logo, the exported icon, and that referenced local assets
+exist. The deployment workflow runs it before uploading `out/`.
 
 Prefer role/name queries and visible outcomes over implementation details or
 broad snapshots. Test public behavior at the smallest useful layer. Use browser

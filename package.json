@@ -10,6 +10,7 @@
   "scripts": {
     "dev": "node scripts/next.mjs dev --hostname 127.0.0.1",
     "build": "node scripts/next.mjs build",
+    "verify:pages": "node scripts/verify-pages-export.mjs",
     "start": "node scripts/next.mjs start --hostname 127.0.0.1",
     "lint": "eslint . --max-warnings=0",
     "format": "prettier --write .",

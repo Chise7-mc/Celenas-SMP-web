@@ -8,6 +8,7 @@ import { SectionHeading } from "@/components/section-heading";
 import { site } from "@/config/site";
 import { homeContent } from "@/content/home";
 import { navigation } from "@/content/navigation";
+import { withBasePath } from "@/lib/asset-path";
 import { getLunarPhase } from "@/lib/lunar-phase";
 
 export default function Home() {
@@ -22,7 +23,7 @@ export default function Home() {
         <div className="header-bar glass-surface">
           <Link className="brand-link" href="/" aria-label="Celenas SMP ホーム">
             <Image
-              src="/brand/celenas-logo-white.png"
+              src={withBasePath("/brand/celenas-logo-white.png")}
               alt=""
               width={48}
               height={48}
@@ -51,7 +52,7 @@ export default function Home() {
             <p className="eyebrow">{homeContent.hero.eyebrow}</p>
             <div className="hero-brand">
               <Image
-                src="/brand/celenas-logo-white.png"
+                src={withBasePath("/brand/celenas-logo-white.png")}
                 alt=""
                 width={176}
                 height={176}
@@ -203,7 +204,7 @@ export default function Home() {
                 <figure key={image.src} className="gallery-item">
                   <div className="gallery-image">
                     <Image
-                      src={image.src}
+                      src={withBasePath(image.src)}
                       alt={image.alt}
                       fill
                       sizes="(max-width: 48rem) 100vw, (max-width: 72rem) 50vw, 36rem"

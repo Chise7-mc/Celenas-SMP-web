@@ -9,6 +9,12 @@ The workflow has read-only permissions, no deployment, no secrets, no retained
 checkout credentials and no artifact uploads. Actions use fixed commit SHAs.
 Redundant runs for the same ref are cancelled.
 
+The independent `.github/workflows/pages.yml` workflow deploys only pushes to
+`main` (or an explicit manual dispatch). It builds Next.js Static Export with
+the `/Celenas-SMP` Project Site base path, verifies `out/`, then uploads and
+deploys that artifact. It does not run for pull requests and does not change the
+normal `pnpm check` workflow.
+
 Use the same Node.js major, pnpm version and commands locally. CI uses Ubuntu;
 Windows development is also supported. Configure branch protection to require
 `quality` separately when repository policy is decided. A workflow alone does

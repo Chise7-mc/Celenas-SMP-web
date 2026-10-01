@@ -18,6 +18,13 @@ pnpm dev
 環境変数や認証情報は不要です。Next.js のテレメトリはプロジェクトの実行
 スクリプトで無効化しています。
 
+## デプロイ
+
+本番サイトは [GitHub Pages](https://bosatsu25.github.io/Celenas-SMP/) で公開します。
+通常の品質CIとは独立した `Deploy GitHub Pages` workflow が `main` への push 時に
+静的エクスポートを作成・検証し、GitHub Pages にデプロイします。
+Project Site の `/Celenas-SMP` base path は Pages build 時だけ有効です。
+
 ## 検証
 
 ```sh
@@ -49,6 +56,7 @@ Windows のブラウザ導入コマンドなど、詳細は [テスト手順](do
 - CSS Custom Properties によるデザイントークン
 - Vitest / React Testing Library / Playwright / axe
 - ESLint / Prettier / GitHub Actions
+- GitHub Pages 用の独立した Static Export workflow
 
 参加情報は `src/config/site.ts` で管理し、未確定値は `null` のまま表示します。
 架空のアドレス・バージョン・Discord URL は使用しません。確認済みの公開情報を
