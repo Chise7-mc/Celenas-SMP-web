@@ -4,22 +4,25 @@
 
 Celenas Web v1 is a marketing landing page rendered by Next.js App Router.
 It has no API routes, data collection, authentication or external runtime
-requests; the only client state controls the mobile navigation menu. Internal
-anchors provide navigation without a custom library.
+requests; small client boundaries handle the mobile menu and lunar scene.
+Internal anchors provide navigation without a custom library.
 
 | Location                               | Responsibility                                       |
 | -------------------------------------- | ---------------------------------------------------- |
 | `src/app/layout.tsx`                   | Japanese language, metadata, global styles           |
 | `src/app/page.tsx`                     | Semantic home-page composition                       |
+| `src/app/icon.png`                     | Canonical Celenas logo used as the site icon         |
 | `src/components/community-details.tsx` | Configured / unavailable participation details       |
 | `src/components/glass-surface.tsx`     | Shared glass interaction surface                     |
+| `src/components/lunar-phase-scene.tsx` | Small client boundary for date-refreshing hero scene |
 | `src/components/mobile-navigation.tsx` | Small client boundary for closing mobile navigation  |
 | `src/config/site.ts`                   | Reviewed, public product configuration               |
 | `src/content/home.ts`                  | Editable editorial copy and approved gallery entries |
 | `src/content/navigation.ts`            | Shared anchor navigation definitions                 |
+| `src/lib/lunar-phase.ts`               | Pure UTC lunar phase approximation                   |
 | `docs/world-assets.md`                 | Approved world screenshot asset convention           |
 | `src/styles/tokens.css`                | Shared visual tokens                                 |
-| `tests/`                               | Component behavior in jsdom                          |
+| `tests/`                               | Component behavior and lunar domain tests            |
 | `e2e/`                                 | Production page in Playwright                        |
 | `scripts/next.mjs`                     | Portable Next.js entry point with telemetry disabled |
 
@@ -37,7 +40,10 @@ This is a lightweight source model, not a CMS or a source of live server data.
 The glass surface is a small server component backed by shared CSS tokens.
 Desktop navigation is server-rendered. Mobile navigation is a small client
 boundary only to close the menu after selection, update the hash and focus its
-destination. Hero and interaction motion are CSS-only.
+destination. The home page computes an initial lunar phase while rendering; a
+small client scene refreshes it after hydration and every six hours. Phase
+calculation is local and UTC-based, with no API or geolocation. Hero motion is
+CSS-only.
 
 ## Public configuration
 
@@ -77,8 +83,9 @@ implemented work. System fonts avoid build-time font downloads.
 The current v1 landing page intentionally leaves real server/community facts,
 administrator-approved rules, official domain information and real Minecraft
 imagery as pending values. The canonical logo is already included and used by
-the site. Hosting and live server status remain separate from the marketing
-experience.
+the site. Lunar phase visuals are an approximation based on a mean synodic
+month, not an astronomical ephemeris. Hosting and live server status remain
+separate from the marketing experience.
 
 References: [Next.js installation](https://nextjs.org/docs/app/getting-started/installation),
 [pnpm supply-chain protection](https://pnpm.io/supply-chain-security).

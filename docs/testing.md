@@ -26,15 +26,18 @@ an existing listener. Free that port instead of changing reuse behavior.
 
 Component tests verify unavailable information has no fabricated join action and
 configured values produce readable details and a usable HTTPS link. Fixtures
-use reserved `.test` domains; those are never production defaults.
+use reserved `.test` domains; those are never production defaults. Lunar phase
+unit tests use fixed UTC dates and verify phase sectors, waxing/waning,
+illumination bounds and deterministic output. Visual component tests check
+decorative SVG output and phase-driven atmospheric CSS properties.
 
 Browser tests load the production page, follow the participation anchor, check
-missing information, the canonical logo, pending gallery state, deterministic
-decorative CSS motion, keyboard-operable mobile menu navigation and
-close-on-selection, destination focus, keyboard skip navigation, runtime errors,
-layout overflow from 320px through wide desktop at 200% text size, reduced motion
-and axe WCAG A/AA rules. Desktop and mobile projects both use Chromium; this is
-not Safari or Firefox coverage.
+missing information, the canonical logo and site icon, pending gallery state,
+the date-driven decorative lunar SVG, CSS motion, keyboard-operable mobile menu
+navigation and close-on-selection, destination focus, keyboard skip navigation,
+runtime errors, layout overflow from 320px through wide desktop at 200% text
+scaling, reduced motion and axe WCAG A/AA rules. Desktop and mobile projects
+both use Chromium; this is not Safari or Firefox coverage.
 
 Prefer role/name queries and visible outcomes over implementation details or
 broad snapshots. Test public behavior at the smallest useful layer. Use browser

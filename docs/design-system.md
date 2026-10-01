@@ -15,10 +15,12 @@ The canonical logo is the official white asset at
 The site remains intentionally modest about unverified server/community data and
 keeps confirmed values separate from pending placeholders.
 
-The Hero pairs the official mark with a separate CSS moon/orbit illustration.
-The illustration is decorative, not a substitute logo or a representation of
-the actual Minecraft world. World themes are editorial aspirations; the
-Gallery stays in a polished pending state until approved screenshots exist.
+The Hero pairs the official mark with a separate date-driven SVG moon and CSS
+orbit illustration. Moon shape, glow and star-field strength respond subtly to
+the calculated lunar illumination. The illustration is decorative, not a
+substitute logo or a representation of the actual Minecraft world. World
+themes are editorial aspirations; the Gallery stays in a polished pending
+state until approved screenshots exist.
 
 ## Tokens and components
 
@@ -35,12 +37,17 @@ not turn every section into a card.
 
 Use system sans-serif for copy and monospace only for connection addresses.
 The page uses a floating desktop glass header and an accessible expandable
-mobile menu. The Hero combines a large official mark with a separate, CSS-only
+mobile menu. The Hero combines a large official mark with a separate SVG/CSS
 celestial scene: deterministic far/mid star layers, a few asynchronously
-twinkling accents, slowly drifting moonlight and differently paced orbit rings.
-Motion uses transforms and opacity, is intentionally low-key, and is disabled
-when the user requests reduced motion. Only mobile menu state requires a small
-client component; no animation dependency is needed.
+twinkling accents, three deterministic radial-gradient stardust depth layers, a
+locally calculated lunar phase, slowly drifting moonlight and differently paced
+orbit rings. Stardust opacity responds subtly to continuous lunar illumination;
+its layers drift with transforms rather than animating individual particles or
+background positions. Motion is intentionally low-key and is disabled when the
+user requests reduced motion, while the static phase shape, atmosphere and dust
+remain visible. Small client boundaries support mobile menu behavior and
+refreshing the lunar phase; no animation or astronomy dependency is needed. The
+calculation is an approximation; see [lunar phase](lunar-phase.md).
 
 ## Interaction and accessibility
 

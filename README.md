@@ -34,7 +34,9 @@ Windows のブラウザ導入コマンドなど、詳細は [テスト手順](do
 - Web v1 ランディングページを実装済み
 - Hero / About / World / Server / Rules / Gallery / Join / Footer を含む
 - 月明かりと軌道をモチーフにした、控えめな Liquid Glass ナビゲーションと操作表現
+- UTC日付から近似計算する月相に応じて、Heroの月・月光・星の強さが変化
 - 公式ロゴ `public/brand/celenas-logo-white.png` をヘッダーと Hero で使用
+- App Router のサイトアイコンにも同じ公式ロゴを使用
 - 編集コピーは `src/content/home.ts`、確認済みの接続情報は `src/config/site.ts` で管理
 - 実スクリーンショット未掲載時は意図的な Gallery pending 表示。画像の追加手順は `docs/world-assets.md`
 - 未確定の公開情報は `src/config/site.ts` の `null` / optional で保持
@@ -56,6 +58,7 @@ Windows のブラウザ導入コマンドなど、詳細は [テスト手順](do
 
 - [アーキテクチャと依存関係の判断](docs/architecture.md)
 - [デザイン基盤](docs/design-system.md)
+- [月相の計算と表示](docs/lunar-phase.md)
 - [テスト](docs/testing.md)
 - [品質ゲート](docs/quality-gates.md)
 - [実装記録と計画](docs/phase-1-plan.md)

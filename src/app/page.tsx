@@ -2,13 +2,17 @@ import Image from "next/image";
 import Link from "next/link";
 import { CommunityDetails } from "@/components/community-details";
 import { GlassSurface } from "@/components/glass-surface";
+import { LunarPhaseScene } from "@/components/lunar-phase-scene";
 import { MobileNavigation } from "@/components/mobile-navigation";
 import { SectionHeading } from "@/components/section-heading";
 import { site } from "@/config/site";
 import { homeContent } from "@/content/home";
 import { navigation } from "@/content/navigation";
+import { getLunarPhase } from "@/lib/lunar-phase";
 
 export default function Home() {
+  const initialPhase = getLunarPhase(new Date());
+
   return (
     <>
       <a className="skip-link" href="#main">
@@ -74,22 +78,7 @@ export default function Home() {
           </div>
 
           <div className="hero-visual" aria-hidden="true">
-            <div className="star-field star-field-far" />
-            <div className="star-field star-field-mid" />
-            <div className="star-accents">
-              <span className="star-twinkle star-twinkle-one" />
-              <span className="star-twinkle star-twinkle-two" />
-              <span className="star-twinkle star-twinkle-three" />
-              <span className="star-steady star-steady-one" />
-              <span className="star-steady star-steady-two" />
-            </div>
-            <div className="celestial-stage">
-              <span className="moon" />
-              <span className="orbit orbit-one" />
-              <span className="orbit orbit-two" />
-              <span className="orbit orbit-three" />
-              <span className="orbit-light" />
-            </div>
+            <LunarPhaseScene initialPhase={initialPhase} />
             <GlassSurface className="hero-glass-note">
               <span className="panel-label">Celenas</span>
               <strong>A quieter kind of world</strong>
