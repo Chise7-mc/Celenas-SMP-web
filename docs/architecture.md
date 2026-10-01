@@ -3,15 +3,21 @@
 ## Boundaries
 
 Celenas Web v1 is a marketing landing page rendered by Next.js App Router.
-It has no API routes, data collection, authentication, external runtime requests
-or client state. Internal anchors provide navigation without a custom library.
+It has no API routes, data collection, authentication or external runtime
+requests; the only client state controls the mobile navigation menu. Internal
+anchors provide navigation without a custom library.
 
 | Location                               | Responsibility                                       |
 | -------------------------------------- | ---------------------------------------------------- |
 | `src/app/layout.tsx`                   | Japanese language, metadata, global styles           |
 | `src/app/page.tsx`                     | Semantic home-page composition                       |
 | `src/components/community-details.tsx` | Configured / unavailable participation details       |
+| `src/components/glass-surface.tsx`     | Shared glass interaction surface                     |
+| `src/components/mobile-navigation.tsx` | Small client boundary for closing mobile navigation  |
 | `src/config/site.ts`                   | Reviewed, public product configuration               |
+| `src/content/home.ts`                  | Editable editorial copy and approved gallery entries |
+| `src/content/navigation.ts`            | Shared anchor navigation definitions                 |
+| `docs/world-assets.md`                 | Approved world screenshot asset convention           |
 | `src/styles/tokens.css`                | Shared visual tokens                                 |
 | `tests/`                               | Component behavior in jsdom                          |
 | `e2e/`                                 | Production page in Playwright                        |
@@ -20,6 +26,18 @@ or client state. Internal anchors provide navigation without a custom library.
 Server components are the default. Add a client boundary only for an implemented
 interaction needing browser state or APIs. Do not introduce state stores,
 animation engines, 3D libraries or data-query clients speculatively.
+
+`src/content/home.ts` owns brand/editorial language and typed gallery metadata.
+Operational facts remain in `src/config/site.ts`; unknown connection fields stay
+`null`. The gallery starts empty and renders an intentional pending state. To add
+approved screenshots, place optimized files in `public/world/` and add their
+public path, meaningful alt text and approved caption to the gallery content.
+This is a lightweight source model, not a CMS or a source of live server data.
+
+The glass surface is a small server component backed by shared CSS tokens.
+Desktop navigation is server-rendered. Mobile navigation is a small client
+boundary only to close the menu after selection, update the hash and focus its
+destination. Hero and interaction motion are CSS-only.
 
 ## Public configuration
 
@@ -57,10 +75,10 @@ implemented work. System fonts avoid build-time font downloads.
 ## Deferred decisions
 
 The current v1 landing page intentionally leaves real server/community facts,
-official domain information and final Minecraft imagery as pending values.
-The canonical logo is supplied as a public asset when approved; the site uses it
-where appropriate. Hosting, live server status and production policy remain
-separate from the implemented marketing experience.
+administrator-approved rules, official domain information and real Minecraft
+imagery as pending values. The canonical logo is already included and used by
+the site. Hosting and live server status remain separate from the marketing
+experience.
 
 References: [Next.js installation](https://nextjs.org/docs/app/getting-started/installation),
 [pnpm supply-chain protection](https://pnpm.io/supply-chain-security).

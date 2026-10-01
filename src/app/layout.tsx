@@ -6,6 +6,18 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: `${site.name} | Minecraft コミュニティ`,
   description: site.description,
+  openGraph: {
+    title: `${site.name} | Minecraft コミュニティ`,
+    description: site.description,
+    siteName: site.name,
+    locale: "ja_JP",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: `${site.name} | Minecraft コミュニティ`,
+    description: site.description,
+  },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

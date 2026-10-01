@@ -29,9 +29,12 @@ configured values produce readable details and a usable HTTPS link. Fixtures
 use reserved `.test` domains; those are never production defaults.
 
 Browser tests load the production page, follow the participation anchor, check
-missing information, keyboard skip navigation, runtime errors, narrow layout at
-200% text size, reduced motion and axe WCAG A/AA rules. Desktop and mobile
-projects both use Chromium; this is not Safari or Firefox coverage.
+missing information, the canonical logo, pending gallery state, deterministic
+decorative CSS motion, keyboard-operable mobile menu navigation and
+close-on-selection, destination focus, keyboard skip navigation, runtime errors,
+layout overflow from 320px through wide desktop at 200% text size, reduced motion
+and axe WCAG A/AA rules. Desktop and mobile projects both use Chromium; this is
+not Safari or Firefox coverage.
 
 Prefer role/name queries and visible outcomes over implementation details or
 broad snapshots. Test public behavior at the smallest useful layer. Use browser
