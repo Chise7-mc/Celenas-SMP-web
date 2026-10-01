@@ -1,0 +1,39 @@
+:root {
+  color-scheme: dark;
+  --color-background: #0b1020;
+  --color-background-alt: #121b2b;
+  --color-surface: rgba(20, 27, 39, 0.78);
+  --color-surface-strong: #151d2c;
+  --color-surface-soft: rgba(163, 176, 198, 0.1);
+  --color-text: #f3f4fa;
+  --color-muted: #b7bfce;
+  --color-accent: #d2d0ff;
+  --color-accent-strong: #b8b5ff;
+  --color-on-accent: #17172c;
+  --color-border: rgba(180, 193, 219, 0.2);
+  --color-focus: #f6dc98;
+  --color-glass: rgba(255, 255, 255, 0.06);
+  --color-glass-strong: rgba(255, 255, 255, 0.12);
+  --shadow-soft: 0 20px 45px rgba(3, 8, 18, 0.35);
+  --shadow-card: 0 18px 40px rgba(16, 22, 30, 0.4);
+  --font-sans:
+    system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, Consolas, monospace;
+  --text-small: 0.875rem;
+  --text-body: 1rem;
+  --text-heading: clamp(1.75rem, 3vw, 2.5rem);
+  --text-display: clamp(2.75rem, 8vw, 6.5rem);
+  --space-1: 0.5rem;
+  --space-2: 1rem;
+  --space-3: 1.5rem;
+  --space-4: 2rem;
+  --space-5: 3rem;
+  --space-6: 5rem;
+  --radius-control: 0.875rem;
+  --radius-panel: 1.25rem;
+  --content-width: 72rem;
+  --motion-fast: 160ms;
+  --motion-medium: 280ms;
+  --motion-slow: 520ms;
+  --easing-standard: cubic-bezier(0.22, 1, 0.36, 1);
+}
