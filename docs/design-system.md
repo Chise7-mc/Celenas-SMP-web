@@ -15,18 +15,23 @@ The canonical logo is the official white asset at
 The site remains intentionally modest about unverified server/community data and
 keeps confirmed values separate from pending placeholders.
 
-The Hero pairs the official mark with a separate date-driven SVG moon and CSS
-orbit illustration. Moon shape, glow and star-field strength respond subtly to
-the calculated lunar illumination. The illustration is decorative, not a
-substitute logo or a representation of the actual Minecraft world. World
-themes are editorial aspirations; the Gallery stays in a polished pending
-state until approved screenshots exist.
+The Hero pairs the official mark with a fictional gas giant, a soft-edged SVG
+phase mask, and three fixed CSS orbit paths with one satellite each. The
+white satellites and planetary shadow complete a cycle every five minutes,
+while the planet and paths share a gentle vertical drift. Aurora-like periwinkle curtains
+replace the former diffuse halo. The mask follows the calculated lunar phase;
+the page uses black, white, and one periwinkle accent.
+The planet's restrained amber cloud bands stay within the illustration. The
+scene is decorative, not a substitute logo or a representation of the actual
+Minecraft world. World themes are editorial
+aspirations; the Gallery stays in a polished pending state until approved
+screenshots exist.
 
 ## Tokens and components
 
-`src/styles/tokens.css` is the source of truth. The palette includes deep
-night backgrounds, moonlit surfaces, subtle accent tones and accessible
-focus contrast. Use semantic tokens instead of duplicating color literals.
+`src/styles/tokens.css` is the source of truth. The palette uses a black canvas,
+white text, grayscale surfaces, and one periwinkle accent with accessible focus
+contrast. Use semantic tokens instead of duplicating color literals.
 Control radius, spacing, readable width and type scale live here too.
 
 Glass tokens cover fallback and translucent surfaces, border/highlight, shadow,
@@ -37,11 +42,13 @@ not turn every section into a card.
 
 Use system sans-serif for copy and monospace only for connection addresses.
 The page uses a floating desktop glass header and an accessible expandable
-mobile menu. The Hero combines a large official mark with a separate SVG/CSS
-celestial scene: deterministic far/mid star layers, a few asynchronously
-twinkling accents, three deterministic radial-gradient stardust depth layers, a
-locally calculated lunar phase, slowly drifting moonlight and differently paced
-orbit rings. Stardust opacity responds subtly to continuous lunar illumination;
+mobile menu. The Hero combines a large official mark with a date-driven
+fictional gas giant: a banded cloud texture masked by SVG terminator geometry,
+deterministic far/mid star layers, a few asynchronously twinkling white stars,
+three deterministic radial-gradient stardust depth layers, animated aurora,
+fixed orbit rings with white orbiting satellites, and a slowly moving planetary
+shadow.
+Stardust opacity responds subtly to continuous lunar illumination;
 its layers drift with transforms rather than animating individual particles or
 background positions. Motion is intentionally low-key and is disabled when the
 user requests reduced motion, while the static phase shape, atmosphere and dust

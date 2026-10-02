@@ -26,14 +26,14 @@ export type LunarPhaseResult = Readonly<{
 }>;
 
 const phaseNames: Record<LunarPhase, string> = {
-  new: "New Moon",
-  "waxing-crescent": "Waxing Crescent",
-  "first-quarter": "First Quarter",
-  "waxing-gibbous": "Waxing Gibbous",
-  full: "Full Moon",
-  "waning-gibbous": "Waning Gibbous",
-  "last-quarter": "Last Quarter",
-  "waning-crescent": "Waning Crescent",
+  new: "新月",
+  "waxing-crescent": "満ちていく細い月",
+  "first-quarter": "上弦の月",
+  "waxing-gibbous": "満ちていく月",
+  full: "満月",
+  "waning-gibbous": "欠けていく月",
+  "last-quarter": "下弦の月",
+  "waning-crescent": "欠けていく細い月",
 };
 
 export function getLunarPhase(date: Date): LunarPhaseResult {

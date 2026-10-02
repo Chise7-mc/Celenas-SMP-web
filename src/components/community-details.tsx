@@ -25,7 +25,9 @@ export function CommunityDetails({
         <dt>コミュニティ</dt>
         <dd>
           {connection.discordUrl ? (
-            <a href={connection.discordUrl}>Discord へ</a>
+            <a href={connection.discordUrl} target="_blank" rel="noreferrer">
+              Discord コミュニティへ参加 ↗
+            </a>
           ) : (
             "Discord の案内は準備中です。"
           )}

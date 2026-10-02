@@ -3,12 +3,12 @@
 import { useEffect, useState } from "react";
 import type { CSSProperties } from "react";
 import { getLunarPhase, type LunarPhaseResult } from "@/lib/lunar-phase";
+import { withBasePath } from "@/lib/asset-path";
 
 const SIX_HOURS_MS = 6 * 60 * 60 * 1000;
 
 type SceneStyle = CSSProperties & {
   "--moon-glow-opacity": string;
-  "--moon-glow-spread": string;
   "--moonlight-opacity": string;
   "--star-field-far-opacity": string;
   "--star-field-mid-opacity": string;
@@ -31,9 +31,8 @@ function getShadowPath(phaseFraction: number): string {
 export function LunarPhaseVisual({ phase }: { phase: LunarPhaseResult }) {
   const waxingSide = phase.phaseFraction <= 0.5;
   const style: SceneStyle = {
-    "--moon-glow-opacity": (0.12 + phase.illumination * 0.24).toFixed(3),
-    "--moon-glow-spread": `${8 + phase.illumination * 24}px`,
-    "--moonlight-opacity": (0.08 + phase.illumination * 0.16).toFixed(3),
+    "--moon-glow-opacity": (0.06 + phase.illumination * 0.12).toFixed(3),
+    "--moonlight-opacity": (0.2 + phase.illumination * 0.3).toFixed(3),
     "--star-field-far-opacity": (0.34 + (1 - phase.illumination) * 0.1).toFixed(
       3,
     ),
@@ -57,6 +56,44 @@ export function LunarPhaseVisual({ phase }: { phase: LunarPhaseResult }) {
         <span className="star-steady star-steady-one" />
         <span className="star-steady star-steady-two" />
       </div>
+      <svg
+        className="aurora-curtains"
+        viewBox="0 0 100 100"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <defs>
+          <linearGradient id="aurora-ribbon-color" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#a7b5ff" stopOpacity="0" />
+            <stop offset="35%" stopColor="#a7b5ff" stopOpacity="0.48" />
+            <stop offset="62%" stopColor="#dce2ff" stopOpacity="0.76" />
+            <stop offset="100%" stopColor="#a7b5ff" stopOpacity="0" />
+          </linearGradient>
+          <filter
+            id="aurora-soft-edge"
+            x="-18%"
+            y="-18%"
+            width="136%"
+            height="136%"
+          >
+            <feGaussianBlur stdDeviation="1.25" />
+          </filter>
+        </defs>
+        <g className="aurora-wave" filter="url(#aurora-soft-edge)">
+          <path
+            className="aurora-ribbon aurora-ribbon-one"
+            d="M 5 54 C 17 39, 17 20, 38 15 C 57 10, 66 24, 77 26 C 86 28, 92 22, 98 14"
+          />
+          <path
+            className="aurora-ribbon aurora-ribbon-two"
+            d="M 2 66 C 19 54, 24 34, 43 29 C 62 24, 70 39, 82 42 C 90 44, 95 38, 100 29"
+          />
+          <path
+            className="aurora-ribbon aurora-ribbon-three"
+            d="M 1 76 C 17 64, 28 62, 43 67 C 58 72, 67 85, 81 84 C 90 83, 95 77, 100 69"
+          />
+        </g>
+      </svg>
       <div className="celestial-stage">
         <span
           className="moon"
@@ -70,37 +107,59 @@ export function LunarPhaseVisual({ phase }: { phase: LunarPhaseResult }) {
             focusable="false"
           >
             <defs>
-              <radialGradient id="moon-surface" cx="31%" cy="26%" r="82%">
-                <stop offset="0%" stopColor="#ffffff" />
-                <stop offset="48%" stopColor="#e9ebff" />
-                <stop offset="100%" stopColor="#aab7e0" />
-              </radialGradient>
+              <clipPath id="moon-disc">
+                <circle cx="50" cy="50" r="49" />
+              </clipPath>
               <linearGradient id="moon-shadow" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="#131b2c" />
-                <stop offset="100%" stopColor="#080c17" />
+                <stop offset="0%" stopColor="#050505" stopOpacity="0.86" />
+                <stop offset="100%" stopColor="#080808" stopOpacity="0.96" />
               </linearGradient>
+              <filter
+                id="moon-terminator-soft"
+                x="-12%"
+                y="-12%"
+                width="124%"
+                height="124%"
+                colorInterpolationFilters="sRGB"
+              >
+                <feGaussianBlur stdDeviation="1.35" />
+              </filter>
             </defs>
-            <circle
-              cx="50"
-              cy="50"
-              r="49"
-              fill="url(#moon-surface)"
-              stroke="rgba(255,255,255,0.8)"
-              strokeWidth="1"
-            />
-            <path
-              d={getShadowPath(phase.phaseFraction)}
-              fill="url(#moon-shadow)"
-              transform={
-                waxingSide ? undefined : "translate(100 0) scale(-1 1)"
-              }
-            />
+            <g clipPath="url(#moon-disc)">
+              <image
+                href={withBasePath("/space/lunar-surface.png")}
+                x="1"
+                y="1"
+                width="98"
+                height="98"
+                preserveAspectRatio="xMidYMid slice"
+              />
+              <g className="planet-shadow-sway">
+                <g
+                  transform={
+                    waxingSide ? undefined : "translate(100 0) scale(-1 1)"
+                  }
+                >
+                  <path
+                    d={getShadowPath(phase.phaseFraction)}
+                    fill="url(#moon-shadow)"
+                    opacity="0.94"
+                    filter="url(#moon-terminator-soft)"
+                  />
+                </g>
+              </g>
+            </g>
           </svg>
         </span>
-        <span className="orbit orbit-one" />
-        <span className="orbit orbit-two" />
-        <span className="orbit orbit-three" />
-        <span className="orbit-light" />
+        <span className="orbit orbit-one">
+          <span className="orbiting-body orbiting-body-one" />
+        </span>
+        <span className="orbit orbit-two">
+          <span className="orbiting-body orbiting-body-two" />
+        </span>
+        <span className="orbit orbit-three">
+          <span className="orbiting-body orbiting-body-three" />
+        </span>
       </div>
       <div className="stardust-layer stardust-near" />
     </div>

@@ -64,8 +64,15 @@ export default function Home() {
             <p className="hero-description">{homeContent.hero.description}</p>
             <p className="hero-supporting">{homeContent.hero.supportingText}</p>
             <div className="hero-actions">
-              <a className="glass-button glass-button-primary" href="#join">
-                {homeContent.hero.primaryAction}
+              <a
+                className="glass-button glass-button-primary"
+                href={site.connection.discordUrl ?? "#join"}
+                target={site.connection.discordUrl ? "_blank" : undefined}
+                rel={site.connection.discordUrl ? "noreferrer" : undefined}
+              >
+                {site.connection.discordUrl
+                  ? "Discord に参加する"
+                  : homeContent.hero.primaryAction}
                 <span aria-hidden="true">↗</span>
               </a>
               <a className="glass-button glass-button-secondary" href="#about">
@@ -78,12 +85,8 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="hero-visual" aria-hidden="true">
+          <div className="hero-visual">
             <LunarPhaseScene initialPhase={initialPhase} />
-            <GlassSurface className="hero-glass-note">
-              <span className="panel-label">Celenas</span>
-              <strong>A quieter kind of world</strong>
-            </GlassSurface>
           </div>
           <a className="scroll-cue" href="#about">
             Discover <span aria-hidden="true">↓</span>
@@ -102,6 +105,18 @@ export default function Home() {
             title={homeContent.about.title}
             description={homeContent.about.description}
           />
+          <div className="about-signature">
+            <Image
+              src={withBasePath("/brand/celenas-logo-white.png")}
+              alt=""
+              width={64}
+              height={64}
+            />
+            <span>
+              <strong>Celenas SMP</strong>
+              <small>Moonlit community</small>
+            </span>
+          </div>
           <div className="split-layout">
             <div className="about-copy">
               {homeContent.about.paragraphs.map((paragraph) => (
