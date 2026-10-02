@@ -1,10 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
-import { CommunityDetails } from "@/components/community-details";
+import { ConstellationNavigation } from "@/components/constellation-navigation";
 import { GlassSurface } from "@/components/glass-surface";
 import { LunarPhaseScene } from "@/components/lunar-phase-scene";
 import { MobileNavigation } from "@/components/mobile-navigation";
 import { SectionHeading } from "@/components/section-heading";
+import { TransmissionPanel } from "@/components/transmission-panel";
 import { site } from "@/config/site";
 import { homeContent } from "@/content/home";
 import { navigation } from "@/content/navigation";
@@ -90,6 +91,8 @@ export default function Home() {
           </a>
         </section>
 
+        <ConstellationNavigation />
+
         <section
           id="about"
           className="shell content-section about-section"
@@ -167,10 +170,10 @@ export default function Home() {
             description={homeContent.community.description}
           />
           <div className="community-layout">
-            <GlassSurface className="community-panel">
-              <p className="panel-label">Connection / Details</p>
-              <CommunityDetails connection={site.connection} />
-            </GlassSurface>
+            <TransmissionPanel
+              connection={site.connection}
+              variant="community"
+            />
             <GlassSurface className="community-note">
               <span className="status-indicator" aria-hidden="true" />
               <p>{homeContent.community.note}</p>
@@ -255,9 +258,7 @@ export default function Home() {
             <h2 id="join-title">{homeContent.join.title}</h2>
             <p className="muted">{homeContent.join.description}</p>
           </div>
-          <GlassSurface className="join-panel">
-            <CommunityDetails connection={site.connection} />
-          </GlassSurface>
+          <TransmissionPanel connection={site.connection} variant="join" />
         </section>
       </main>
       <footer className="site-footer shell">

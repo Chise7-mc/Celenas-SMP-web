@@ -24,7 +24,11 @@ test("home exposes honest connection details with no runtime errors", async ({
     }),
   ).toBeInViewport();
   await expect(
-    page.locator("#join").getByText("接続先は公開準備中です。"),
+    page
+      .locator("#join")
+      .getByText(
+        "Minecraftの接続情報とDiscordの案内は、確認できたものから公開します。",
+      ),
   ).toBeVisible();
   await expect(page.getByRole("link", { name: "Discord へ" })).toHaveCount(0);
   expect(errors).toEqual([]);
@@ -115,6 +119,128 @@ test("mobile navigation is keyboard-operable and reaches page sections", async (
     await expect(toggle).toHaveAttribute("aria-expanded", "false");
     await expect(page.locator(hash)).toBeFocused();
   }
+});
+
+test("constellation navigation links, focuses destinations, and tracks the active section", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  const constellation = page.getByRole("navigation", {
+    name: "Celenas セクションナビゲーション",
+  });
+  await expect(constellation).toBeVisible();
+  const links = constellation.getByRole("link");
+  await expect(links).toHaveCount(6);
+  const expectedHrefs = [
+    "#about",
+    "#world",
+    "#community",
+    "#rules",
+    "#gallery",
+    "#join",
+  ];
+  for (const [index, href] of expectedHrefs.entries()) {
+    await expect(links.nth(index)).toHaveAttribute("href", href);
+  }
+
+  const world = constellation.getByRole("link", { name: /02 World/ });
+  await world.focus();
+  await page.keyboard.press("Enter");
+  await expect(page).toHaveURL(/#world$/);
+  await expect(page.locator("#world")).toBeFocused();
+  await expect(page.locator("#world")).toBeInViewport();
+  await expect(world).toHaveAttribute("aria-current", "location");
+
+  await page.goBack();
+  await expect(page).toHaveURL(/\/$/);
+  await page.goForward();
+  await expect(page).toHaveURL(/#world$/);
+  await expect(page.locator("#world")).toBeFocused();
+
+  const gallery = constellation.getByRole("link", { name: /05 Gallery/ });
+  await gallery.focus();
+  await page.keyboard.press("Space");
+  await expect(page).toHaveURL(/#gallery$/);
+  await expect(page.locator("#gallery")).toBeFocused();
+});
+
+test("constellation supports direct hash navigation and stays hidden on mobile", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/#gallery");
+  await expect(page.locator("#gallery")).toBeInViewport();
+  await expect(
+    page
+      .getByRole("navigation", { name: "Celenas セクションナビゲーション" })
+      .getByRole("link", { name: /05 Gallery/ }),
+  ).toHaveAttribute("aria-current", "location");
+
+  await page.setViewportSize({ width: 375, height: 812 });
+  await expect(
+    page.getByRole("navigation", { name: "Celenas セクションナビゲーション" }),
+  ).toBeHidden();
+  const toggle = page.getByRole("button", { name: "Menu" });
+  await toggle.click();
+  await expect(
+    page.getByRole("navigation", { name: "ページ内" }),
+  ).toBeVisible();
+});
+
+test("transmission uses truthful pending state and distinguishes Join access", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const community = page.locator(".transmission-panel-community");
+  await expect(community).toHaveAttribute("data-state", "pending");
+  await expect(community.getByText("PENDING", { exact: true })).toBeVisible();
+  await expect(community.getByText(/PUBLIC LINK \/ PENDING/)).toBeVisible();
+  await expect(page.locator(".transmission-panel-join")).toContainText(
+    "PUBLIC ACCESS / PENDING",
+  );
+  await expect(
+    page.locator(".transmission-panel-join").getByRole("link"),
+  ).toHaveCount(0);
+  await expect(
+    page.getByText(/PING|LATENCY|UPTIME|PLAYER\s+\d|SIGNAL\s+\d/i),
+  ).toHaveCount(0);
+});
+
+test("keeps constellation visible on tablet and hides it on narrow mobile", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const constellation = page.getByRole("navigation", {
+    name: "Celenas セクションナビゲーション",
+  });
+  for (const width of [1024, 768]) {
+    await page.setViewportSize({ width, height: 900 });
+    await expect(constellation).toBeVisible();
+    expect(
+      await constellation
+        .getByRole("link", { name: /06 Join/ })
+        .evaluate((node) => {
+          const right = node.getBoundingClientRect().right;
+          const navigationRight = node
+            .closest("nav")!
+            .getBoundingClientRect().right;
+          return right <= navigationRight;
+        }),
+    ).toBe(true);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    ).toBe(true);
+  }
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(constellation).toBeHidden();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
 });
 
 test("hero celestial scene is decorative and uses CSS motion", async ({
@@ -456,6 +582,23 @@ test("keeps the planetary scene framed on target desktop and mobile sizes", asyn
 test("respects reduced motion", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
+  await page.locator("#about").scrollIntoViewIfNeeded();
+  const constellationPoint = page.locator(".constellation-point").first();
+  await expect(constellationPoint).toHaveCSS("animation-name", "none");
+  await expect(page.locator(".constellation-lines line").first()).toHaveCSS(
+    "transition-duration",
+    "0s",
+  );
+  await expect(page.locator(".transmission-light").first()).toHaveCSS(
+    "animation-name",
+    "none",
+  );
+  expect(
+    await page
+      .locator(".transmission-panel")
+      .first()
+      .evaluate((panel) => getComputedStyle(panel, "::after").animationName),
+  ).toBe("none");
   expect(
     await page.evaluate(
       () => getComputedStyle(document.documentElement).scrollBehavior,
