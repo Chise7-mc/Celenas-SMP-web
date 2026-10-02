@@ -128,7 +128,7 @@ describe("lunar phase visual", () => {
     const { container } = render(<LunarPhaseScene />);
     const texture = container.querySelector(".moon image");
 
-    expect(texture).toHaveAttribute("href", "/space/lunar-surface.png");
+    expect(texture).toHaveAttribute("href", "/space/lunar-surface.webp");
     expect(texture).not.toHaveAttribute("transform");
     expect(container.querySelector(".planet-shadow-morph")).toBeInTheDocument();
   });

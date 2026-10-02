@@ -530,7 +530,7 @@ export function LunarPhaseVisual() {
             </defs>
             <g clipPath="url(#moon-disc)">
               <image
-                href={withBasePath("/space/lunar-surface.png")}
+                href={withBasePath("/space/lunar-surface.webp")}
                 x="1"
                 y="1"
                 width="98"
