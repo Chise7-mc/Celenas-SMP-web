@@ -1,4 +1,8 @@
-# Phase 1 implementation plan
+# Phase 1 implementation plan (historical)
+
+This document records the original Phase 1 plan and implementation context.
+Its time-specific notes below are historical and do not describe the current
+repository configuration.
 
 ## Goal and design
 

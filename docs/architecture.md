@@ -51,11 +51,11 @@ CSS-only.
 ## GitHub Pages deployment
 
 The public Project Site is
-[`https://bosatsu25.github.io/Celenas-SMP/`](https://bosatsu25.github.io/Celenas-SMP/).
+[`https://chise7-mc.github.io/Celenas-SMP-web/`](https://chise7-mc.github.io/Celenas-SMP-web/).
 The separate `pages.yml` workflow runs only for pushes to `main` or manual
 dispatch; pull requests continue to run the read-only quality workflow without
 deploying. Only the Pages build sets `GITHUB_PAGES=true` and
-`NEXT_PUBLIC_BASE_PATH=/Celenas-SMP`, enabling Next.js static export, the
+`NEXT_PUBLIC_BASE_PATH=/Celenas-SMP-web`, enabling Next.js static export, the
 project base path and unoptimized local images. `withBasePath` applies the same
 prefix to local logo and future gallery image paths. The generated `out/` is
 checked for the expected HTML, asset paths, icon and logo before it is uploaded

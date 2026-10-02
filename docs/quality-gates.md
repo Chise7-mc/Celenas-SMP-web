@@ -11,7 +11,7 @@ Redundant runs for the same ref are cancelled.
 
 The independent `.github/workflows/pages.yml` workflow deploys only pushes to
 `main` (or an explicit manual dispatch). It builds Next.js Static Export with
-the `/Celenas-SMP` Project Site base path, verifies `out/`, then uploads and
+the `/Celenas-SMP-web` Project Site base path, verifies `out/`, then uploads and
 deploys that artifact. It does not run for pull requests and does not change the
 normal `pnpm check` workflow.
 

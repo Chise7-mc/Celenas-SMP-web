@@ -85,7 +85,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="hero-visual">
+          <div className="hero-visual" aria-hidden="true">
             <LunarPhaseScene initialPhase={initialPhase} />
           </div>
           <a className="scroll-cue" href="#about">

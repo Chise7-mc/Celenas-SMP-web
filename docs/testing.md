@@ -44,7 +44,7 @@ To validate the GitHub Pages output locally on PowerShell:
 
 ```powershell
 $env:GITHUB_PAGES = "true"
-$env:NEXT_PUBLIC_BASE_PATH = "/Celenas-SMP"
+$env:NEXT_PUBLIC_BASE_PATH = "/Celenas-SMP-web"
 pnpm build
 pnpm verify:pages
 Remove-Item Env:GITHUB_PAGES

@@ -20,10 +20,10 @@ pnpm dev
 
 ## デプロイ
 
-本番サイトは [GitHub Pages](https://bosatsu25.github.io/Celenas-SMP/) で公開します。
+本番サイトは [GitHub Pages](https://chise7-mc.github.io/Celenas-SMP-web/) で公開します。
 通常の品質CIとは独立した `Deploy GitHub Pages` workflow が `main` への push 時に
 静的エクスポートを作成・検証し、GitHub Pages にデプロイします。
-Project Site の `/Celenas-SMP` base path は Pages build 時だけ有効です。
+Project Site の `/Celenas-SMP-web` base path は Pages build 時だけ有効です。
 
 ## 検証
 

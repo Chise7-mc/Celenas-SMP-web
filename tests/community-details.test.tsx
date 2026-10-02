@@ -33,9 +33,8 @@ describe("community information", () => {
 
     expect(screen.getByText("play.example.test")).toBeVisible();
     expect(screen.getByText("Test version")).toBeVisible();
-    expect(screen.getByRole("link", { name: "Discord へ" })).toHaveAttribute(
-      "href",
-      "https://example.test/community",
-    );
+    expect(
+      screen.getByRole("link", { name: /Discord コミュニティへ参加/ }),
+    ).toHaveAttribute("href", "https://example.test/community");
   });
 });

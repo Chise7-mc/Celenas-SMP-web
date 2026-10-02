@@ -1,11 +1,6 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import type { CSSProperties } from "react";
-import { getLunarPhase, type LunarPhaseResult } from "@/lib/lunar-phase";
+import type { LunarPhaseResult } from "@/lib/lunar-phase";
 import { withBasePath } from "@/lib/asset-path";
-
-const SIX_HOURS_MS = 6 * 60 * 60 * 1000;
 
 type SceneStyle = CSSProperties & {
   "--moon-glow-opacity": string;
@@ -171,18 +166,5 @@ export function LunarPhaseScene({
 }: {
   initialPhase: LunarPhaseResult;
 }) {
-  const [phase, setPhase] = useState(initialPhase);
-
-  useEffect(() => {
-    const updatePhase = () => setPhase(getLunarPhase(new Date()));
-    const timeoutId = window.setTimeout(updatePhase, 0);
-    const intervalId = window.setInterval(updatePhase, SIX_HOURS_MS);
-
-    return () => {
-      window.clearTimeout(timeoutId);
-      window.clearInterval(intervalId);
-    };
-  }, []);
-
-  return <LunarPhaseVisual phase={phase} />;
+  return <LunarPhaseVisual phase={initialPhase} />;
 }

@@ -67,7 +67,7 @@ test("uses the canonical logo and keeps unconfirmed content pending", async ({
 }) => {
   await page.goto("/");
   await expect(page.locator('img[src*="celenas-logo-white.png"]')).toHaveCount(
-    2,
+    3,
   );
   await expect(
     page.getByText("サーバールールは現在、管理者確認中です。"),
@@ -112,11 +112,10 @@ test("hero celestial scene is decorative and uses CSS motion", async ({
   await page.goto("/");
   const hero = page.locator(".hero-visual");
   await expect(hero).toHaveAttribute("aria-hidden", "true");
-  expect(
-    await page.locator(".moon").evaluate((moon) => {
-      return getComputedStyle(moon).animationName;
-    }),
-  ).toBe("moon-drift");
+  await expect(page.locator(".celestial-stage")).toHaveCSS(
+    "animation-name",
+    "celestial-drift",
+  );
   await expect(page.locator(".moon-svg")).toHaveAttribute(
     "viewBox",
     "0 0 100 100",
@@ -156,11 +155,45 @@ test("hero celestial scene is decorative and uses CSS motion", async ({
       return getComputedStyle(star).animationName;
     }),
   ).toBe("star-breathe");
+  for (const [selector, duration] of [
+    [".orbiting-body-one", "300s"],
+    [".orbiting-body-two", "360s"],
+    [".orbiting-body-three", "260s"],
+  ] as const) {
+    const body = page.locator(selector);
+    await expect(body).toHaveCSS("animation-name", "orbit-turn");
+    await expect(body).toHaveCSS("animation-duration", duration);
+  }
+  const shadow = page.locator(".planet-shadow-sway");
+  await expect(shadow).toHaveCSS("animation-name", "shadow-waver");
+  await expect(shadow).toHaveCSS("animation-duration", "300s");
   expect(
-    await page.locator(".orbit-one").evaluate((orbit) => {
-      return getComputedStyle(orbit).animationName;
+    await shadow.evaluate((element) => {
+      const animation = element.getAnimations()[0];
+      if (!animation) return false;
+      animation.pause();
+      animation.currentTime = 0;
+      const start = getComputedStyle(element).rotate;
+      animation.currentTime = 150_000;
+      const halfway = getComputedStyle(element).rotate;
+      animation.play();
+      return start !== halfway;
     }),
-  ).toBe("orbit-turn");
+  ).toBe(true);
+  await expect(page.locator(".aurora-curtains")).toHaveCSS(
+    "animation-duration",
+    "76s",
+  );
+  expect(
+    await page.locator(".hero").evaluate((hero) => {
+      return getComputedStyle(hero, "::after").animationName;
+    }),
+  ).toBe("hero-ambient-drift");
+  expect(
+    await page.locator(".hero").evaluate((hero) => {
+      return getComputedStyle(hero, "::after").animationDuration;
+    }),
+  ).toBe("72s");
 });
 
 test("has no detectable WCAG AA accessibility violations", async ({ page }) => {
@@ -202,7 +235,11 @@ test("respects reduced motion", async ({ page }) => {
   ).toBe("auto");
   for (const selector of [
     ".moon",
-    ".orbit-one",
+    ".planet-shadow-sway",
+    ".aurora-curtains",
+    ".orbiting-body-one",
+    ".orbiting-body-two",
+    ".orbiting-body-three",
     ".star-twinkle-one",
     ".stardust-far",
     ".stardust-mid",
@@ -210,6 +247,11 @@ test("respects reduced motion", async ({ page }) => {
   ]) {
     await expect(page.locator(selector)).toHaveCSS("animation-name", "none");
   }
+  expect(
+    await page.locator(".hero").evaluate((hero) => {
+      return getComputedStyle(hero, "::after").animationName;
+    }),
+  ).toBe("none");
   await expect(page.locator(".moon-svg")).toBeVisible();
   await expect(page.locator(".moon")).toHaveAttribute("data-phase", /.+/);
   await expect(page.locator(".hero-logo")).toBeVisible();

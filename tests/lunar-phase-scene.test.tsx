@@ -1,14 +1,10 @@
-import { act, render } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { render } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
 import {
   LunarPhaseScene,
   LunarPhaseVisual,
 } from "@/components/lunar-phase-scene";
 import { getLunarPhase } from "@/lib/lunar-phase";
-
-afterEach(() => {
-  vi.useRealTimers();
-});
 
 describe("lunar phase visual", () => {
   it("renders a decorative SVG and phase-driven atmosphere", () => {
@@ -27,8 +23,8 @@ describe("lunar phase visual", () => {
       "0 0 100 100",
     );
     expect(container.querySelector(".celestial-scene")).toHaveStyle({
-      "--moon-glow-opacity": "0.120",
-      "--moonlight-opacity": "0.080",
+      "--moon-glow-opacity": "0.060",
+      "--moonlight-opacity": "0.200",
       "--star-field-far-opacity": "0.440",
       "--stardust-opacity": "0.240",
     });
@@ -58,21 +54,21 @@ describe("lunar phase visual", () => {
     );
     const moon = container.querySelector(".moon");
     expect(moon).toHaveAttribute("data-illumination", "0.000");
-    expect(container.querySelector(".moon path")).not.toHaveAttribute(
-      "transform",
-    );
+    expect(
+      container.querySelector(".planet-shadow-sway > g"),
+    ).not.toHaveAttribute("transform");
 
     rerender(<LunarPhaseVisual phase={firstQuarter} />);
     expect(moon).toHaveAttribute("data-phase", "first-quarter");
-    expect(container.querySelector(".moon path")).not.toHaveAttribute(
-      "transform",
-    );
+    expect(
+      container.querySelector(".planet-shadow-sway > g"),
+    ).not.toHaveAttribute("transform");
     expect(moon).toHaveAttribute("data-illumination", "0.500");
 
     rerender(<LunarPhaseVisual phase={waningCrescent} />);
     expect(moon).toHaveAttribute("data-phase", "waning-crescent");
     expect(moon).toHaveAttribute("data-illumination", "0.146");
-    expect(container.querySelector(".moon path")).toHaveAttribute(
+    expect(container.querySelector(".planet-shadow-sway > g")).toHaveAttribute(
       "transform",
       "translate(100 0) scale(-1 1)",
     );
@@ -85,27 +81,18 @@ describe("lunar phase visual", () => {
     });
   });
 
-  it("refreshes the server-provided phase after hydration and cleans up its timers", async () => {
-    const reference = Date.parse("2001-01-24T13:07:00.000Z");
-    const synodicMonthMs = 29.530588 * 24 * 60 * 60 * 1000;
-    const currentDate = new Date(reference + synodicMonthMs * 0.25);
-    vi.useFakeTimers();
-    vi.setSystemTime(currentDate);
-
-    const { container, unmount } = render(
-      <LunarPhaseScene
-        initialPhase={getLunarPhase(new Date("2001-01-24T13:07:00.000Z"))}
-      />,
+  it("keeps the supplied phase stable for CSS-led shadow motion", () => {
+    const initialPhase = getLunarPhase(new Date("2001-01-24T13:07:00.000Z"));
+    const { container } = render(
+      <LunarPhaseScene initialPhase={initialPhase} />,
     );
-    const moon = container.querySelector(".moon");
-    expect(moon).toHaveAttribute("data-phase", "new");
-
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(0);
-    });
-    expect(moon).toHaveAttribute("data-phase", "first-quarter");
-
-    unmount();
-    expect(vi.getTimerCount()).toBe(0);
+    expect(container.querySelector(".moon")).toHaveAttribute(
+      "data-phase",
+      "new",
+    );
+    expect(container.querySelectorAll(".orbiting-body")).toHaveLength(3);
+    expect(
+      container.querySelector(".planet-shadow-sway > g > path"),
+    ).toBeTruthy();
   });
 });
