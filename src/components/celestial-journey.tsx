@@ -39,26 +39,33 @@ export function CelestialJourney() {
     };
 
     const observer = new IntersectionObserver(
-      (entries) => {
-        const visibleSection = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort(
+      () => {
+        const activeLine = window.innerHeight * 0.4;
+        const visibleSections = observedSections
+          .map((section) => ({
+            section,
+            rect: section.getBoundingClientRect(),
+          }))
+          .filter(
+            ({ rect }) => rect.bottom > 0 && rect.top < window.innerHeight,
+          );
+        const activeSection =
+          visibleSections.find(
+            ({ rect }) => rect.top <= activeLine && rect.bottom > activeLine,
+          )?.section ??
+          visibleSections.sort(
             (first, second) =>
-              Math.abs(
-                first.boundingClientRect.top - window.innerHeight * 0.4,
-              ) -
-              Math.abs(
-                second.boundingClientRect.top - window.innerHeight * 0.4,
-              ),
-          )[0]?.target;
+              Math.abs(first.rect.top - activeLine) -
+              Math.abs(second.rect.top - activeLine),
+          )[0]?.section;
 
-        if (!visibleSection) return;
-        setActiveStage(visibleSection.id);
+        if (!activeSection) return;
+        setActiveStage(activeSection.id);
         setActiveHref(
-          visibleSection.id === "hero" ? null : "#" + visibleSection.id,
+          activeSection.id === "hero" ? null : "#" + activeSection.id,
         );
       },
-      { rootMargin: "-28% 0px -55% 0px", threshold: 0 },
+      { rootMargin: "-35% 0px -35% 0px", threshold: 0 },
     );
 
     observedSections.forEach((section) => observer.observe(section));
@@ -82,6 +89,8 @@ export function CelestialJourney() {
 
     event.preventDefault();
     window.history.pushState(null, "", href);
+    setActiveStage(target.id);
+    setActiveHref(href);
     target.focus({ preventScroll: true });
     target.scrollIntoView({ block: "start" });
   }
