@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ConstellationNavigation } from "@/components/constellation-navigation";
+import { CelestialJourney } from "@/components/celestial-journey";
 import { GlassSurface } from "@/components/glass-surface";
 import { LunarPhaseScene } from "@/components/lunar-phase-scene";
 import { MobileNavigation } from "@/components/mobile-navigation";
@@ -39,6 +39,7 @@ export default function Home() {
           <MobileNavigation />
         </div>
       </header>
+      <CelestialJourney />
       <main id="main" tabIndex={-1} className="page-shell">
         <section
           className="hero shell"
@@ -90,8 +91,6 @@ export default function Home() {
             About Celenas <span aria-hidden="true">↓</span>
           </a>
         </section>
-
-        <ConstellationNavigation />
 
         <section
           id="about"

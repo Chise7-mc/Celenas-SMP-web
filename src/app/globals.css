@@ -1007,16 +1007,277 @@ h3 {
   transform: translateY(3px);
 }
 
-.constellation-navigation {
-  position: relative;
-  z-index: 1;
-  margin-top: -0.25rem;
-  margin-bottom: clamp(2rem, 5vw, 4rem);
-  padding: 1.1rem 1.5rem 0.5rem;
-  border-top: 1px solid var(--color-border);
+.celestial-journey-atmosphere {
+  --journey-nebula-opacity: 0.22;
+  --journey-stars-opacity: 0.18;
+  --journey-nebula-x: 0%;
+  --journey-nebula-y: 0%;
+  position: fixed;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
 }
 
-.constellation-label,
+.celestial-journey-atmosphere::before,
+.celestial-journey-atmosphere::after,
+.journey-starfield,
+.journey-horizon {
+  position: absolute;
+  inset: -8%;
+  pointer-events: none;
+  transition:
+    opacity 1.8s var(--easing-standard),
+    transform 2.2s var(--easing-standard);
+}
+
+.celestial-journey-atmosphere::before {
+  background:
+    radial-gradient(
+      ellipse at 78% 19%,
+      rgba(103, 117, 204, 0.15),
+      transparent 34%
+    ),
+    radial-gradient(
+      ellipse at 69% 69%,
+      rgba(86, 99, 169, 0.11),
+      transparent 34%
+    ),
+    radial-gradient(
+      ellipse at 36% 100%,
+      rgba(91, 102, 159, 0.055),
+      transparent 38%
+    );
+  content: "";
+  opacity: var(--journey-nebula-opacity);
+  transform: translate3d(var(--journey-nebula-x), var(--journey-nebula-y), 0);
+}
+
+.celestial-journey-atmosphere::after {
+  background: radial-gradient(
+    ellipse at 86% 45%,
+    rgba(207, 215, 255, 0.055),
+    transparent 26%
+  );
+  content: "";
+  opacity: calc(var(--journey-nebula-opacity) * 0.75);
+  transform: translate3d(
+    calc(var(--journey-nebula-x) * -0.45),
+    var(--journey-nebula-y),
+    0
+  );
+}
+
+.journey-starfield {
+  inset: 0;
+  background-image:
+    radial-gradient(
+      1px 1px at 72% 17%,
+      rgba(240, 242, 255, 0.7) 50%,
+      transparent 100%
+    ),
+    radial-gradient(
+      1px 1px at 84% 33%,
+      rgba(207, 215, 255, 0.65) 50%,
+      transparent 100%
+    ),
+    radial-gradient(
+      1px 1px at 61% 47%,
+      rgba(240, 242, 255, 0.55) 50%,
+      transparent 100%
+    ),
+    radial-gradient(
+      1px 1px at 92% 72%,
+      rgba(207, 215, 255, 0.55) 50%,
+      transparent 100%
+    ),
+    radial-gradient(
+      1px 1px at 77% 86%,
+      rgba(240, 242, 255, 0.5) 50%,
+      transparent 100%
+    );
+  opacity: var(--journey-stars-opacity);
+}
+
+.journey-horizon {
+  inset: auto -10% -42% 34%;
+  height: 65%;
+  background: radial-gradient(
+    ellipse,
+    rgba(110, 123, 198, 0.11),
+    transparent 67%
+  );
+  opacity: 0.24;
+  transform: translate3d(var(--journey-nebula-x), 0, 0);
+}
+
+.celestial-journey-atmosphere[data-stage="about"] {
+  --journey-nebula-opacity: 0.3;
+  --journey-stars-opacity: 0.23;
+  --journey-nebula-x: -2%;
+  --journey-nebula-y: 1%;
+}
+
+.celestial-journey-atmosphere[data-stage="world"] {
+  --journey-nebula-opacity: 0.35;
+  --journey-stars-opacity: 0.28;
+  --journey-nebula-x: 2%;
+  --journey-nebula-y: -2%;
+}
+
+.celestial-journey-atmosphere[data-stage="community"] {
+  --journey-nebula-opacity: 0.31;
+  --journey-stars-opacity: 0.25;
+  --journey-nebula-x: -1%;
+  --journey-nebula-y: -1%;
+}
+
+.celestial-journey-atmosphere[data-stage="rules"] {
+  --journey-nebula-opacity: 0.2;
+  --journey-stars-opacity: 0.17;
+  --journey-nebula-x: -3%;
+  --journey-nebula-y: 1%;
+}
+
+.celestial-journey-atmosphere[data-stage="gallery"] {
+  --journey-nebula-opacity: 0.34;
+  --journey-stars-opacity: 0.31;
+  --journey-nebula-x: 2%;
+  --journey-nebula-y: 2%;
+}
+
+.celestial-journey-atmosphere[data-stage="join"] {
+  --journey-nebula-opacity: 0.32;
+  --journey-stars-opacity: 0.28;
+  --journey-nebula-x: 0%;
+  --journey-nebula-y: -2%;
+}
+
+.page-shell,
+.site-footer {
+  position: relative;
+  z-index: 1;
+}
+
+.orbital-section-navigation {
+  position: fixed;
+  z-index: 2;
+  top: 50%;
+  right: clamp(1rem, 2.5vw, 2.5rem);
+  width: 4.5rem;
+  height: min(35rem, 68vh);
+  min-height: 22rem;
+  transform: translateY(-50%);
+}
+
+.orbital-section-path {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.orbital-section-path path {
+  fill: none;
+  stroke: rgba(205, 213, 255, 0.2);
+  stroke-width: 0.65;
+  vector-effect: non-scaling-stroke;
+}
+
+.orbital-section-link {
+  position: absolute;
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  color: var(--color-muted);
+}
+
+.orbital-section-link:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 1px;
+}
+
+.orbital-section-node {
+  width: 0.42rem;
+  height: 0.42rem;
+  border: 1px solid rgba(232, 237, 255, 0.7);
+  border-radius: 50%;
+  background: var(--color-background);
+  box-shadow: 0 0 0 0.18rem rgba(167, 181, 255, 0.06);
+  transition:
+    background-color var(--motion-medium) var(--easing-standard),
+    border-color var(--motion-medium) var(--easing-standard),
+    box-shadow var(--motion-medium) var(--easing-standard),
+    transform var(--motion-medium) var(--easing-standard);
+}
+
+.orbital-section-link:hover .orbital-section-node,
+.orbital-section-link:focus-visible .orbital-section-node,
+.orbital-section-link[aria-current="location"] .orbital-section-node {
+  transform: scale(1.25);
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  box-shadow: 0 0 0 0.24rem rgba(167, 181, 255, 0.12);
+}
+
+.orbital-active-satellite {
+  position: absolute;
+  z-index: 1;
+  width: 0.48rem;
+  height: 0.48rem;
+  transform: translate(-50%, -50%);
+  border: 1px solid white;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow:
+    0 0 0 0.28rem rgba(217, 224, 255, 0.1),
+    0 0 0.75rem rgba(217, 224, 255, 0.5);
+  pointer-events: none;
+  transition:
+    left 560ms var(--easing-standard),
+    top 560ms var(--easing-standard);
+}
+
+.orbital-section-label {
+  position: absolute;
+  top: 50%;
+  right: calc(100% + 0.65rem);
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.42rem 0.65rem;
+  transform: translate(0.25rem, -50%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-control);
+  background: rgba(5, 6, 11, 0.92);
+  color: var(--color-text);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity var(--motion-fast) var(--easing-standard),
+    transform var(--motion-fast) var(--easing-standard);
+  white-space: nowrap;
+}
+
+.orbital-section-label span {
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+}
+
+.orbital-section-link:hover .orbital-section-label,
+.orbital-section-link:focus-visible .orbital-section-label {
+  transform: translate(0, -50%);
+  opacity: 1;
+}
+
 .transmission-label,
 .transmission-state,
 .transmission-pending,
@@ -1026,107 +1287,6 @@ h3 {
   font-size: 0.7rem;
   letter-spacing: 0.12em;
   line-height: 1.5;
-}
-
-.constellation-map {
-  position: relative;
-  height: clamp(8rem, 15vw, 11rem);
-  margin-top: 0.35rem;
-}
-
-.constellation-lines {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-  pointer-events: none;
-}
-
-.constellation-lines line {
-  stroke: rgba(220, 227, 255, 0.28);
-  stroke-width: 1;
-  vector-effect: non-scaling-stroke;
-  transition:
-    stroke var(--motion-medium) var(--easing-standard),
-    filter var(--motion-medium) var(--easing-standard);
-}
-
-.constellation-lines line.is-traversed {
-  stroke: rgba(167, 181, 255, 0.68);
-  filter: drop-shadow(0 0 3px rgba(167, 181, 255, 0.28));
-}
-
-.constellation-node {
-  position: absolute;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.55rem;
-  min-height: 2.75rem;
-  padding: 0.3rem 0.45rem;
-  border-radius: var(--radius-control);
-  color: var(--color-muted);
-  text-decoration: none;
-  transform: translate(-0.5rem, -50%);
-  transition:
-    color var(--motion-medium) var(--easing-standard),
-    background-color var(--motion-medium) var(--easing-standard);
-}
-
-.constellation-node:hover,
-.constellation-node[aria-current="location"] {
-  color: var(--color-text);
-}
-
-.constellation-node:focus-visible {
-  outline: 2px solid var(--color-focus);
-  outline-offset: 3px;
-}
-
-.constellation-point {
-  position: relative;
-  flex: 0 0 auto;
-  width: 0.42rem;
-  height: 0.42rem;
-  border: 1px solid rgba(234, 238, 255, 0.8);
-  border-radius: 50%;
-  background: var(--color-background);
-  box-shadow: 0 0 0 0.22rem rgba(167, 181, 255, 0.08);
-  transition:
-    background-color var(--motion-medium) var(--easing-standard),
-    box-shadow var(--motion-medium) var(--easing-standard),
-    transform var(--motion-medium) var(--easing-standard);
-}
-
-.constellation-node:hover .constellation-point,
-.constellation-node[aria-current="location"] .constellation-point {
-  transform: scale(1.18);
-  border-color: var(--color-accent);
-  background: var(--color-accent);
-  box-shadow: 0 0 0 0.28rem rgba(167, 181, 255, 0.13);
-}
-
-.constellation-node[aria-current="location"] .constellation-point {
-  animation: constellation-breathe 8s ease-in-out infinite;
-}
-
-.constellation-node-copy {
-  display: grid;
-  gap: 0.02rem;
-  white-space: nowrap;
-}
-
-.constellation-number {
-  color: var(--color-muted);
-  font-family: var(--font-mono);
-  font-size: 0.59rem;
-  letter-spacing: 0.08em;
-}
-
-.constellation-name {
-  font-size: 0.73rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 .content-section {
@@ -1967,8 +2127,8 @@ h3 {
   }
 }
 
-@media (max-width: 40rem) {
-  .constellation-navigation {
+@media (max-width: 71.999rem), (pointer: coarse) {
+  .orbital-section-navigation {
     display: none;
   }
 }
@@ -2021,16 +2181,6 @@ h3 {
     animation: none !important;
     transition: none !important;
     will-change: auto !important;
-  }
-}
-
-@keyframes constellation-breathe {
-  0%,
-  100% {
-    box-shadow: 0 0 0 0.2rem rgba(167, 181, 255, 0.08);
-  }
-  50% {
-    box-shadow: 0 0 0 0.34rem rgba(167, 181, 255, 0.15);
   }
 }
 

@@ -121,65 +121,65 @@ test("mobile navigation is keyboard-operable and reaches page sections", async (
   }
 });
 
-test("constellation navigation links, focuses destinations, and tracks the active section", async ({
+test("celestial journey tracks sections and orbital links navigate accessibly", async ({
   page,
-}) => {
+}, testInfo) => {
+  test.skip(
+    testInfo.project.name === "mobile-chromium",
+    "The orbital indicator is intentionally hidden on touch devices.",
+  );
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
-  const constellation = page.getByRole("navigation", {
-    name: "Celenas セクションナビゲーション",
-  });
-  await expect(constellation).toBeVisible();
-  const links = constellation.getByRole("link");
-  await expect(links).toHaveCount(6);
-  const expectedHrefs = [
-    "#about",
-    "#world",
-    "#community",
-    "#rules",
-    "#gallery",
-    "#join",
-  ];
-  for (const [index, href] of expectedHrefs.entries()) {
-    await expect(links.nth(index)).toHaveAttribute("href", href);
+  const atmosphere = page.locator(".celestial-journey-atmosphere");
+  const orbital = page.getByRole("navigation", { name: "ページ内セクション" });
+  await expect(orbital).toBeVisible();
+  await expect(orbital.getByRole("link")).toHaveCount(6);
+  await expect(atmosphere).toHaveAttribute("data-stage", "hero");
+
+  const destinations = [
+    ["01 About", "#about"],
+    ["02 World", "#world"],
+    ["03 Community", "#community"],
+    ["04 Rules", "#rules"],
+    ["05 Gallery", "#gallery"],
+    ["06 Join", "#join"],
+  ] as const;
+
+  for (const [name, hash] of destinations) {
+    const link = orbital.getByRole("link", { name });
+    await link.click();
+    await expect(page).toHaveURL(new RegExp(`${hash}$`));
+    await expect(page.locator(hash)).toBeFocused();
+    await expect(link).toHaveAttribute("aria-current", "location");
+    await expect(atmosphere).toHaveAttribute("data-stage", hash.slice(1));
   }
 
-  const world = constellation.getByRole("link", { name: /02 World/ });
-  await world.focus();
-  await page.keyboard.press("Enter");
-  await expect(page).toHaveURL(/#world$/);
-  await expect(page.locator("#world")).toBeFocused();
-  await expect(page.locator("#world")).toBeInViewport();
-  await expect(world).toHaveAttribute("aria-current", "location");
-
   await page.goBack();
-  await expect(page).toHaveURL(/\/$/);
-  await page.goForward();
-  await expect(page).toHaveURL(/#world$/);
-  await expect(page.locator("#world")).toBeFocused();
-
-  const gallery = constellation.getByRole("link", { name: /05 Gallery/ });
-  await gallery.focus();
-  await page.keyboard.press("Space");
   await expect(page).toHaveURL(/#gallery$/);
   await expect(page.locator("#gallery")).toBeFocused();
+  await expect(atmosphere).toHaveAttribute("data-stage", "gallery");
+  await page.goForward();
+  await expect(page).toHaveURL(/#join$/);
+  await expect(page.locator("#join")).toBeFocused();
 });
 
-test("constellation supports direct hash navigation and stays hidden on mobile", async ({
+test("celestial journey supports direct hashes and keeps mobile navigation", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/#gallery");
   await expect(page.locator("#gallery")).toBeInViewport();
+  await expect(page.locator(".celestial-journey-atmosphere")).toHaveAttribute(
+    "data-stage",
+    "gallery",
+  );
   await expect(
-    page
-      .getByRole("navigation", { name: "Celenas セクションナビゲーション" })
-      .getByRole("link", { name: /05 Gallery/ }),
-  ).toHaveAttribute("aria-current", "location");
+    page.getByRole("navigation", { name: "メインナビゲーション" }),
+  ).toBeVisible();
 
   await page.setViewportSize({ width: 375, height: 812 });
   await expect(
-    page.getByRole("navigation", { name: "Celenas セクションナビゲーション" }),
+    page.getByRole("navigation", { name: "ページ内セクション" }),
   ).toBeHidden();
   const toggle = page.getByRole("button", { name: "Menu" });
   await toggle.click();
@@ -207,26 +207,31 @@ test("transmission uses truthful pending state and distinguishes Join access", a
   ).toHaveCount(0);
 });
 
-test("keeps constellation visible on tablet and hides it on narrow mobile", async ({
+test("keeps the orbital indicator within desktop bounds and hides it on smaller screens", async ({
   page,
-}) => {
+}, testInfo) => {
   await page.goto("/");
-  const constellation = page.getByRole("navigation", {
-    name: "Celenas セクションナビゲーション",
-  });
-  for (const width of [1024, 768]) {
+  const orbital = page.getByRole("navigation", { name: "ページ内セクション" });
+  const touchDevice = testInfo.project.name === "mobile-chromium";
+  for (const width of [1440, 1200]) {
     await page.setViewportSize({ width, height: 900 });
-    await expect(constellation).toBeVisible();
+    if (touchDevice) {
+      await expect(orbital).toBeHidden();
+    } else {
+      await expect(orbital).toBeVisible();
+    }
+    await expect(
+      page.getByRole("navigation", { name: "メインナビゲーション" }),
+    ).toBeVisible();
+    if (touchDevice) continue;
     expect(
-      await constellation
-        .getByRole("link", { name: /06 Join/ })
-        .evaluate((node) => {
-          const right = node.getBoundingClientRect().right;
-          const navigationRight = node
-            .closest("nav")!
-            .getBoundingClientRect().right;
-          return right <= navigationRight;
-        }),
+      await orbital.getByRole("link", { name: "06 Join" }).evaluate((node) => {
+        const right = node.getBoundingClientRect().right;
+        const navigationRight = node
+          .closest("nav")!
+          .getBoundingClientRect().right;
+        return right <= navigationRight;
+      }),
     ).toBe(true);
     expect(
       await page.evaluate(
@@ -234,13 +239,26 @@ test("keeps constellation visible on tablet and hides it on narrow mobile", asyn
       ),
     ).toBe(true);
   }
-  await page.setViewportSize({ width: 390, height: 844 });
-  await expect(constellation).toBeHidden();
-  expect(
-    await page.evaluate(
-      () => document.documentElement.scrollWidth <= window.innerWidth,
-    ),
-  ).toBe(true);
+  for (const [width, height] of [
+    [1024, 900],
+    [768, 900],
+    [390, 844],
+  ] as const) {
+    await page.setViewportSize({ width, height });
+    await expect(orbital).toBeHidden();
+    if (width > 768) {
+      await expect(
+        page.getByRole("navigation", { name: "メインナビゲーション" }),
+      ).toBeVisible();
+    } else {
+      await expect(page.getByRole("button", { name: "Menu" })).toBeVisible();
+    }
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    ).toBe(true);
+  }
 });
 
 test("hero celestial scene is decorative and uses CSS motion", async ({
@@ -628,9 +646,11 @@ test("respects reduced motion", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   await page.locator("#about").scrollIntoViewIfNeeded();
-  const constellationPoint = page.locator(".constellation-point").first();
-  await expect(constellationPoint).toHaveCSS("animation-name", "none");
-  await expect(page.locator(".constellation-lines line").first()).toHaveCSS(
+  await expect(page.locator(".orbital-active-satellite")).toHaveCSS(
+    "transition-duration",
+    "0s",
+  );
+  await expect(page.locator(".celestial-journey-atmosphere")).toHaveCSS(
     "transition-duration",
     "0s",
   );
