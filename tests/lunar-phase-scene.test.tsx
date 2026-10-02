@@ -136,6 +136,7 @@ describe("lunar phase visual", () => {
     const { container } = render(<LunarPhaseScene />);
 
     expect(container.querySelector(".aurora-curtains")).toBeInTheDocument();
-    expect(container.querySelectorAll(".nebula-layer")).toHaveLength(2);
+    expect(container.querySelectorAll(".nebula-layer")).toHaveLength(3);
+    expect(container.querySelector(".nebula-band")).toBeInTheDocument();
   });
 });

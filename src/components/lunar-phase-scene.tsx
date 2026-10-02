@@ -206,6 +206,7 @@ export function LunarPhaseVisual() {
     >
       <div className="star-field star-field-far" />
       <div className="nebula-layer nebula-far" />
+      <div className="nebula-layer nebula-band" />
       <div className="stardust-layer stardust-far" />
       <div className="star-field star-field-mid" />
       <div className="nebula-layer nebula-mid" />

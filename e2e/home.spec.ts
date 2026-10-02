@@ -198,9 +198,10 @@ test("hero celestial scene is decorative and uses CSS motion", async ({
       .locator(".celestial-orbits")
       .evaluate((svg) => (svg as SVGSVGElement).animationsPaused()),
   ).toBe(false);
-  await expect(page.locator(".nebula-layer")).toHaveCount(2);
+  await expect(page.locator(".nebula-layer")).toHaveCount(3);
   for (const [selector, animationName] of [
     [".nebula-far", "nebula-drift-far"],
+    [".nebula-band", "nebula-rift-drift"],
     [".nebula-mid", "nebula-drift-mid"],
     [".aurora-wave", "aurora-flow"],
     [".aurora-curtains", "aurora-color-shift"],
@@ -245,6 +246,10 @@ test("hero celestial scene is decorative and uses CSS motion", async ({
   await expect(page.locator(".aurora-wave")).toHaveCSS(
     "animation-duration",
     "52s",
+  );
+  await expect(page.locator(".nebula-band")).toHaveCSS(
+    "animation-duration",
+    "68s",
   );
   expect(
     await page.locator(".hero").evaluate((hero) => {
@@ -436,6 +441,7 @@ test("respects reduced motion", async ({ page }) => {
     ".aurora-curtains",
     ".aurora-wave",
     ".nebula-far",
+    ".nebula-band",
     ".nebula-mid",
     ".star-twinkle-one",
     ".stardust-far",

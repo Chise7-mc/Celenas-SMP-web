@@ -583,6 +583,27 @@ h3 {
   animation: nebula-drift-far 82s ease-in-out infinite alternate;
 }
 
+.nebula-band {
+  z-index: 1;
+  opacity: 0.42;
+  background-image:
+    linear-gradient(
+      151deg,
+      transparent 22%,
+      rgba(83, 96, 174, 0.02) 34%,
+      rgba(106, 121, 198, 0.22) 44%,
+      rgba(76, 88, 159, 0.12) 51%,
+      transparent 64%
+    ),
+    radial-gradient(
+      ellipse 82% 24% at 78% 49%,
+      rgba(125, 143, 224, 0.2),
+      transparent 76%
+    );
+  filter: blur(8px);
+  animation: nebula-rift-drift 68s ease-in-out infinite alternate;
+}
+
 .nebula-mid {
   z-index: 2;
   opacity: 0.46;
@@ -1413,6 +1434,17 @@ h3 {
   to {
     transform: translate3d(-3%, 2.5%, 0) scale(0.96);
     opacity: 0.78;
+  }
+}
+
+@keyframes nebula-rift-drift {
+  from {
+    transform: translate3d(-2%, 1%, 0) scale(0.98);
+    opacity: 0.24;
+  }
+  to {
+    transform: translate3d(2%, -1%, 0) scale(1.03);
+    opacity: 0.38;
   }
 }
 
