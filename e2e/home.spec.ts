@@ -10,7 +10,7 @@ test("home exposes honest connection details with no runtime errors", async ({
 
   expect(response?.status()).toBe(200);
   await expect(page).toHaveTitle(
-    "Celenas SMP | ひとつの世界を、時間をかけて育てていく",
+    "Celenas SMP | Minecraftサバイバルを、時間とともに",
   );
   await expect(
     page.getByRole("heading", { level: 1, name: "Celenas SMP" }),
@@ -18,7 +18,10 @@ test("home exposes honest connection details with no runtime errors", async ({
   await page.getByRole("link", { name: "参加方法を見る" }).click();
   await expect(page).toHaveURL(/#join$/);
   await expect(
-    page.getByRole("heading", { name: "この世界に加わる。", exact: true }),
+    page.getByRole("heading", {
+      name: "Celenas SMPに参加する。",
+      exact: true,
+    }),
   ).toBeInViewport();
   await expect(
     page.locator("#join").getByText("接続先は公開準備中です。"),
@@ -78,10 +81,10 @@ test("uses the canonical logo and keeps unconfirmed content pending", async ({
   ).toBeVisible();
   await expect(page.getByText("景色の記録は準備中です。")).toBeVisible();
   await expect(
-    page.getByText("ひとつの世界を、時間をかけて育てていく。"),
+    page.getByText("ひとつのMinecraft世界を、みんなで少しずつ育てていく。"),
   ).toBeVisible();
   await expect(
-    page.getByText("過ごした時間が、世界に残っていく。"),
+    page.getByText("Minecraftサバイバルを、それぞれのペースで。"),
   ).toBeVisible();
   await expect(page.getByText(/Java版|Bedrock版|whitelist/i)).toHaveCount(0);
 });
@@ -163,22 +166,47 @@ test("hero celestial scene is decorative and uses CSS motion", async ({
       return getComputedStyle(star).animationName;
     }),
   ).toBe("star-breathe");
-  for (const [selector, duration] of [
-    [".orbiting-body-one", "300s"],
-    [".orbiting-body-two", "360s"],
-    [".orbiting-body-three", "260s"],
-  ] as const) {
-    const body = page.locator(selector);
-    await expect(body).toHaveCSS("animation-name", "orbit-turn");
-    await expect(body).toHaveCSS("animation-duration", duration);
+  const orbitBodies = [
+    [".satellite-one animateMotion", "72s", "-5.76s"],
+    [".satellite-two animateMotion", "103s", "-44.29s"],
+    [".satellite-three animateMotion", "137s", "-104.12s"],
+  ] as const;
+  for (const [selector, duration, delay] of orbitBodies) {
+    const motion = page.locator(selector);
+    await expect(motion).toHaveAttribute("dur", duration);
+    await expect(motion).toHaveAttribute("begin", delay);
   }
+  await expect(page.locator(".orbiting-body")).toHaveCount(3);
+  await expect(page.locator(".orbit-line")).toHaveCount(3);
+  expect(
+    await page
+      .locator(".celestial-orbits")
+      .evaluate((svg) => (svg as SVGSVGElement).animationsPaused()),
+  ).toBe(false);
+  await expect(page.locator(".nebula-layer")).toHaveCount(2);
+  await expect(page.locator(".nebula-far")).toHaveCSS(
+    "animation-name",
+    "nebula-drift",
+  );
+  await expect(page.locator(".nebula-mid")).toHaveCSS(
+    "animation-name",
+    "nebula-drift",
+  );
   await expect(page.locator(".celestial-scene")).toHaveAttribute(
     "data-cycle-duration",
-    "300000",
+    "120000",
+  );
+  await expect(page.locator(".celestial-scene")).toHaveAttribute(
+    "data-initial-phase",
+    "0.125",
   );
   await expect(page.locator(".aurora-curtains")).toHaveCSS(
     "animation-duration",
-    "76s",
+    "96s",
+  );
+  await expect(page.locator(".aurora-wave")).toHaveCSS(
+    "animation-duration",
+    "84s",
   );
   expect(
     await page.locator(".hero").evaluate((hero) => {
@@ -200,7 +228,15 @@ test("morphs the terminator geometry without rotating the texture", async ({
   const moon = page.locator(".moon");
   await expect(page.locator(".celestial-scene")).toHaveAttribute(
     "data-cycle-duration",
-    "300000",
+    "120000",
+  );
+  await expect(page.locator(".moon")).toHaveAttribute(
+    "data-phase",
+    "waxing-crescent",
+  );
+  await expect(page.locator(".planet-shadow-morph")).toHaveAttribute(
+    "transform",
+    "rotate(12 50 50)",
   );
   const shadow = page.locator(".planet-shadow-morph path");
   const initialPath = await shadow.getAttribute("d");
@@ -210,6 +246,73 @@ test("morphs the terminator geometry without rotating the texture", async ({
     "transform",
     /.+/,
   );
+});
+
+test("satellites move along their distinct rendered ellipse paths", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const orbits = [
+    [".satellite-one", "orbit-one-path"],
+    [".satellite-two", "orbit-two-path"],
+    [".satellite-three", "orbit-three-path"],
+  ] as const;
+  for (const [selector, pathId] of orbits) {
+    const pathCheck = await page
+      .locator(selector)
+      .evaluate((circle, expectedPathId) => {
+        const satellite = circle as SVGCircleElement;
+        const svg = satellite.ownerSVGElement;
+        const group = satellite.parentElement as SVGGElement | null;
+        const animation = circle.querySelector("animateMotion");
+        const mpath = animation?.querySelector("mpath");
+        const path = svg?.querySelector<SVGPathElement>(`#${expectedPathId}`);
+        if (!svg || !group || !animation || !mpath || !path) return null;
+        if (mpath.getAttribute("href") !== `#${expectedPathId}`) return null;
+
+        const durationSeconds = Number.parseFloat(
+          animation.getAttribute("dur") ?? "0",
+        );
+        const beginSeconds = Number.parseFloat(
+          animation.getAttribute("begin") ?? "0",
+        );
+        const sample = (timeSeconds: number) => {
+          svg.pauseAnimations();
+          svg.setCurrentTime(timeSeconds);
+          const progress =
+            ((((timeSeconds - beginSeconds) % durationSeconds) +
+              durationSeconds) %
+              durationSeconds) /
+            durationSeconds;
+          const point = path.getPointAtLength(path.getTotalLength() * progress);
+          const groupMatrix = group.getScreenCTM();
+          const circleMatrix = satellite.getScreenCTM();
+          if (!groupMatrix || !circleMatrix) return null;
+          const expected = new DOMPoint(point.x, point.y).matrixTransform(
+            groupMatrix,
+          );
+          const actual = new DOMPoint(0, 0).matrixTransform(circleMatrix);
+          return { expected, actual };
+        };
+
+        const first = sample(10.25);
+        const second = sample(15.25);
+        if (!first || !second) return null;
+        return {
+          pathError: Math.hypot(
+            first.actual.x - first.expected.x,
+            first.actual.y - first.expected.y,
+          ),
+          travelDistance: Math.hypot(
+            first.actual.x - second.actual.x,
+            first.actual.y - second.actual.y,
+          ),
+        };
+      }, pathId);
+    expect(pathCheck).not.toBeNull();
+    expect(pathCheck!.pathError).toBeLessThan(1);
+    expect(pathCheck!.travelDistance).toBeGreaterThan(10);
+  }
 });
 
 test("has no detectable WCAG AA accessibility violations", async ({ page }) => {
@@ -227,7 +330,7 @@ test("supports narrow screens and enlarged text without horizontal overflow", as
   await page.evaluate(() => {
     document.documentElement.style.fontSize = "200%";
   });
-  for (const width of [320, 375, 430, 768, 1024, 1280, 1440, 1920]) {
+  for (const width of [320, 360, 375, 390, 430, 768, 1024, 1280, 1440, 1920]) {
     await page.setViewportSize({ width, height: 900 });
     expect(
       await page.evaluate(
@@ -293,9 +396,9 @@ test("respects reduced motion", async ({ page }) => {
   for (const selector of [
     ".moon",
     ".aurora-curtains",
-    ".orbiting-body-one",
-    ".orbiting-body-two",
-    ".orbiting-body-three",
+    ".aurora-wave",
+    ".nebula-far",
+    ".nebula-mid",
     ".star-twinkle-one",
     ".stardust-far",
     ".stardust-mid",
@@ -304,6 +407,11 @@ test("respects reduced motion", async ({ page }) => {
     await expect(page.locator(selector)).toHaveCSS("animation-name", "none");
   }
   expect(
+    await page
+      .locator(".celestial-orbits")
+      .evaluate((svg) => (svg as SVGSVGElement).animationsPaused()),
+  ).toBe(true);
+  expect(
     await page.locator(".hero").evaluate((hero) => {
       return getComputedStyle(hero, "::after").animationName;
     }),
@@ -311,11 +419,15 @@ test("respects reduced motion", async ({ page }) => {
   await expect(page.locator(".moon-svg")).toBeVisible();
   await expect(page.locator(".moon")).toHaveAttribute(
     "data-phase",
-    "first-quarter",
+    "waxing-crescent",
   );
   await expect(page.locator(".moon")).toHaveAttribute(
     "data-cycle-position",
-    "0.250",
+    "0.125",
+  );
+  await expect(page.locator(".planet-shadow-morph")).toHaveAttribute(
+    "transform",
+    "rotate(12 50 50)",
   );
   await expect(page.locator(".hero-logo")).toBeVisible();
 });

@@ -34,10 +34,12 @@ decorative SVG output and phase-driven atmospheric CSS properties.
 
 Browser tests load the production page, follow the participation anchor, check
 missing information, the canonical logo and site icon, pending gallery state,
-the five-minute decorative SVG phase morph, CSS motion, keyboard-operable mobile menu
-navigation and close-on-selection, destination focus, keyboard skip navigation,
-runtime errors, layout overflow from 320px through wide desktop at 200% text
-scaling, reduced motion and axe WCAG A/AA rules. Desktop and mobile projects
+the 120-second waxing-crescent SVG phase morph and fixed tilt, CSS orbit periods,
+satellite positions on their ellipse paths, layered nebula and aurora motion,
+keyboard-operable mobile menu navigation and close-on-selection, destination
+focus, keyboard skip navigation, runtime errors, layout overflow from 320px
+through wide desktop at 200% text scaling, reduced motion and axe WCAG A/AA
+rules. Desktop and mobile projects
 both use Chromium; this is not Safari or Firefox coverage.
 
 To validate the GitHub Pages output locally on PowerShell:

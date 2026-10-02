@@ -2,12 +2,15 @@ import { render } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   getCycleFraction,
+  getPhaseFraction,
   getShadowPath,
   getShadowTransform,
+  INITIAL_PHASE,
   LUNAR_CYCLE_DURATION_MS,
   LunarPhaseScene,
   LunarPhaseVisual,
   REDUCED_MOTION_PHASE,
+  SHADOW_TILT_DEGREES,
 } from "@/components/lunar-phase-scene";
 
 beforeEach(() => {
@@ -27,22 +30,36 @@ afterEach(() => {
 });
 
 describe("hero phase cycle", () => {
-  it("maps 0, 75, 150, 225 and 300 seconds to one seamless cycle", () => {
-    const fractions = [0, 75_000, 150_000, 225_000, 300_000].map(
+  it("starts waxing crescent and completes a seamless 120-second cycle", () => {
+    const fractions = [0, 30_000, 60_000, 90_000, 120_000].map(
+      getPhaseFraction,
+    );
+    const cycleFractions = [0, 30_000, 60_000, 90_000, 120_000].map(
       getCycleFraction,
     );
 
-    expect(LUNAR_CYCLE_DURATION_MS).toBe(300_000);
-    expect(fractions).toEqual([0, 0.25, 0.5, 0.75, 0]);
+    expect(LUNAR_CYCLE_DURATION_MS).toBe(120_000);
+    expect(INITIAL_PHASE).toBe(0.125);
+    expect(fractions).toEqual([0.125, 0.375, 0.625, 0.875, 0.125]);
+    expect(cycleFractions).toEqual([0, 0.25, 0.5, 0.75, 0]);
+    expect(getShadowPath(fractions[0] ?? 0)).toBe(
+      getShadowPath(fractions[4] ?? 0),
+    );
+    expect(getShadowTransform(fractions[0] ?? 0)).toBe(
+      getShadowTransform(fractions[4] ?? 0),
+    );
+    expect(getShadowPath(fractions[0] ?? 0)).not.toBe(
+      getShadowPath(fractions[2] ?? 0),
+    );
   });
 
-  it("changes terminator geometry and mirrors only the waning phases", () => {
+  it("morphs through the cycle and mirrors only the waning phases", () => {
     const fractions = [
-      0,
-      0.25,
-      0.5,
-      0.75,
-      getCycleFraction(LUNAR_CYCLE_DURATION_MS),
+      0.125,
+      0.375,
+      0.625,
+      0.875,
+      getPhaseFraction(LUNAR_CYCLE_DURATION_MS),
     ];
     const states = fractions.map((fraction) => ({
       path: getShadowPath(fraction),
@@ -51,12 +68,13 @@ describe("hero phase cycle", () => {
 
     expect(states[0]).toEqual(states[4]);
     expect(states[0]?.path).not.toBe(states[1]?.path);
-    expect(states[1]?.path).not.toBe(states[2]?.path);
-    expect(states[1]?.path).toBe(states[3]?.path);
+    expect(states[1]?.path).toBe(states[2]?.path);
+    expect(states[1]?.direction).not.toBe(states[2]?.direction);
+    expect(states[0]?.path).toBe(states[4]?.path);
     expect(states.map((state) => state.direction)).toEqual([
       null,
       null,
-      null,
+      "translate(100 0) scale(-1 1)",
       "translate(100 0) scale(-1 1)",
       null,
     ]);
@@ -73,10 +91,10 @@ describe("lunar phase visual", () => {
     const { container } = render(<LunarPhaseVisual />);
     const moon = container.querySelector(".moon");
 
-    expect(moon).toHaveAttribute("data-phase", "first-quarter");
-    expect(moon).toHaveAttribute("data-illumination", "0.500");
-    expect(moon).toHaveAttribute("data-cycle-position", "0.250");
-    expect(moon).toHaveAttribute("data-cycle-duration", "300000");
+    expect(moon).toHaveAttribute("data-phase", "waxing-crescent");
+    expect(moon).toHaveAttribute("data-illumination", "0.146");
+    expect(moon).toHaveAttribute("data-cycle-position", "0.125");
+    expect(moon).toHaveAttribute("data-cycle-duration", "120000");
     expect(
       container.querySelector(".planet-shadow-morph path"),
     ).toHaveAttribute("d", getShadowPath(REDUCED_MOTION_PHASE));
@@ -86,6 +104,23 @@ describe("lunar phase visual", () => {
       "true",
     );
     expect(container.querySelectorAll(".orbiting-body")).toHaveLength(3);
+    expect(container.querySelectorAll("animateMotion")).toHaveLength(3);
+    expect(
+      [...container.querySelectorAll("animateMotion")].map((motion) =>
+        motion.getAttribute("dur"),
+      ),
+    ).toEqual(["72s", "103s", "137s"]);
+    expect(
+      [...container.querySelectorAll("animateMotion")].map((motion) =>
+        motion.getAttribute("begin"),
+      ),
+    ).toEqual(["-5.76s", "-44.29s", "-104.12s"]);
+    expect(container.querySelectorAll(".orbit-line")).toHaveLength(3);
+    expect(container.querySelector(".planet-shadow-morph")).toHaveAttribute(
+      "transform",
+      `rotate(${SHADOW_TILT_DEGREES} 50 50)`,
+    );
+    expect(SHADOW_TILT_DEGREES).toBe(12);
   });
 
   it("renders the official texture without attaching phase transforms to it", () => {
@@ -95,5 +130,12 @@ describe("lunar phase visual", () => {
     expect(texture).toHaveAttribute("href", "/space/lunar-surface.png");
     expect(texture).not.toHaveAttribute("transform");
     expect(container.querySelector(".planet-shadow-morph")).toBeInTheDocument();
+  });
+
+  it("renders layered aurora and nebula atmosphere", () => {
+    const { container } = render(<LunarPhaseScene />);
+
+    expect(container.querySelector(".aurora-curtains")).toBeInTheDocument();
+    expect(container.querySelectorAll(".nebula-layer")).toHaveLength(2);
   });
 });

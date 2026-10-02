@@ -111,7 +111,7 @@ export default function Home() {
             />
             <span>
               <strong>Celenas SMP</strong>
-              <small>A world, over time</small>
+              <small>Minecraft survival, over time</small>
             </span>
           </div>
           <div className="split-layout">
@@ -264,7 +264,7 @@ export default function Home() {
         <Link href="/" aria-label="Celenas SMP ホーム">
           Celenas SMP
         </Link>
-        <p>A shared world, shaped over time.</p>
+        <p>Celenas SMP — A Minecraft world built over time.</p>
       </footer>
     </>
   );

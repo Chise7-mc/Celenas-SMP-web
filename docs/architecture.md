@@ -14,7 +14,7 @@ Internal anchors provide navigation without a custom library.
 | `src/app/icon.png`                     | Canonical Celenas logo used as the site icon              |
 | `src/components/community-details.tsx` | Configured / unavailable participation details            |
 | `src/components/glass-surface.tsx`     | Shared glass interaction surface                          |
-| `src/components/lunar-phase-scene.tsx` | Client boundary for the Hero's 300-second SVG phase morph |
+| `src/components/lunar-phase-scene.tsx` | Client boundary for the Hero's 120-second SVG phase morph |
 | `src/components/mobile-navigation.tsx` | Small client boundary for closing mobile navigation       |
 | `src/config/site.ts`                   | Reviewed, public product configuration                    |
 | `src/content/home.ts`                  | Editable editorial copy and approved gallery entries      |
@@ -44,9 +44,10 @@ The glass surface is a small server component backed by shared CSS tokens.
 Desktop navigation is server-rendered. Mobile navigation is a small client
 boundary only to close the menu after selection, update the hash and focus its
 destination. One small client scene updates the SVG terminator path directly on
-a 300-second cycle without React state updates each frame. CSS handles the
-ambient, orbit and other decorative motion. The Hero does not use date-based
-lunar data, an API or geolocation.
+a 120-second cycle from a waxing crescent without React state updates each
+frame. CSS handles the ambient, nebula and aurora; SVG motion paths handle the
+three satellites. The Hero does not use date-based lunar data, an API or
+geolocation.
 
 ## GitHub Pages deployment
 

@@ -4,8 +4,40 @@ import { useEffect, useRef } from "react";
 import type { CSSProperties } from "react";
 import { withBasePath } from "@/lib/asset-path";
 
-export const LUNAR_CYCLE_DURATION_MS = 300_000;
-export const REDUCED_MOTION_PHASE = 0.25;
+export const LUNAR_CYCLE_DURATION_MS = 120_000;
+export const INITIAL_PHASE = 0.125;
+export const REDUCED_MOTION_PHASE = INITIAL_PHASE;
+export const SHADOW_TILT_DEGREES = 12;
+
+const ORBITING_BODIES = [
+  {
+    id: "orbit-one",
+    path: "M 500 200 A 630 300 0 1 0 500 800 A 630 300 0 1 0 500 200",
+    rotation: -32,
+    duration: "72s",
+    begin: "-5.76s",
+    radius: 3.1,
+    satelliteClass: "satellite-one",
+  },
+  {
+    id: "orbit-two",
+    path: "M 500 120 A 540 380 0 1 0 500 880 A 540 380 0 1 0 500 120",
+    rotation: 54,
+    duration: "103s",
+    begin: "-44.29s",
+    radius: 3.8,
+    satelliteClass: "satellite-two",
+  },
+  {
+    id: "orbit-three",
+    path: "M 500 -130 A 430 630 0 1 0 500 1130 A 430 630 0 1 0 500 -130",
+    rotation: -36,
+    duration: "137s",
+    begin: "-104.12s",
+    radius: 2.5,
+    satelliteClass: "satellite-three",
+  },
+] as const;
 
 type SceneStyle = CSSProperties & {
   "--moon-glow-opacity": string;
@@ -16,26 +48,22 @@ type SceneStyle = CSSProperties & {
 };
 
 const INITIAL_SCENE_STYLE: SceneStyle = {
-  "--moon-glow-opacity": "0.060",
-  "--moonlight-opacity": "0.200",
-  "--star-field-far-opacity": "0.440",
-  "--star-field-mid-opacity": "0.600",
-  "--stardust-opacity": "0.240",
+  "--moon-glow-opacity": "0.078",
+  "--moonlight-opacity": "0.244",
+  "--star-field-far-opacity": "0.425",
+  "--star-field-mid-opacity": "0.583",
+  "--stardust-opacity": "0.228",
 };
 
 export function getCycleFraction(elapsedMs: number): number {
   const cyclePosition =
     ((elapsedMs % LUNAR_CYCLE_DURATION_MS) + LUNAR_CYCLE_DURATION_MS) %
     LUNAR_CYCLE_DURATION_MS;
-  const frameDuration = 1000 / 60;
-
-  if (
-    cyclePosition < frameDuration ||
-    LUNAR_CYCLE_DURATION_MS - cyclePosition < frameDuration
-  ) {
-    return 0;
-  }
   return cyclePosition / LUNAR_CYCLE_DURATION_MS;
+}
+
+export function getPhaseFraction(elapsedMs: number): number {
+  return (getCycleFraction(elapsedMs) + INITIAL_PHASE) % 1;
 }
 
 export function getShadowPath(phaseFraction: number): string {
@@ -74,15 +102,17 @@ function getIllumination(phaseFraction: number): number {
 export function LunarPhaseVisual() {
   const sceneRef = useRef<HTMLDivElement>(null);
   const moonRef = useRef<HTMLSpanElement>(null);
+  const orbitsRef = useRef<SVGSVGElement>(null);
   const shadowDirectionRef = useRef<SVGGElement>(null);
   const shadowPathRef = useRef<SVGPathElement>(null);
 
   useEffect(() => {
     const scene = sceneRef.current;
     const moon = moonRef.current;
+    const orbits = orbitsRef.current;
     const direction = shadowDirectionRef.current;
     const shadow = shadowPathRef.current;
-    if (!scene || !moon || !direction || !shadow) return;
+    if (!scene || !moon || !orbits || !direction || !shadow) return;
 
     const motionPreference = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
@@ -127,7 +157,7 @@ export function LunarPhaseVisual() {
 
     const animate = (timestamp: number) => {
       cycleStart ??= timestamp;
-      updatePhase(getCycleFraction(timestamp - cycleStart));
+      updatePhase(getPhaseFraction(timestamp - cycleStart));
       animationFrame = window.requestAnimationFrame(animate);
     };
 
@@ -143,8 +173,14 @@ export function LunarPhaseVisual() {
       }
 
       if (motionPreference.matches) {
+        if (typeof orbits.pauseAnimations === "function") {
+          orbits.pauseAnimations();
+        }
         updatePhase(REDUCED_MOTION_PHASE);
       } else {
+        if (typeof orbits.unpauseAnimations === "function") {
+          orbits.unpauseAnimations();
+        }
         startAnimation();
       }
     };
@@ -166,10 +202,13 @@ export function LunarPhaseVisual() {
       ref={sceneRef}
       style={INITIAL_SCENE_STYLE}
       data-cycle-duration={LUNAR_CYCLE_DURATION_MS}
+      data-initial-phase={INITIAL_PHASE}
     >
       <div className="star-field star-field-far" />
+      <div className="nebula-layer nebula-far" />
       <div className="stardust-layer stardust-far" />
       <div className="star-field star-field-mid" />
+      <div className="nebula-layer nebula-mid" />
       <div className="stardust-layer stardust-mid" />
       <div className="star-accents">
         <span className="star-twinkle star-twinkle-one" />
@@ -217,12 +256,45 @@ export function LunarPhaseVisual() {
         </g>
       </svg>
       <div className="celestial-stage">
+        <svg
+          ref={orbitsRef}
+          className="celestial-orbits"
+          viewBox="0 0 1000 1000"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <defs>
+            {ORBITING_BODIES.map((orbit) => (
+              <path key={orbit.id} id={`${orbit.id}-path`} d={orbit.path} />
+            ))}
+          </defs>
+          {ORBITING_BODIES.map((orbit) => (
+            <g key={orbit.id} transform={`rotate(${orbit.rotation} 500 500)`}>
+              <use href={`#${orbit.id}-path`} className="orbit-line" />
+              <circle
+                className={`orbiting-body ${orbit.satelliteClass}`}
+                cx="0"
+                cy="0"
+                r={orbit.radius}
+              >
+                <animateMotion
+                  dur={orbit.duration}
+                  begin={orbit.begin}
+                  repeatCount="indefinite"
+                  calcMode="paced"
+                >
+                  <mpath href={`#${orbit.id}-path`} />
+                </animateMotion>
+              </circle>
+            </g>
+          ))}
+        </svg>
         <span
           className="moon"
           ref={moonRef}
-          data-phase="new"
-          data-illumination="0.000"
-          data-cycle-position="0.000"
+          data-phase="waxing-crescent"
+          data-illumination={getIllumination(INITIAL_PHASE).toFixed(3)}
+          data-cycle-position={INITIAL_PHASE.toFixed(3)}
           data-cycle-duration={LUNAR_CYCLE_DURATION_MS}
         >
           <svg
@@ -259,11 +331,14 @@ export function LunarPhaseVisual() {
                 height="98"
                 preserveAspectRatio="xMidYMid slice"
               />
-              <g className="planet-shadow-morph">
+              <g
+                className="planet-shadow-morph"
+                transform={`rotate(${SHADOW_TILT_DEGREES} 50 50)`}
+              >
                 <g ref={shadowDirectionRef}>
                   <path
                     ref={shadowPathRef}
-                    d={getShadowPath(0)}
+                    d={getShadowPath(INITIAL_PHASE)}
                     fill="url(#moon-shadow)"
                     opacity="0.94"
                     filter="url(#moon-terminator-soft)"
@@ -272,15 +347,6 @@ export function LunarPhaseVisual() {
               </g>
             </g>
           </svg>
-        </span>
-        <span className="orbit orbit-one">
-          <span className="orbiting-body orbiting-body-one" />
-        </span>
-        <span className="orbit orbit-two">
-          <span className="orbiting-body orbiting-body-two" />
-        </span>
-        <span className="orbit orbit-three">
-          <span className="orbiting-body orbiting-body-three" />
         </span>
       </div>
       <div className="stardust-layer stardust-near" />

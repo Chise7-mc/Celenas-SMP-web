@@ -16,11 +16,12 @@ The site remains intentionally modest about unverified server/community data and
 keeps confirmed values separate from pending placeholders.
 
 The Hero pairs the official mark with a fictional gas giant, a soft-edged SVG
-phase mask, and three fixed CSS orbit paths with one satellite each. The white
-satellites keep separate five-, six-, and four-minute periods. A local SVG path
-morphs the planetary shadow through a five-minute phase cycle without moving
-the texture or orbit paths. Aurora-like periwinkle curtains replace the former
-diffuse halo. The page uses black, white, and one periwinkle accent.
+phase mask, and three enlarged SVG ellipse paths with one satellite each. The
+satellites follow their matching ellipse at distinct 72-, 103-, and 137-second
+periods. A local SVG path morphs the planetary shadow through a 120-second
+cycle from waxing crescent, with a fixed 12-degree tilt and no texture motion.
+Layered CSS nebula and slow periwinkle aurora add depth while keeping the copy
+side dark. The page uses black, white, and one periwinkle accent.
 The planet's restrained amber cloud bands stay within the illustration. The
 scene is decorative, not a substitute logo or a representation of the actual
 Minecraft world. World themes are editorial
@@ -43,15 +44,15 @@ not turn every section into a card.
 Use system sans-serif for copy and monospace only for connection addresses.
 The page uses a floating desktop glass header and an accessible expandable
 mobile menu. The Hero combines a large official mark with a fictional gas
-giant: a banded cloud texture masked by SVG terminator geometry,
+giant: a banded cloud texture masked by fixed-tilt SVG terminator geometry,
 deterministic far/mid star layers, a few asynchronously twinkling white stars,
-three deterministic radial-gradient stardust depth layers, animated aurora,
-fixed orbit rings with white orbiting satellites, and a slowly moving planetary
-shadow.
+three deterministic radial-gradient stardust depth layers, CSS nebula, animated
+aurora, three fixed SVG paths with white orbiting satellites, and a slowly
+morphing planetary shadow.
 Stardust opacity responds subtly to the animated phase;
 its layers drift with transforms rather than animating individual particles or
 background positions. Motion is intentionally low-key and is disabled when the
-user requests reduced motion, while a static quarter-phase shape, atmosphere
+user requests reduced motion, while a static waxing-crescent shape, atmosphere
 and dust remain visible. The client boundary updates one SVG shadow path without
 React state updates each frame. No animation library is needed; see
 [lunar phase](lunar-phase.md).
