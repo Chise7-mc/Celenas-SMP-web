@@ -1225,6 +1225,10 @@ h3 {
   box-shadow: 0 0 0 0.24rem rgba(167, 181, 255, 0.12);
 }
 
+.orbital-section-link[aria-current="location"] .orbital-section-node {
+  opacity: 0;
+}
+
 .orbital-active-satellite {
   position: absolute;
   z-index: 1;

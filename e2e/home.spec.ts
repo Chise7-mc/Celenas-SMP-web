@@ -135,6 +135,67 @@ test("celestial journey tracks sections and orbital links navigate accessibly", 
   await expect(orbital).toBeVisible();
   await expect(orbital.getByRole("link")).toHaveCount(6);
   await expect(atmosphere).toHaveAttribute("data-stage", "hero");
+  await expect(orbital.locator(".orbital-section-node")).toHaveCount(6);
+  await expect(
+    orbital.locator('.orbital-section-link[aria-current="location"]'),
+  ).toHaveCount(0);
+  const heroMarker = await orbital
+    .locator(".orbital-active-satellite")
+    .evaluate((marker) => ({
+      left: (marker as HTMLElement).style.left,
+      top: (marker as HTMLElement).style.top,
+    }));
+  expect(heroMarker).toEqual({ left: "47%", top: "8%" });
+
+  async function expectMarkerAligned(href: string) {
+    await expect(orbital.locator('a[href="' + href + '"]')).toHaveAttribute(
+      "aria-current",
+      "location",
+    );
+    await expect
+      .poll(() =>
+        page.evaluate((targetHref) => {
+          const link = document.querySelector<HTMLAnchorElement>(
+            '.orbital-section-link[href="' + targetHref + '"]',
+          );
+          const marker = document.querySelector<HTMLElement>(
+            ".orbital-active-satellite",
+          );
+          const node = link?.querySelector<HTMLElement>(
+            ".orbital-section-node",
+          );
+          if (!link || !marker || !node) {
+            throw new Error("Missing orbital marker");
+          }
+          const markerRect = marker.getBoundingClientRect();
+          const nodeRect = link.getBoundingClientRect();
+          return {
+            horizontal:
+              Math.abs(
+                markerRect.left +
+                  markerRect.width / 2 -
+                  (nodeRect.left + nodeRect.width / 2),
+              ) <= 1,
+            vertical:
+              Math.abs(
+                markerRect.top +
+                  markerRect.height / 2 -
+                  (nodeRect.top + nodeRect.height / 2),
+              ) <= 1,
+            nodeOpacity: getComputedStyle(node).opacity,
+            currentHref: document
+              .querySelector('.orbital-section-link[aria-current="location"]')
+              ?.getAttribute("href"),
+          };
+        }, href),
+      )
+      .toEqual({
+        horizontal: true,
+        vertical: true,
+        nodeOpacity: "0",
+        currentHref: href,
+      });
+  }
 
   const destinations = [
     ["01 About", "#about"],
@@ -152,6 +213,7 @@ test("celestial journey tracks sections and orbital links navigate accessibly", 
     await expect(page.locator(hash)).toBeFocused();
     await expect(link).toHaveAttribute("aria-current", "location");
     await expect(atmosphere).toHaveAttribute("data-stage", hash.slice(1));
+    await expectMarkerAligned(hash);
   }
 
   await page.goBack();
@@ -161,6 +223,20 @@ test("celestial journey tracks sections and orbital links navigate accessibly", 
   await page.goForward();
   await expect(page).toHaveURL(/#join$/);
   await expect(page.locator("#join")).toBeFocused();
+  await expectMarkerAligned("#join");
+
+  for (const [width, height] of [
+    [1920, 1080],
+    [1440, 900],
+    [1366, 768],
+  ] as const) {
+    await page.setViewportSize({ width, height });
+    await expect(orbital).toBeVisible();
+    for (const href of ["#about", "#world", "#gallery", "#join"]) {
+      await orbital.locator('a[href="' + href + '"]').click();
+      await expectMarkerAligned(href);
+    }
+  }
 });
 
 test("celestial journey supports direct hashes and keeps mobile navigation", async ({

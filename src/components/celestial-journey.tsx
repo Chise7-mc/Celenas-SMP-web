@@ -38,43 +38,49 @@ export function CelestialJourney() {
       section.scrollIntoView({ block: "start" });
     };
 
-    const observer = new IntersectionObserver(
-      () => {
-        const activeLine = window.innerHeight * 0.4;
-        const visibleSections = observedSections
-          .map((section) => ({
-            section,
-            rect: section.getBoundingClientRect(),
-          }))
-          .filter(
-            ({ rect }) => rect.bottom > 0 && rect.top < window.innerHeight,
-          );
-        const activeSection =
-          visibleSections.find(
+    const updateActiveSection = () => {
+      const activeLine = window.innerHeight * 0.4;
+      const isAtPageEnd =
+        window.scrollY + window.innerHeight >=
+        document.documentElement.scrollHeight - 2;
+      const visibleSections = observedSections
+        .map((section) => ({
+          section,
+          rect: section.getBoundingClientRect(),
+        }))
+        .filter(({ rect }) => rect.bottom > 0 && rect.top < window.innerHeight);
+      const activeSection = isAtPageEnd
+        ? observedSections.at(-1)
+        : (visibleSections.find(
             ({ rect }) => rect.top <= activeLine && rect.bottom > activeLine,
           )?.section ??
           visibleSections.sort(
             (first, second) =>
               Math.abs(first.rect.top - activeLine) -
               Math.abs(second.rect.top - activeLine),
-          )[0]?.section;
+          )[0]?.section);
 
-        if (!activeSection) return;
-        setActiveStage(activeSection.id);
-        setActiveHref(
-          activeSection.id === "hero" ? null : "#" + activeSection.id,
-        );
-      },
-      { rootMargin: "-35% 0px -35% 0px", threshold: 0 },
-    );
+      if (!activeSection) return;
+      setActiveStage(activeSection.id);
+      setActiveHref(
+        activeSection.id === "hero" ? null : "#" + activeSection.id,
+      );
+    };
+
+    const observer = new IntersectionObserver(updateActiveSection, {
+      rootMargin: "-35% 0px -35% 0px",
+      threshold: 0,
+    });
 
     observedSections.forEach((section) => observer.observe(section));
+    window.addEventListener("scrollend", updateActiveSection);
     window.addEventListener("popstate", navigateFromHistory);
     window.addEventListener("hashchange", navigateFromHistory);
     navigateFromHistory();
 
     return () => {
       observer.disconnect();
+      window.removeEventListener("scrollend", updateActiveSection);
       window.removeEventListener("popstate", navigateFromHistory);
       window.removeEventListener("hashchange", navigateFromHistory);
     };
@@ -96,7 +102,11 @@ export function CelestialJourney() {
   }
 
   const activeIndex = navigation.findIndex(({ href }) => href === activeHref);
-  const marker = markerPositions[Math.max(0, activeIndex)] ?? { x: 47, y: 8 };
+  const heroMarker = markerPositions[0] ?? { x: 47, y: 8 };
+  const marker =
+    activeIndex >= 0
+      ? (markerPositions[activeIndex + 1] ?? heroMarker)
+      : heroMarker;
 
   return (
     <>
@@ -132,8 +142,8 @@ export function CelestialJourney() {
             key={item.href}
             href={item.href}
             style={{
-              left: (markerPositions[index + 1] ?? { x: 47, y: 8 }).x + "%",
-              top: (markerPositions[index + 1] ?? { x: 47, y: 8 }).y + "%",
+              left: (markerPositions[index + 1] ?? heroMarker).x + "%",
+              top: (markerPositions[index + 1] ?? heroMarker).y + "%",
             }}
             aria-label={String(index + 1).padStart(2, "0") + " " + item.label}
             aria-current={activeHref === item.href ? "location" : undefined}
