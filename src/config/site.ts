@@ -6,7 +6,8 @@ export type CommunityConnection = Readonly<{
 
 export const site = {
   name: "Celenas SMP",
-  description: "Celenas SMP — Minecraft コミュニティの案内サイト。",
+  description:
+    "Celenas SMP — Minecraftで、ひとつの世界を時間をかけて育てていくコミュニティ。",
   connection: {
     serverAddress: null,
     minecraftVersion: null,

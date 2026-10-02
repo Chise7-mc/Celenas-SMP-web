@@ -34,7 +34,7 @@ decorative SVG output and phase-driven atmospheric CSS properties.
 
 Browser tests load the production page, follow the participation anchor, check
 missing information, the canonical logo and site icon, pending gallery state,
-the date-driven decorative lunar SVG, CSS motion, keyboard-operable mobile menu
+the five-minute decorative SVG phase morph, CSS motion, keyboard-operable mobile menu
 navigation and close-on-selection, destination focus, keyboard skip navigation,
 runtime errors, layout overflow from 320px through wide desktop at 200% text
 scaling, reduced motion and axe WCAG A/AA rules. Desktop and mobile projects

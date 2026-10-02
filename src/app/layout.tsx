@@ -4,10 +4,10 @@ import { site } from "@/config/site";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: `${site.name} | Minecraft コミュニティ`,
+  title: `${site.name} | ひとつの世界を、時間をかけて育てていく`,
   description: site.description,
   openGraph: {
-    title: `${site.name} | Minecraft コミュニティ`,
+    title: `${site.name} | ひとつの世界を、時間をかけて育てていく`,
     description: site.description,
     siteName: site.name,
     locale: "ja_JP",
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary",
-    title: `${site.name} | Minecraft コミュニティ`,
+    title: `${site.name} | ひとつの世界を、時間をかけて育てていく`,
     description: site.description,
   },
 };

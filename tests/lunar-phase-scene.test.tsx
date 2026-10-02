@@ -1,98 +1,99 @@
 import { render } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  getCycleFraction,
+  getShadowPath,
+  getShadowTransform,
+  LUNAR_CYCLE_DURATION_MS,
   LunarPhaseScene,
   LunarPhaseVisual,
+  REDUCED_MOTION_PHASE,
 } from "@/components/lunar-phase-scene";
-import { getLunarPhase } from "@/lib/lunar-phase";
+
+beforeEach(() => {
+  vi.stubGlobal(
+    "matchMedia",
+    vi.fn(() => ({
+      matches: true,
+      media: "(prefers-reduced-motion: reduce)",
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    })),
+  );
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
+
+describe("hero phase cycle", () => {
+  it("maps 0, 75, 150, 225 and 300 seconds to one seamless cycle", () => {
+    const fractions = [0, 75_000, 150_000, 225_000, 300_000].map(
+      getCycleFraction,
+    );
+
+    expect(LUNAR_CYCLE_DURATION_MS).toBe(300_000);
+    expect(fractions).toEqual([0, 0.25, 0.5, 0.75, 0]);
+  });
+
+  it("changes terminator geometry and mirrors only the waning phases", () => {
+    const fractions = [
+      0,
+      0.25,
+      0.5,
+      0.75,
+      getCycleFraction(LUNAR_CYCLE_DURATION_MS),
+    ];
+    const states = fractions.map((fraction) => ({
+      path: getShadowPath(fraction),
+      direction: getShadowTransform(fraction),
+    }));
+
+    expect(states[0]).toEqual(states[4]);
+    expect(states[0]?.path).not.toBe(states[1]?.path);
+    expect(states[1]?.path).not.toBe(states[2]?.path);
+    expect(states[1]?.path).toBe(states[3]?.path);
+    expect(states.map((state) => state.direction)).toEqual([
+      null,
+      null,
+      null,
+      "translate(100 0) scale(-1 1)",
+      null,
+    ]);
+    expect(
+      new Set(
+        states.slice(0, 4).map((state) => `${state.path}|${state.direction}`),
+      ).size,
+    ).toBe(4);
+  });
+});
 
 describe("lunar phase visual", () => {
-  it("renders a decorative SVG and phase-driven atmosphere", () => {
-    const phase = getLunarPhase(new Date("2001-01-24T13:07:00.000Z"));
-    const { container } = render(<LunarPhaseVisual phase={phase} />);
+  it("keeps the fictional planet and displays a static phase for reduced motion", () => {
+    const { container } = render(<LunarPhaseVisual />);
     const moon = container.querySelector(".moon");
 
-    expect(moon).toHaveAttribute("data-phase", "new");
+    expect(moon).toHaveAttribute("data-phase", "first-quarter");
+    expect(moon).toHaveAttribute("data-illumination", "0.500");
+    expect(moon).toHaveAttribute("data-cycle-position", "0.250");
+    expect(moon).toHaveAttribute("data-cycle-duration", "300000");
+    expect(
+      container.querySelector(".planet-shadow-morph path"),
+    ).toHaveAttribute("d", getShadowPath(REDUCED_MOTION_PHASE));
     expect(container.querySelector("[role='img']")).toBeNull();
-    expect(container.querySelector("svg")).toHaveAttribute(
+    expect(container.querySelector(".moon-svg")).toHaveAttribute(
       "aria-hidden",
       "true",
     );
-    expect(container.querySelector("svg")).toHaveAttribute(
-      "viewBox",
-      "0 0 100 100",
-    );
-    expect(container.querySelector(".celestial-scene")).toHaveStyle({
-      "--moon-glow-opacity": "0.060",
-      "--moonlight-opacity": "0.200",
-      "--star-field-far-opacity": "0.440",
-      "--stardust-opacity": "0.240",
-    });
-    expect(container.querySelectorAll(".stardust-layer")).toHaveLength(3);
-  });
-
-  it("renders distinct illumination and waxing direction for each phase", () => {
-    const newMoon = getLunarPhase(new Date("2001-01-24T13:07:00.000Z"));
-    const firstQuarterDate = new Date(
-      Date.parse("2001-01-24T13:07:00.000Z") +
-        29.530588 * 24 * 60 * 60 * 1000 * 0.25,
-    );
-    const firstQuarter = getLunarPhase(firstQuarterDate);
-    const waningCrescentDate = new Date(
-      Date.parse("2001-01-24T13:07:00.000Z") +
-        29.530588 * 24 * 60 * 60 * 1000 * 0.875,
-    );
-    const waningCrescent = getLunarPhase(waningCrescentDate);
-    const fullMoonDate = new Date(
-      Date.parse("2001-01-24T13:07:00.000Z") +
-        29.530588 * 24 * 60 * 60 * 1000 * 0.5,
-    );
-    const fullMoon = getLunarPhase(fullMoonDate);
-
-    const { container, rerender } = render(
-      <LunarPhaseVisual phase={newMoon} />,
-    );
-    const moon = container.querySelector(".moon");
-    expect(moon).toHaveAttribute("data-illumination", "0.000");
-    expect(
-      container.querySelector(".planet-shadow-sway > g"),
-    ).not.toHaveAttribute("transform");
-
-    rerender(<LunarPhaseVisual phase={firstQuarter} />);
-    expect(moon).toHaveAttribute("data-phase", "first-quarter");
-    expect(
-      container.querySelector(".planet-shadow-sway > g"),
-    ).not.toHaveAttribute("transform");
-    expect(moon).toHaveAttribute("data-illumination", "0.500");
-
-    rerender(<LunarPhaseVisual phase={waningCrescent} />);
-    expect(moon).toHaveAttribute("data-phase", "waning-crescent");
-    expect(moon).toHaveAttribute("data-illumination", "0.146");
-    expect(container.querySelector(".planet-shadow-sway > g")).toHaveAttribute(
-      "transform",
-      "translate(100 0) scale(-1 1)",
-    );
-
-    rerender(<LunarPhaseVisual phase={fullMoon} />);
-    expect(moon).toHaveAttribute("data-phase", "full");
-    expect(moon).toHaveAttribute("data-illumination", "1.000");
-    expect(container.querySelector(".celestial-scene")).toHaveStyle({
-      "--stardust-opacity": "0.160",
-    });
-  });
-
-  it("keeps the supplied phase stable for CSS-led shadow motion", () => {
-    const initialPhase = getLunarPhase(new Date("2001-01-24T13:07:00.000Z"));
-    const { container } = render(
-      <LunarPhaseScene initialPhase={initialPhase} />,
-    );
-    expect(container.querySelector(".moon")).toHaveAttribute(
-      "data-phase",
-      "new",
-    );
     expect(container.querySelectorAll(".orbiting-body")).toHaveLength(3);
-    expect(
-      container.querySelector(".planet-shadow-sway > g > path"),
-    ).toBeTruthy();
+  });
+
+  it("renders the official texture without attaching phase transforms to it", () => {
+    const { container } = render(<LunarPhaseScene />);
+    const texture = container.querySelector(".moon image");
+
+    expect(texture).toHaveAttribute("href", "/space/lunar-surface.png");
+    expect(texture).not.toHaveAttribute("transform");
+    expect(container.querySelector(".planet-shadow-morph")).toBeInTheDocument();
   });
 });

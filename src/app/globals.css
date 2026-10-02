@@ -824,13 +824,6 @@ h3 {
   overflow: visible;
 }
 
-.planet-shadow-sway {
-  transform-box: view-box;
-  transform-origin: 50% 50%;
-  rotate: 0deg;
-  animation: shadow-waver 300s linear infinite;
-}
-
 .orbit {
   position: absolute;
   width: 88%;
@@ -1331,15 +1324,6 @@ h3 {
   }
   50% {
     transform: translateY(-5px);
-  }
-}
-
-@keyframes shadow-waver {
-  0% {
-    rotate: -12deg;
-  }
-  100% {
-    rotate: 348deg;
   }
 }
 

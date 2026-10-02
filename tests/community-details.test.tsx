@@ -14,9 +14,9 @@ describe("community information", () => {
       />,
     );
 
-    expect(screen.getByText("サーバーアドレスは準備中です。")).toBeVisible();
-    expect(screen.getByText("対応バージョンは準備中です。")).toBeVisible();
-    expect(screen.getByText("Discord の案内は準備中です。")).toBeVisible();
+    expect(screen.getByText("接続先は公開準備中です。")).toBeVisible();
+    expect(screen.getByText("対応バージョンは確認中です。")).toBeVisible();
+    expect(screen.getByText("Discordの案内は準備中です。")).toBeVisible();
     expect(screen.queryByRole("link")).not.toBeInTheDocument();
   });
 

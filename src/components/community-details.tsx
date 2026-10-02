@@ -13,13 +13,13 @@ export function CommunityDetails({
           {connection.serverAddress ? (
             <code>{connection.serverAddress}</code>
           ) : (
-            "サーバーアドレスは準備中です。"
+            "接続先は公開準備中です。"
           )}
         </dd>
       </div>
       <div>
         <dt>Minecraft バージョン</dt>
-        <dd>{connection.minecraftVersion || "対応バージョンは準備中です。"}</dd>
+        <dd>{connection.minecraftVersion || "対応バージョンは確認中です。"}</dd>
       </div>
       <div>
         <dt>コミュニティ</dt>
@@ -29,7 +29,7 @@ export function CommunityDetails({
               Discord コミュニティへ参加 ↗
             </a>
           ) : (
-            "Discord の案内は準備中です。"
+            "Discordの案内は準備中です。"
           )}
         </dd>
       </div>

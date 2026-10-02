@@ -9,11 +9,8 @@ import { site } from "@/config/site";
 import { homeContent } from "@/content/home";
 import { navigation } from "@/content/navigation";
 import { withBasePath } from "@/lib/asset-path";
-import { getLunarPhase } from "@/lib/lunar-phase";
 
 export default function Home() {
-  const initialPhase = getLunarPhase(new Date());
-
   return (
     <>
       <a className="skip-link" href="#main">
@@ -81,15 +78,15 @@ export default function Home() {
             </div>
             <p className="hero-note">
               <span className="status-indicator" aria-hidden="true" />
-              参加方法は準備中
+              接続情報は準備中
             </p>
           </div>
 
           <div className="hero-visual" aria-hidden="true">
-            <LunarPhaseScene initialPhase={initialPhase} />
+            <LunarPhaseScene />
           </div>
           <a className="scroll-cue" href="#about">
-            Discover <span aria-hidden="true">↓</span>
+            About Celenas <span aria-hidden="true">↓</span>
           </a>
         </section>
 
@@ -114,7 +111,7 @@ export default function Home() {
             />
             <span>
               <strong>Celenas SMP</strong>
-              <small>Moonlit community</small>
+              <small>A world, over time</small>
             </span>
           </div>
           <div className="split-layout">
@@ -165,13 +162,13 @@ export default function Home() {
         >
           <SectionHeading
             id="community-title"
-            eyebrow="Server / Community"
+            eyebrow="Community / Connection"
             title={homeContent.community.title}
             description={homeContent.community.description}
           />
           <div className="community-layout">
             <GlassSurface className="community-panel">
-              <p className="panel-label">Connection details</p>
+              <p className="panel-label">Connection / Details</p>
               <CommunityDetails connection={site.connection} />
             </GlassSurface>
             <GlassSurface className="community-note">
@@ -239,11 +236,9 @@ export default function Home() {
                 <span />
               </div>
               <div>
-                <p className="panel-label">Field notes / 00</p>
+                <p className="panel-label">ARCHIVE / 00</p>
                 <h3>{homeContent.gallery.pending}</h3>
-                <p>
-                  実際の風景が届いたら、ここから Celenas の記録をお届けします。
-                </p>
+                <p>公開できる景色から、少しずつここに記録していきます。</p>
               </div>
             </GlassSurface>
           )}
@@ -269,7 +264,7 @@ export default function Home() {
         <Link href="/" aria-label="Celenas SMP ホーム">
           Celenas SMP
         </Link>
-        <p>Minecraft community / Moonlit moments, made together.</p>
+        <p>A shared world, shaped over time.</p>
       </footer>
     </>
   );

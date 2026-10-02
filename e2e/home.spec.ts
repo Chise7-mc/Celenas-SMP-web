@@ -9,17 +9,19 @@ test("home exposes honest connection details with no runtime errors", async ({
   const response = await page.goto("/");
 
   expect(response?.status()).toBe(200);
-  await expect(page).toHaveTitle("Celenas SMP | Minecraft コミュニティ");
+  await expect(page).toHaveTitle(
+    "Celenas SMP | ひとつの世界を、時間をかけて育てていく",
+  );
   await expect(
     page.getByRole("heading", { level: 1, name: "Celenas SMP" }),
   ).toBeVisible();
-  await page.getByRole("link", { name: "参加案内を見る" }).click();
+  await page.getByRole("link", { name: "参加方法を見る" }).click();
   await expect(page).toHaveURL(/#join$/);
   await expect(
-    page.getByRole("heading", { name: "参加案内", exact: true }),
+    page.getByRole("heading", { name: "この世界に加わる。", exact: true }),
   ).toBeInViewport();
   await expect(
-    page.locator("#join").getByText("サーバーアドレスは準備中です。"),
+    page.locator("#join").getByText("接続先は公開準備中です。"),
   ).toBeVisible();
   await expect(page.getByRole("link", { name: "Discord へ" })).toHaveCount(0);
   expect(errors).toEqual([]);
@@ -70,12 +72,18 @@ test("uses the canonical logo and keeps unconfirmed content pending", async ({
     3,
   );
   await expect(
-    page.getByText("サーバールールは現在、管理者確認中です。"),
+    page.getByText(
+      "正式なルールは準備中です。確定した内容をこちらに掲載します。",
+    ),
   ).toBeVisible();
-  await expect(page.getByText("ワールドの写真は準備中です。")).toBeVisible();
-  await expect(page.getByText("Moonlit base")).toHaveCount(0);
-  await expect(page.getByText("Campsite")).toHaveCount(0);
-  await expect(page.getByText(/チェストや保護の範囲/)).toHaveCount(0);
+  await expect(page.getByText("景色の記録は準備中です。")).toBeVisible();
+  await expect(
+    page.getByText("ひとつの世界を、時間をかけて育てていく。"),
+  ).toBeVisible();
+  await expect(
+    page.getByText("過ごした時間が、世界に残っていく。"),
+  ).toBeVisible();
+  await expect(page.getByText(/Java版|Bedrock版|whitelist/i)).toHaveCount(0);
 });
 
 test("mobile navigation is keyboard-operable and reaches page sections", async ({
@@ -164,22 +172,10 @@ test("hero celestial scene is decorative and uses CSS motion", async ({
     await expect(body).toHaveCSS("animation-name", "orbit-turn");
     await expect(body).toHaveCSS("animation-duration", duration);
   }
-  const shadow = page.locator(".planet-shadow-sway");
-  await expect(shadow).toHaveCSS("animation-name", "shadow-waver");
-  await expect(shadow).toHaveCSS("animation-duration", "300s");
-  expect(
-    await shadow.evaluate((element) => {
-      const animation = element.getAnimations()[0];
-      if (!animation) return false;
-      animation.pause();
-      animation.currentTime = 0;
-      const start = getComputedStyle(element).rotate;
-      animation.currentTime = 150_000;
-      const halfway = getComputedStyle(element).rotate;
-      animation.play();
-      return start !== halfway;
-    }),
-  ).toBe(true);
+  await expect(page.locator(".celestial-scene")).toHaveAttribute(
+    "data-cycle-duration",
+    "300000",
+  );
   await expect(page.locator(".aurora-curtains")).toHaveCSS(
     "animation-duration",
     "76s",
@@ -194,6 +190,26 @@ test("hero celestial scene is decorative and uses CSS motion", async ({
       return getComputedStyle(hero, "::after").animationDuration;
     }),
   ).toBe("72s");
+});
+
+test("morphs the terminator geometry without rotating the texture", async ({
+  page,
+}) => {
+  await page.goto("/");
+
+  const moon = page.locator(".moon");
+  await expect(page.locator(".celestial-scene")).toHaveAttribute(
+    "data-cycle-duration",
+    "300000",
+  );
+  const shadow = page.locator(".planet-shadow-morph path");
+  const initialPath = await shadow.getAttribute("d");
+  await expect.poll(() => shadow.getAttribute("d")).not.toBe(initialPath);
+  await expect(moon).toHaveAttribute("data-cycle-position", /^(?!0\.000)/);
+  await expect(page.locator(".moon image")).not.toHaveAttribute(
+    "transform",
+    /.+/,
+  );
 });
 
 test("has no detectable WCAG AA accessibility violations", async ({ page }) => {
@@ -221,8 +237,49 @@ test("supports narrow screens and enlarged text without horizontal overflow", as
     ).toBe(true);
   }
   await expect(
-    page.getByRole("link", { name: "参加案内を見る" }),
+    page.getByRole("link", { name: "参加方法を見る" }),
   ).toBeVisible();
+});
+
+test("keeps the planetary scene framed on target desktop and mobile sizes", async ({
+  page,
+}) => {
+  await page.goto("/");
+
+  for (const [width, height] of [
+    [1920, 1080],
+    [1440, 900],
+    [1366, 768],
+    [390, 844],
+    [375, 812],
+    [360, 800],
+    [320, 700],
+  ] as const) {
+    await page.setViewportSize({ width, height });
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+      `expected no horizontal overflow at ${width}x${height}`,
+    ).toBe(true);
+    await expect(
+      page.getByRole("link", { name: "参加方法を見る" }),
+    ).toBeVisible();
+
+    const framing = await page.locator(".moon").evaluate((moon) => {
+      const circle = moon.getBoundingClientRect();
+      const scene = moon.closest(".hero-visual")?.getBoundingClientRect();
+      return {
+        circleWidth: circle.width,
+        withinScene:
+          scene !== undefined &&
+          circle.left >= scene.left &&
+          circle.right <= scene.right,
+      };
+    });
+    expect(framing.circleWidth).toBeGreaterThan(48);
+    expect(framing.withinScene).toBe(true);
+  }
 });
 
 test("respects reduced motion", async ({ page }) => {
@@ -235,7 +292,6 @@ test("respects reduced motion", async ({ page }) => {
   ).toBe("auto");
   for (const selector of [
     ".moon",
-    ".planet-shadow-sway",
     ".aurora-curtains",
     ".orbiting-body-one",
     ".orbiting-body-two",
@@ -253,6 +309,13 @@ test("respects reduced motion", async ({ page }) => {
     }),
   ).toBe("none");
   await expect(page.locator(".moon-svg")).toBeVisible();
-  await expect(page.locator(".moon")).toHaveAttribute("data-phase", /.+/);
+  await expect(page.locator(".moon")).toHaveAttribute(
+    "data-phase",
+    "first-quarter",
+  );
+  await expect(page.locator(".moon")).toHaveAttribute(
+    "data-cycle-position",
+    "0.250",
+  );
   await expect(page.locator(".hero-logo")).toBeVisible();
 });

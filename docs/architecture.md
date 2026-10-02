@@ -7,27 +7,27 @@ It has no API routes, data collection, authentication or external runtime
 requests; small client boundaries handle the mobile menu and lunar scene.
 Internal anchors provide navigation without a custom library.
 
-| Location                               | Responsibility                                        |
-| -------------------------------------- | ----------------------------------------------------- |
-| `src/app/layout.tsx`                   | Japanese language, metadata, global styles            |
-| `src/app/page.tsx`                     | Semantic home-page composition                        |
-| `src/app/icon.png`                     | Canonical Celenas logo used as the site icon          |
-| `src/components/community-details.tsx` | Configured / unavailable participation details        |
-| `src/components/glass-surface.tsx`     | Shared glass interaction surface                      |
-| `src/components/lunar-phase-scene.tsx` | Small client boundary for date-refreshing hero scene  |
-| `src/components/mobile-navigation.tsx` | Small client boundary for closing mobile navigation   |
-| `src/config/site.ts`                   | Reviewed, public product configuration                |
-| `src/content/home.ts`                  | Editable editorial copy and approved gallery entries  |
-| `src/content/navigation.ts`            | Shared anchor navigation definitions                  |
-| `src/lib/lunar-phase.ts`               | Pure UTC lunar phase approximation                    |
-| `src/lib/asset-path.ts`                | Public asset paths for the optional Pages base path   |
-| `docs/world-assets.md`                 | Approved world screenshot asset convention            |
-| `src/styles/tokens.css`                | Shared visual tokens                                  |
-| `tests/`                               | Component behavior and lunar domain tests             |
-| `e2e/`                                 | Production page in Playwright                         |
-| `scripts/next.mjs`                     | Portable Next.js entry point with telemetry disabled  |
-| `.github/workflows/ci.yml`             | Pull request and main-branch quality gates            |
-| `.github/workflows/pages.yml`          | Independent GitHub Pages static export and deployment |
+| Location                               | Responsibility                                            |
+| -------------------------------------- | --------------------------------------------------------- |
+| `src/app/layout.tsx`                   | Japanese language, metadata, global styles                |
+| `src/app/page.tsx`                     | Semantic home-page composition                            |
+| `src/app/icon.png`                     | Canonical Celenas logo used as the site icon              |
+| `src/components/community-details.tsx` | Configured / unavailable participation details            |
+| `src/components/glass-surface.tsx`     | Shared glass interaction surface                          |
+| `src/components/lunar-phase-scene.tsx` | Client boundary for the Hero's 300-second SVG phase morph |
+| `src/components/mobile-navigation.tsx` | Small client boundary for closing mobile navigation       |
+| `src/config/site.ts`                   | Reviewed, public product configuration                    |
+| `src/content/home.ts`                  | Editable editorial copy and approved gallery entries      |
+| `src/content/navigation.ts`            | Shared anchor navigation definitions                      |
+| `src/lib/lunar-phase.ts`               | Pure UTC lunar phase approximation                        |
+| `src/lib/asset-path.ts`                | Public asset paths for the optional Pages base path       |
+| `docs/world-assets.md`                 | Approved world screenshot asset convention                |
+| `src/styles/tokens.css`                | Shared visual tokens                                      |
+| `tests/`                               | Component behavior and lunar domain tests                 |
+| `e2e/`                                 | Production page in Playwright                             |
+| `scripts/next.mjs`                     | Portable Next.js entry point with telemetry disabled      |
+| `.github/workflows/ci.yml`             | Pull request and main-branch quality gates                |
+| `.github/workflows/pages.yml`          | Independent GitHub Pages static export and deployment     |
 
 Server components are the default. Add a client boundary only for an implemented
 interaction needing browser state or APIs. Do not introduce state stores,
@@ -43,10 +43,10 @@ This is a lightweight source model, not a CMS or a source of live server data.
 The glass surface is a small server component backed by shared CSS tokens.
 Desktop navigation is server-rendered. Mobile navigation is a small client
 boundary only to close the menu after selection, update the hash and focus its
-destination. The home page computes an initial lunar phase while rendering; a
-small client scene refreshes it after hydration and every six hours. Phase
-calculation is local and UTC-based, with no API or geolocation. Hero motion is
-CSS-only.
+destination. One small client scene updates the SVG terminator path directly on
+a 300-second cycle without React state updates each frame. CSS handles the
+ambient, orbit and other decorative motion. The Hero does not use date-based
+lunar data, an API or geolocation.
 
 ## GitHub Pages deployment
 
