@@ -7,6 +7,7 @@ import {
   getShadowTransform,
   INITIAL_PHASE,
   LUNAR_CYCLE_DURATION_MS,
+  LunarPhaseBackground,
   LunarPhaseScene,
   LunarPhaseVisual,
   REDUCED_MOTION_PHASE,
@@ -133,9 +134,20 @@ describe("lunar phase visual", () => {
   });
 
   it("renders decorative deep-space layers and procedural nebula texture", () => {
-    const { container } = render(<LunarPhaseScene />);
+    const { container } = render(
+      <>
+        <LunarPhaseBackground />
+        <LunarPhaseScene />
+      </>,
+    );
 
+    expect(
+      container.querySelector(".hero-space-background"),
+    ).toBeInTheDocument();
     expect(container.querySelector(".deep-space-backdrop")).toBeInTheDocument();
+    expect(
+      container.querySelector(".celestial-scene .deep-space-backdrop"),
+    ).toBeNull();
     expect(container.querySelector(".aurora-curtains")).toBeInTheDocument();
     const nebula = container.querySelector(".deep-space-nebula");
     expect(nebula).toHaveAttribute("aria-hidden", "true");

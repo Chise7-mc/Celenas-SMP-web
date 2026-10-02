@@ -87,6 +87,7 @@ h3 {
 }
 
 .page-shell {
+  overflow-x: clip;
   padding-bottom: var(--space-6);
 }
 
@@ -302,7 +303,6 @@ h3 {
 
 .hero {
   position: relative;
-  overflow-x: clip;
   display: grid;
   grid-template-columns: minmax(0, 1.1fr) minmax(20rem, 0.9fr);
   align-items: center;
@@ -483,13 +483,55 @@ h3 {
 
 .hero-visual {
   position: relative;
+  z-index: 1;
   display: grid;
   min-width: 0;
   min-height: clamp(25rem, 43vw, 40rem);
-  overflow: clip;
+  overflow: visible;
   place-items: center;
   isolation: isolate;
   animation: reveal-up 900ms 100ms var(--easing-standard) both;
+}
+
+.hero-space-background {
+  position: absolute;
+  z-index: 0;
+  inset-block: -6%;
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  overflow: hidden;
+  isolation: isolate;
+  mask-image: radial-gradient(
+    ellipse 58% 84% at 65% 48%,
+    #000 28%,
+    rgba(0, 0, 0, 0.94) 56%,
+    rgba(0, 0, 0, 0.58) 78%,
+    transparent 100%
+  );
+  -webkit-mask-image: radial-gradient(
+    ellipse 58% 84% at 65% 48%,
+    #000 28%,
+    rgba(0, 0, 0, 0.94) 56%,
+    rgba(0, 0, 0, 0.58) 78%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+.hero-space-background::after {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    #050608 0%,
+    rgba(5, 6, 8, 0.92) 25%,
+    rgba(5, 6, 8, 0.55) 43%,
+    transparent 70%
+  );
+  content: "";
+  pointer-events: none;
 }
 
 .celestial-scene {
@@ -578,13 +620,6 @@ h3 {
   pointer-events: none;
   mix-blend-mode: screen;
   overflow: visible;
-  -webkit-mask-image: linear-gradient(
-    90deg,
-    #000 0%,
-    #000 92%,
-    transparent 100%
-  );
-  mask-image: linear-gradient(90deg, #000 0%, #000 92%, transparent 100%);
 }
 
 .nebula-planet-separation {
@@ -1116,6 +1151,11 @@ h3 {
   --journey-stars-opacity: 0.23;
   --journey-nebula-x: -2%;
   --journey-nebula-y: 1%;
+}
+
+.celestial-journey-atmosphere[data-stage="hero"] {
+  --journey-nebula-opacity: 0.05;
+  --journey-stars-opacity: 0.05;
 }
 
 .celestial-journey-atmosphere[data-stage="world"] {
@@ -2038,6 +2078,34 @@ h3 {
   .hero-visual {
     min-height: clamp(17rem, 82vw, 26rem);
     margin-top: 1rem;
+  }
+
+  .hero-space-background {
+    inset-block: -2%;
+    mask-image: radial-gradient(
+      ellipse 66% 56% at 68% 59%,
+      #000 28%,
+      rgba(0, 0, 0, 0.92) 58%,
+      rgba(0, 0, 0, 0.48) 82%,
+      transparent 100%
+    );
+    -webkit-mask-image: radial-gradient(
+      ellipse 66% 56% at 68% 59%,
+      #000 28%,
+      rgba(0, 0, 0, 0.92) 58%,
+      rgba(0, 0, 0, 0.48) 82%,
+      transparent 100%
+    );
+  }
+
+  .hero-space-background::after {
+    background: linear-gradient(
+      180deg,
+      #050608 0%,
+      rgba(5, 6, 8, 0.96) 42%,
+      rgba(5, 6, 8, 0.62) 60%,
+      transparent 78%
+    );
   }
 
   .deep-space-nebula {

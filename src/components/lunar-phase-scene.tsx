@@ -99,111 +99,9 @@ function getIllumination(phaseFraction: number): number {
   return (1 - Math.cos(2 * Math.PI * phaseFraction)) / 2;
 }
 
-export function LunarPhaseVisual() {
-  const sceneRef = useRef<HTMLDivElement>(null);
-  const moonRef = useRef<HTMLSpanElement>(null);
-  const orbitsRef = useRef<SVGSVGElement>(null);
-  const shadowDirectionRef = useRef<SVGGElement>(null);
-  const shadowPathRef = useRef<SVGPathElement>(null);
-
-  useEffect(() => {
-    const scene = sceneRef.current;
-    const moon = moonRef.current;
-    const orbits = orbitsRef.current;
-    const direction = shadowDirectionRef.current;
-    const shadow = shadowPathRef.current;
-    if (!scene || !moon || !orbits || !direction || !shadow) return;
-
-    const motionPreference = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    );
-    let animationFrame: number | null = null;
-    let cycleStart: number | null = null;
-
-    const updatePhase = (phaseFraction: number) => {
-      const illumination = getIllumination(phaseFraction);
-      shadow.setAttribute("d", getShadowPath(phaseFraction));
-      const transform = getShadowTransform(phaseFraction);
-      if (transform) {
-        direction.setAttribute("transform", transform);
-      } else {
-        direction.removeAttribute("transform");
-      }
-
-      moon.dataset.phase = getPhaseName(phaseFraction);
-      moon.dataset.illumination = illumination.toFixed(3);
-      moon.dataset.cyclePosition = phaseFraction.toFixed(3);
-      scene.style.setProperty(
-        "--moon-glow-opacity",
-        (0.06 + illumination * 0.12).toFixed(3),
-      );
-      scene.style.setProperty(
-        "--moonlight-opacity",
-        (0.2 + illumination * 0.3).toFixed(3),
-      );
-      scene.style.setProperty(
-        "--star-field-far-opacity",
-        (0.34 + (1 - illumination) * 0.1).toFixed(3),
-      );
-      scene.style.setProperty(
-        "--star-field-mid-opacity",
-        (0.48 + (1 - illumination) * 0.12).toFixed(3),
-      );
-      scene.style.setProperty(
-        "--stardust-opacity",
-        (0.16 + (1 - illumination) * 0.08).toFixed(3),
-      );
-    };
-
-    const animate = (timestamp: number) => {
-      cycleStart ??= timestamp;
-      updatePhase(getPhaseFraction(timestamp - cycleStart));
-      animationFrame = window.requestAnimationFrame(animate);
-    };
-
-    const startAnimation = () => {
-      cycleStart = null;
-      animationFrame = window.requestAnimationFrame(animate);
-    };
-
-    const applyMotionPreference = () => {
-      if (animationFrame !== null) {
-        window.cancelAnimationFrame(animationFrame);
-        animationFrame = null;
-      }
-
-      if (motionPreference.matches) {
-        if (typeof orbits.pauseAnimations === "function") {
-          orbits.pauseAnimations();
-        }
-        updatePhase(REDUCED_MOTION_PHASE);
-      } else {
-        if (typeof orbits.unpauseAnimations === "function") {
-          orbits.unpauseAnimations();
-        }
-        startAnimation();
-      }
-    };
-
-    applyMotionPreference();
-    motionPreference.addEventListener("change", applyMotionPreference);
-
-    return () => {
-      if (animationFrame !== null) {
-        window.cancelAnimationFrame(animationFrame);
-      }
-      motionPreference.removeEventListener("change", applyMotionPreference);
-    };
-  }, []);
-
+export function LunarPhaseBackground() {
   return (
-    <div
-      className="celestial-scene"
-      ref={sceneRef}
-      style={INITIAL_SCENE_STYLE}
-      data-cycle-duration={LUNAR_CYCLE_DURATION_MS}
-      data-initial-phase={INITIAL_PHASE}
-    >
+    <div className="hero-space-background" aria-hidden="true">
       <div className="deep-space-backdrop" />
       <div className="star-field star-field-far" />
       <div className="stardust-layer stardust-far" />
@@ -432,6 +330,137 @@ export function LunarPhaseVisual() {
           />
         </g>
       </svg>
+      <div className="stardust-layer stardust-near" />
+    </div>
+  );
+}
+
+export function LunarPhaseVisual() {
+  const sceneRef = useRef<HTMLDivElement>(null);
+  const moonRef = useRef<HTMLSpanElement>(null);
+  const orbitsRef = useRef<SVGSVGElement>(null);
+  const shadowDirectionRef = useRef<SVGGElement>(null);
+  const shadowPathRef = useRef<SVGPathElement>(null);
+
+  useEffect(() => {
+    const scene = sceneRef.current;
+    const hero = scene?.closest<HTMLElement>(".hero");
+    const moon = moonRef.current;
+    const orbits = orbitsRef.current;
+    const direction = shadowDirectionRef.current;
+    const shadow = shadowPathRef.current;
+    if (!scene || !hero || !moon || !orbits || !direction || !shadow) return;
+
+    const motionPreference = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    );
+    let animationFrame: number | null = null;
+    let cycleStart: number | null = null;
+
+    const updatePhase = (phaseFraction: number) => {
+      const illumination = getIllumination(phaseFraction);
+      shadow.setAttribute("d", getShadowPath(phaseFraction));
+      const transform = getShadowTransform(phaseFraction);
+      if (transform) {
+        direction.setAttribute("transform", transform);
+      } else {
+        direction.removeAttribute("transform");
+      }
+
+      moon.dataset.phase = getPhaseName(phaseFraction);
+      moon.dataset.illumination = illumination.toFixed(3);
+      moon.dataset.cyclePosition = phaseFraction.toFixed(3);
+      scene.style.setProperty(
+        "--moon-glow-opacity",
+        (0.06 + illumination * 0.12).toFixed(3),
+      );
+      hero.style.setProperty(
+        "--moon-glow-opacity",
+        (0.06 + illumination * 0.12).toFixed(3),
+      );
+      scene.style.setProperty(
+        "--moonlight-opacity",
+        (0.2 + illumination * 0.3).toFixed(3),
+      );
+      hero.style.setProperty(
+        "--moonlight-opacity",
+        (0.2 + illumination * 0.3).toFixed(3),
+      );
+      scene.style.setProperty(
+        "--star-field-far-opacity",
+        (0.34 + (1 - illumination) * 0.1).toFixed(3),
+      );
+      hero.style.setProperty(
+        "--star-field-far-opacity",
+        (0.34 + (1 - illumination) * 0.1).toFixed(3),
+      );
+      scene.style.setProperty(
+        "--star-field-mid-opacity",
+        (0.48 + (1 - illumination) * 0.12).toFixed(3),
+      );
+      hero.style.setProperty(
+        "--star-field-mid-opacity",
+        (0.48 + (1 - illumination) * 0.12).toFixed(3),
+      );
+      scene.style.setProperty(
+        "--stardust-opacity",
+        (0.16 + (1 - illumination) * 0.08).toFixed(3),
+      );
+      hero.style.setProperty(
+        "--stardust-opacity",
+        (0.16 + (1 - illumination) * 0.08).toFixed(3),
+      );
+    };
+
+    const animate = (timestamp: number) => {
+      cycleStart ??= timestamp;
+      updatePhase(getPhaseFraction(timestamp - cycleStart));
+      animationFrame = window.requestAnimationFrame(animate);
+    };
+
+    const startAnimation = () => {
+      cycleStart = null;
+      animationFrame = window.requestAnimationFrame(animate);
+    };
+
+    const applyMotionPreference = () => {
+      if (animationFrame !== null) {
+        window.cancelAnimationFrame(animationFrame);
+        animationFrame = null;
+      }
+
+      if (motionPreference.matches) {
+        if (typeof orbits.pauseAnimations === "function") {
+          orbits.pauseAnimations();
+        }
+        updatePhase(REDUCED_MOTION_PHASE);
+      } else {
+        if (typeof orbits.unpauseAnimations === "function") {
+          orbits.unpauseAnimations();
+        }
+        startAnimation();
+      }
+    };
+
+    applyMotionPreference();
+    motionPreference.addEventListener("change", applyMotionPreference);
+
+    return () => {
+      if (animationFrame !== null) {
+        window.cancelAnimationFrame(animationFrame);
+      }
+      motionPreference.removeEventListener("change", applyMotionPreference);
+    };
+  }, []);
+
+  return (
+    <div
+      className="celestial-scene"
+      ref={sceneRef}
+      style={INITIAL_SCENE_STYLE}
+      data-cycle-duration={LUNAR_CYCLE_DURATION_MS}
+      data-initial-phase={INITIAL_PHASE}
+    >
       <div className="celestial-stage">
         <svg
           ref={orbitsRef}
@@ -526,7 +555,6 @@ export function LunarPhaseVisual() {
           </svg>
         </span>
       </div>
-      <div className="stardust-layer stardust-near" />
     </div>
   );
 }

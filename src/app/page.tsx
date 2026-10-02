@@ -2,7 +2,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { CelestialJourney } from "@/components/celestial-journey";
 import { GlassSurface } from "@/components/glass-surface";
-import { LunarPhaseScene } from "@/components/lunar-phase-scene";
+import {
+  LunarPhaseBackground,
+  LunarPhaseScene,
+} from "@/components/lunar-phase-scene";
 import { MobileNavigation } from "@/components/mobile-navigation";
 import { SectionHeading } from "@/components/section-heading";
 import { TransmissionPanel } from "@/components/transmission-panel";
@@ -47,6 +50,7 @@ export default function Home() {
           id="hero"
           tabIndex={-1}
         >
+          <LunarPhaseBackground />
           <div className="hero-copy">
             <p className="eyebrow">{homeContent.hero.eyebrow}</p>
             <div className="hero-brand">

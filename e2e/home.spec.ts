@@ -135,6 +135,10 @@ test("celestial journey tracks sections and orbital links navigate accessibly", 
   await expect(orbital).toBeVisible();
   await expect(orbital.getByRole("link")).toHaveCount(6);
   await expect(atmosphere).toHaveAttribute("data-stage", "hero");
+  await expect(page.locator(".orbital-section-path path")).toHaveAttribute(
+    "d",
+    /^M47 27 C50 43 58 66 67 82 /,
+  );
   await expect(orbital.locator(".orbital-section-node")).toHaveCount(6);
   await expect(
     orbital.locator('.orbital-section-link[aria-current="location"]'),
@@ -536,7 +540,7 @@ test("morphs the terminator geometry without rotating the texture", async ({
   );
 });
 
-test("keeps the deep-space nebula's painted right edge inside the visual frame", async ({
+test("contains the full-hero deep-space background with a faded mask", async ({
   page,
 }) => {
   await page.goto("/");
@@ -553,6 +557,7 @@ test("keeps the deep-space nebula's painted right edge inside the visual frame",
     await page.setViewportSize({ width, height });
     const geometry = await page.evaluate(() => {
       const svg = document.querySelector<SVGSVGElement>(".deep-space-nebula")!;
+      const background = document.querySelector(".hero-space-background")!;
       const visual = document.querySelector(".hero-visual")!;
       const bounds = svg.getBBox();
       const rightmostPoint = svg.createSVGPoint();
@@ -563,20 +568,20 @@ test("keeps the deep-space nebula's painted right edge inside the visual frame",
       ).x;
       return {
         paintedRight,
-        visualRight: visual.getBoundingClientRect().right,
-        visualWidth: visual.getBoundingClientRect().width,
-        overflow: getComputedStyle(visual).overflowX,
+        backgroundRight: background.getBoundingClientRect().right,
+        backgroundOverflow: getComputedStyle(background).overflow,
+        backgroundMask: getComputedStyle(background).maskImage,
+        visualOverflow: getComputedStyle(visual).overflowX,
         pageWidth: document.documentElement.scrollWidth,
       };
     });
 
     expect(geometry.paintedRight).toBeLessThanOrEqual(
-      geometry.visualRight + 0.5,
+      geometry.backgroundRight + 0.5,
     );
-    expect(geometry.visualRight - geometry.paintedRight).toBeLessThanOrEqual(
-      geometry.visualWidth * 0.035,
-    );
-    expect(geometry.overflow).toBe("clip");
+    expect(geometry.backgroundOverflow).toBe("hidden");
+    expect(geometry.backgroundMask).toContain("radial-gradient");
+    expect(geometry.visualOverflow).toBe("visible");
     expect(geometry.pageWidth).toBe(width);
   }
 });
@@ -701,6 +706,18 @@ test("keeps the planetary scene framed on target desktop and mobile sizes", asyn
     await expect(
       page.getByRole("link", { name: "参加方法を見る" }),
     ).toBeVisible();
+
+    await expect(page.locator(".hero-space-background")).toBeAttached();
+    const backgroundTreatment = await page
+      .locator(".hero-space-background")
+      .evaluate((background) => ({
+        mask: getComputedStyle(background).maskImage,
+        visualOverflow: getComputedStyle(
+          document.querySelector(".hero-visual")!,
+        ).overflow,
+      }));
+    expect(backgroundTreatment.mask).toContain("radial-gradient");
+    expect(backgroundTreatment.visualOverflow).toBe("visible");
 
     const framing = await page.locator(".moon").evaluate((moon) => {
       const circle = moon.getBoundingClientRect();

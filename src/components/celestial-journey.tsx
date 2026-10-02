@@ -129,7 +129,7 @@ export function CelestialJourney() {
           aria-hidden="true"
           focusable="false"
         >
-          <path d="M67 82 C90 100 20 119 43 136 S88 170 64 190 S17 225 41 245 S87 270 65 286 S69 307 57 320" />
+          <path d="M47 27 C50 43 58 66 67 82 C90 100 20 119 43 136 S88 170 64 190 S17 225 41 245 S87 270 65 286 S69 307 57 320" />
         </svg>
         <span
           className="orbital-active-satellite"
