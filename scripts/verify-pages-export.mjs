@@ -2,7 +2,7 @@ import { access, readFile } from "node:fs/promises";
 import { extname, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const basePath = "/Celenas-SMP";
+const basePath = "/Celenas-SMP-web";
 const outputDirectory = resolve("out");
 const indexPath = resolve(outputDirectory, "index.html");
 
