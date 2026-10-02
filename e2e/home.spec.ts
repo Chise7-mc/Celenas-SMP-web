@@ -198,11 +198,18 @@ test("hero celestial scene is decorative and uses CSS motion", async ({
       .locator(".celestial-orbits")
       .evaluate((svg) => (svg as SVGSVGElement).animationsPaused()),
   ).toBe(false);
-  await expect(page.locator(".nebula-layer")).toHaveCount(3);
+  await expect(page.locator(".deep-space-backdrop")).toHaveCount(1);
+  const proceduralNebula = page.locator(".deep-space-nebula");
+  await expect(proceduralNebula).toHaveAttribute("aria-hidden", "true");
+  await expect(proceduralNebula.locator("feTurbulence")).toHaveCount(2);
+  await expect(page.locator(".nebula-far-cloud")).toHaveCount(1);
+  await expect(page.locator(".nebula-main-cloud")).toHaveCount(1);
+  await expect(page.locator(".nebula-dust-lanes path")).toHaveCount(2);
+  await expect(page.locator(".nebula-near-gas")).toHaveCount(1);
   for (const [selector, animationName] of [
-    [".nebula-far", "nebula-drift-far"],
-    [".nebula-band", "nebula-rift-drift"],
-    [".nebula-mid", "nebula-drift-mid"],
+    [".nebula-far-cloud", "nebula-far-drift"],
+    [".nebula-main-cloud", "nebula-main-drift"],
+    [".nebula-near-gas", "nebula-near-drift"],
     [".aurora-wave", "aurora-flow"],
     [".aurora-curtains", "aurora-color-shift"],
   ] as const) {
@@ -241,16 +248,34 @@ test("hero celestial scene is decorative and uses CSS motion", async ({
   );
   await expect(page.locator(".aurora-curtains")).toHaveCSS(
     "animation-duration",
-    "66s",
+    "96s",
   );
   await expect(page.locator(".aurora-wave")).toHaveCSS(
     "animation-duration",
-    "52s",
+    "74s",
   );
-  await expect(page.locator(".nebula-band")).toHaveCSS(
+  await expect(page.locator(".nebula-far-cloud")).toHaveCSS(
     "animation-duration",
-    "68s",
+    "148s",
   );
+  await expect(page.locator(".nebula-main-cloud")).toHaveCSS(
+    "animation-duration",
+    "96s",
+  );
+  await expect(page.locator(".nebula-near-gas")).toHaveCSS(
+    "animation-duration",
+    "62s",
+  );
+  for (const [selector, duration] of [
+    [".stardust-far", "150s"],
+    [".stardust-mid", "112s"],
+    [".stardust-near", "60s"],
+  ] as const) {
+    await expect(page.locator(selector)).toHaveCSS(
+      "animation-duration",
+      duration,
+    );
+  }
   expect(
     await page.locator(".hero").evaluate((hero) => {
       return getComputedStyle(hero, "::after").animationName;
@@ -440,9 +465,10 @@ test("respects reduced motion", async ({ page }) => {
     ".moon",
     ".aurora-curtains",
     ".aurora-wave",
-    ".nebula-far",
-    ".nebula-band",
-    ".nebula-mid",
+    ".nebula-far-cloud",
+    ".nebula-main-cloud",
+    ".nebula-dust-lanes",
+    ".nebula-near-gas",
     ".star-twinkle-one",
     ".stardust-far",
     ".stardust-mid",

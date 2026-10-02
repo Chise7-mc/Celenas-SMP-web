@@ -45,9 +45,11 @@ Desktop navigation is server-rendered. Mobile navigation is a small client
 boundary only to close the menu after selection, update the hash and focus its
 destination. One small client scene updates the SVG terminator path directly on
 a 120-second cycle from a waxing crescent without React state updates each
-frame. CSS handles the ambient, nebula and aurora; SVG motion paths handle the
-three satellites. The Hero does not use date-based lunar data, an API or
-geolocation.
+frame. CSS handles ambient and aurora motion. A decorative inline SVG builds
+the fixed-seed procedural nebula and dark dust lanes with bounded turbulence,
+displacement and blur filters; CSS transforms move its gas layers at distinct
+slow speeds. SVG motion paths handle the three satellites. The Hero does not
+use date-based lunar data, an API or geolocation.
 
 ## GitHub Pages deployment
 

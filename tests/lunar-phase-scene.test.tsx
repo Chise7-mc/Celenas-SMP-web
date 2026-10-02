@@ -132,11 +132,14 @@ describe("lunar phase visual", () => {
     expect(container.querySelector(".planet-shadow-morph")).toBeInTheDocument();
   });
 
-  it("renders layered aurora and nebula atmosphere", () => {
+  it("renders decorative deep-space layers and procedural nebula texture", () => {
     const { container } = render(<LunarPhaseScene />);
 
+    expect(container.querySelector(".deep-space-backdrop")).toBeInTheDocument();
     expect(container.querySelector(".aurora-curtains")).toBeInTheDocument();
-    expect(container.querySelectorAll(".nebula-layer")).toHaveLength(3);
-    expect(container.querySelector(".nebula-band")).toBeInTheDocument();
+    const nebula = container.querySelector(".deep-space-nebula");
+    expect(nebula).toHaveAttribute("aria-hidden", "true");
+    expect(nebula?.querySelectorAll("feTurbulence")).toHaveLength(2);
+    expect(nebula?.querySelectorAll(".nebula-dust-lanes path")).toHaveLength(2);
   });
 });

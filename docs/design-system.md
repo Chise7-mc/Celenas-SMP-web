@@ -20,8 +20,9 @@ phase mask, and three enlarged SVG ellipse paths with one satellite each. The
 satellites follow their matching ellipse at distinct 72-, 103-, and 137-second
 periods. A local SVG path morphs the planetary shadow through a 120-second
 cycle from waxing crescent, with a fixed 12-degree tilt and no texture motion.
-Layered CSS nebula and slow periwinkle aurora add depth while keeping the copy
-side dark. The page uses black, white, and one periwinkle accent.
+An irregular blue-indigo nebula and a restrained periwinkle aurora add depth
+behind the planet while keeping the copy side dark. The page uses black, white,
+and one periwinkle accent.
 The planet's restrained amber cloud bands stay within the illustration. The
 scene is decorative, not a substitute logo or a representation of the actual
 Minecraft world. World themes are editorial
@@ -45,10 +46,14 @@ Use system sans-serif for copy and monospace only for connection addresses.
 The page uses a floating desktop glass header and an accessible expandable
 mobile menu. The Hero combines a large official mark with a fictional gas
 giant: a banded cloud texture masked by fixed-tilt SVG terminator geometry,
-deterministic far/mid star layers, a few asynchronously twinkling white stars,
-three deterministic radial-gradient stardust depth layers, CSS nebula, animated
-aurora, three fixed SVG paths with white orbiting satellites, and a slowly
-morphing planetary shadow.
+deterministic, non-tiled far/mid star layers, a few asynchronously twinkling
+white stars, three deterministic radial-gradient stardust depth layers, and a
+procedural SVG nebula. Fixed-seed low-frequency fractal noise, displacement and
+bounded blur give the blue-indigo gas irregular edges and internal variation;
+two dark dust lanes interrupt the gas. CSS moves the static gas layers at
+different slow speeds. A restrained animated aurora, three fixed SVG paths
+with white orbiting satellites, and a slowly morphing planetary shadow complete
+the scene.
 Stardust opacity responds subtly to the animated phase;
 its layers drift with transforms rather than animating individual particles or
 background positions. Motion is intentionally low-key and is disabled when the

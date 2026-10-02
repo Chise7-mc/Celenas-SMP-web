@@ -204,12 +204,188 @@ export function LunarPhaseVisual() {
       data-cycle-duration={LUNAR_CYCLE_DURATION_MS}
       data-initial-phase={INITIAL_PHASE}
     >
+      <div className="deep-space-backdrop" />
       <div className="star-field star-field-far" />
-      <div className="nebula-layer nebula-far" />
-      <div className="nebula-layer nebula-band" />
       <div className="stardust-layer stardust-far" />
       <div className="star-field star-field-mid" />
-      <div className="nebula-layer nebula-mid" />
+      <svg
+        className="deep-space-nebula"
+        viewBox="0 0 1000 1000"
+        preserveAspectRatio="xMidYMid slice"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <defs>
+          <linearGradient id="nebula-far-color" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#111a36" stopOpacity="0" />
+            <stop offset="34%" stopColor="#17234a" stopOpacity="0.56" />
+            <stop offset="58%" stopColor="#293568" stopOpacity="0.44" />
+            <stop offset="78%" stopColor="#151e3e" stopOpacity="0.3" />
+            <stop offset="100%" stopColor="#0b1022" stopOpacity="0" />
+          </linearGradient>
+          <linearGradient
+            id="nebula-main-color"
+            x1="0.1"
+            y1="0.15"
+            x2="0.9"
+            y2="0.82"
+          >
+            <stop offset="0%" stopColor="#182348" stopOpacity="0.12" />
+            <stop offset="27%" stopColor="#26366c" stopOpacity="0.56" />
+            <stop offset="48%" stopColor="#485487" stopOpacity="0.68" />
+            <stop offset="66%" stopColor="#26335f" stopOpacity="0.5" />
+            <stop offset="84%" stopColor="#171f40" stopOpacity="0.38" />
+            <stop offset="100%" stopColor="#11182f" stopOpacity="0.04" />
+          </linearGradient>
+          <linearGradient
+            id="nebula-filament-color"
+            x1="0"
+            y1="0"
+            x2="1"
+            y2="0.4"
+          >
+            <stop offset="0%" stopColor="#52608f" stopOpacity="0" />
+            <stop offset="46%" stopColor="#7b86ac" stopOpacity="0.42" />
+            <stop offset="72%" stopColor="#3b4a79" stopOpacity="0.28" />
+            <stop offset="100%" stopColor="#26345f" stopOpacity="0" />
+          </linearGradient>
+          <radialGradient
+            id="nebula-planet-separation"
+            cx="68%"
+            cy="47%"
+            r="42%"
+          >
+            <stop offset="0%" stopColor="#7480a9" stopOpacity="0.28" />
+            <stop offset="48%" stopColor="#394976" stopOpacity="0.16" />
+            <stop offset="100%" stopColor="#182344" stopOpacity="0" />
+          </radialGradient>
+          <filter
+            id="nebula-cloud-texture"
+            x="-14%"
+            y="-14%"
+            width="128%"
+            height="128%"
+            colorInterpolationFilters="sRGB"
+          >
+            <feTurbulence
+              type="fractalNoise"
+              baseFrequency="0.008 0.014"
+              numOctaves="3"
+              seed="23"
+              result="cloud-noise"
+            />
+            <feColorMatrix
+              in="cloud-noise"
+              type="matrix"
+              values="0 0 0 0 0.12
+                0 0 0 0 0.17
+                0 0 0 0 0.35
+                2.2 0 0 0 -0.72"
+              result="cloud-density"
+            />
+            <feDisplacementMap
+              in="SourceGraphic"
+              in2="cloud-noise"
+              scale="24"
+              xChannelSelector="R"
+              yChannelSelector="G"
+              result="warped-cloud"
+            />
+            <feComposite
+              in="warped-cloud"
+              in2="cloud-density"
+              operator="in"
+              result="textured-cloud"
+            />
+            <feGaussianBlur in="textured-cloud" stdDeviation="2.4" />
+          </filter>
+          <filter
+            id="nebula-dust-texture"
+            x="-12%"
+            y="-12%"
+            width="124%"
+            height="124%"
+            colorInterpolationFilters="sRGB"
+          >
+            <feTurbulence
+              type="fractalNoise"
+              baseFrequency="0.016 0.028"
+              numOctaves="2"
+              seed="41"
+              result="dust-noise"
+            />
+            <feDisplacementMap
+              in="SourceGraphic"
+              in2="dust-noise"
+              scale="17"
+              xChannelSelector="R"
+              yChannelSelector="G"
+              result="warped-dust"
+            />
+            <feGaussianBlur in="warped-dust" stdDeviation="2.8" />
+          </filter>
+        </defs>
+        <ellipse
+          className="nebula-planet-separation"
+          cx="670"
+          cy="470"
+          rx="310"
+          ry="260"
+          fill="url(#nebula-planet-separation)"
+        />
+        <g className="nebula-far-cloud" filter="url(#nebula-cloud-texture)">
+          <path
+            d="M 176 505 C 231 442, 284 382, 348 370 C 399 360, 423 401, 481 386 C 545 369, 582 302, 650 317 C 724 332, 763 374, 827 350 C 873 333, 912 365, 963 343 C 944 405, 908 433, 920 473 C 932 516, 875 543, 828 559 C 762 582, 708 549, 654 572 C 592 598, 539 647, 471 628 C 398 608, 369 558, 304 579 C 251 596, 211 557, 176 505 Z"
+            fill="url(#nebula-far-color)"
+          />
+        </g>
+        <g className="nebula-main-cloud" filter="url(#nebula-cloud-texture)">
+          <path
+            d="M 258 451 C 299 392, 349 355, 402 359 C 451 363, 459 410, 505 407 C 553 404, 581 351, 626 355 C 679 359, 691 407, 738 397 C 784 387, 804 350, 847 377 C 892 405, 874 446, 914 468 C 888 492, 847 496, 835 532 C 821 573, 778 589, 738 572 C 688 551, 658 574, 623 610 C 586 649, 533 632, 505 602 C 474 569, 445 566, 408 590 C 366 617, 327 584, 330 548 C 334 510, 289 491, 258 451 Z"
+            fill="url(#nebula-main-color)"
+          />
+          <path
+            className="nebula-filament"
+            d="M 302 472 C 382 420, 427 441, 486 423 C 557 402, 601 375, 659 397 C 712 417, 748 441, 831 403"
+            fill="none"
+            stroke="url(#nebula-filament-color)"
+            strokeWidth="38"
+            strokeLinecap="round"
+          />
+          <path
+            className="nebula-filament nebula-filament-faint"
+            d="M 355 535 C 419 504, 463 528, 520 510 C 588 488, 618 458, 682 474 C 741 489, 771 518, 824 493"
+            fill="none"
+            stroke="url(#nebula-filament-color)"
+            strokeWidth="19"
+            strokeLinecap="round"
+          />
+        </g>
+        <g className="nebula-dust-lanes" filter="url(#nebula-dust-texture)">
+          <path
+            d="M 225 478 C 302 442, 352 510, 428 495 C 493 482, 532 444, 599 465 C 671 488, 699 544, 772 527 C 841 511, 867 470, 937 491"
+            fill="none"
+            stroke="#02040a"
+            strokeWidth="48"
+            strokeLinecap="round"
+            opacity="0.66"
+          />
+          <path
+            d="M 291 554 C 362 525, 409 562, 475 550 C 534 539, 566 510, 619 523 C 682 538, 714 579, 776 561"
+            fill="none"
+            stroke="#030611"
+            strokeWidth="22"
+            strokeLinecap="round"
+            opacity="0.42"
+          />
+        </g>
+        <g className="nebula-near-gas" filter="url(#nebula-cloud-texture)">
+          <path
+            d="M 525 330 C 580 295, 614 302, 653 325 C 692 348, 720 343, 763 320 C 804 299, 839 308, 875 333 C 824 325, 802 361, 758 365 C 704 370, 679 340, 640 340 C 597 339, 568 362, 525 330 Z"
+            fill="url(#nebula-filament-color)"
+          />
+        </g>
+      </svg>
       <div className="stardust-layer stardust-mid" />
       <div className="star-accents">
         <span className="star-twinkle star-twinkle-one" />
@@ -227,8 +403,8 @@ export function LunarPhaseVisual() {
         <defs>
           <linearGradient id="aurora-ribbon-color" x1="0" y1="0" x2="1" y2="0">
             <stop offset="0%" stopColor="#a7b5ff" stopOpacity="0" />
-            <stop offset="35%" stopColor="#a7b5ff" stopOpacity="0.56" />
-            <stop offset="62%" stopColor="#dce2ff" stopOpacity="0.82" />
+            <stop offset="35%" stopColor="#a7b5ff" stopOpacity="0.4" />
+            <stop offset="62%" stopColor="#dce2ff" stopOpacity="0.65" />
             <stop offset="100%" stopColor="#a7b5ff" stopOpacity="0" />
           </linearGradient>
           <filter
