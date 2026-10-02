@@ -139,40 +139,64 @@ test("celestial journey tracks sections and orbital links navigate accessibly", 
     "d",
     /^M47 27 C50 43 58 66 67 82 /,
   );
-  await expect(orbital.locator(".orbital-section-node")).toHaveCount(6);
+  await expect(orbital.locator(".orbital-fixed-node")).toHaveCount(7);
+  await expect(orbital.locator(".orbital-active-satellite")).toHaveCount(1);
   await expect(
     orbital.locator('.orbital-section-link[aria-current="location"]'),
   ).toHaveCount(0);
-  const heroMarker = await orbital
-    .locator(".orbital-active-satellite")
-    .evaluate((marker) => ({
-      left: (marker as HTMLElement).style.left,
-      top: (marker as HTMLElement).style.top,
-    }));
-  expect(heroMarker).toEqual({ left: "47%", top: "8%" });
+  await expectFixedNodesVisible();
+  await expectMarkerAligned("#hero");
+
+  async function expectFixedNodesVisible() {
+    await expect(orbital.locator(".orbital-fixed-node")).toHaveCount(7);
+    await expect(orbital.locator(".orbital-active-satellite")).toHaveCount(1);
+    await expect
+      .poll(() =>
+        page.locator(".orbital-fixed-node").evaluateAll((nodes) =>
+          nodes.every((node) => {
+            const style = getComputedStyle(node);
+            return (
+              Number(style.opacity) > 0 &&
+              style.visibility !== "hidden" &&
+              style.display !== "none"
+            );
+          }),
+        ),
+      )
+      .toBe(true);
+  }
 
   async function expectMarkerAligned(href: string) {
-    await expect(orbital.locator('a[href="' + href + '"]')).toHaveAttribute(
-      "aria-current",
-      "location",
-    );
+    if (href === "#hero") {
+      await expect(
+        orbital.locator('.orbital-section-link[aria-current="location"]'),
+      ).toHaveCount(0);
+    } else {
+      await expect(orbital.locator('a[href="' + href + '"]')).toHaveAttribute(
+        "aria-current",
+        "location",
+      );
+    }
+    await expectFixedNodesVisible();
     await expect
       .poll(() =>
         page.evaluate((targetHref) => {
-          const link = document.querySelector<HTMLAnchorElement>(
-            '.orbital-section-link[href="' + targetHref + '"]',
-          );
           const marker = document.querySelector<HTMLElement>(
             ".orbital-active-satellite",
           );
-          const node = link?.querySelector<HTMLElement>(
-            ".orbital-section-node",
-          );
-          if (!link || !marker || !node) {
-            throw new Error("Missing orbital marker");
-          }
+          const node =
+            targetHref === "#hero"
+              ? document.querySelector<HTMLElement>(
+                  ".orbital-hero-node .orbital-fixed-node",
+                )
+              : document
+                  .querySelector<HTMLAnchorElement>(
+                    '.orbital-section-link[href="' + targetHref + '"]',
+                  )
+                  ?.querySelector<HTMLElement>(".orbital-fixed-node");
+          if (!marker || !node) throw new Error("Missing orbital marker");
           const markerRect = marker.getBoundingClientRect();
-          const nodeRect = link.getBoundingClientRect();
+          const nodeRect = node.getBoundingClientRect();
           return {
             horizontal:
               Math.abs(
@@ -186,19 +210,10 @@ test("celestial journey tracks sections and orbital links navigate accessibly", 
                   markerRect.height / 2 -
                   (nodeRect.top + nodeRect.height / 2),
               ) <= 1,
-            nodeOpacity: getComputedStyle(node).opacity,
-            currentHref: document
-              .querySelector('.orbital-section-link[aria-current="location"]')
-              ?.getAttribute("href"),
           };
         }, href),
       )
-      .toEqual({
-        horizontal: true,
-        vertical: true,
-        nodeOpacity: "0",
-        currentHref: href,
-      });
+      .toEqual({ horizontal: true, vertical: true });
   }
 
   const destinations = [
@@ -228,6 +243,10 @@ test("celestial journey tracks sections and orbital links navigate accessibly", 
   await expect(page).toHaveURL(/#join$/);
   await expect(page.locator("#join")).toBeFocused();
   await expectMarkerAligned("#join");
+
+  await page.goto("/");
+  await expect(atmosphere).toHaveAttribute("data-stage", "hero");
+  await expectMarkerAligned("#hero");
 
   for (const [width, height] of [
     [1920, 1080],

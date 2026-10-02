@@ -132,6 +132,16 @@ export function CelestialJourney() {
           <path d="M47 27 C50 43 58 66 67 82 C90 100 20 119 43 136 S88 170 64 190 S17 225 41 245 S87 270 65 286 S69 307 57 320" />
         </svg>
         <span
+          className="orbital-hero-node"
+          style={{
+            left: heroMarker.x + "%",
+            top: heroMarker.y + "%",
+          }}
+          aria-hidden="true"
+        >
+          <span className="orbital-fixed-node orbital-section-node" />
+        </span>
+        <span
           className="orbital-active-satellite"
           aria-hidden="true"
           style={{ left: marker.x + "%", top: marker.y + "%" }}
@@ -149,7 +159,10 @@ export function CelestialJourney() {
             aria-current={activeHref === item.href ? "location" : undefined}
             onClick={(event) => navigateToSection(event, item.href)}
           >
-            <span className="orbital-section-node" aria-hidden="true" />
+            <span
+              className="orbital-fixed-node orbital-section-node"
+              aria-hidden="true"
+            />
             <span className="orbital-section-label" aria-hidden="true">
               <span>{String(index + 1).padStart(2, "0")}</span>
               {item.label}

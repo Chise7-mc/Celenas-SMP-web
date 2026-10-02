@@ -1237,6 +1237,16 @@ h3 {
   color: var(--color-muted);
 }
 
+.orbital-hero-node {
+  position: absolute;
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
 .orbital-section-link:focus-visible {
   outline: 2px solid var(--color-focus);
   outline-offset: 1px;
@@ -1265,22 +1275,18 @@ h3 {
   box-shadow: 0 0 0 0.24rem rgba(167, 181, 255, 0.12);
 }
 
-.orbital-section-link[aria-current="location"] .orbital-section-node {
-  opacity: 0;
-}
-
 .orbital-active-satellite {
   position: absolute;
   z-index: 1;
-  width: 0.48rem;
-  height: 0.48rem;
+  width: 0.9rem;
+  height: 0.9rem;
   transform: translate(-50%, -50%);
-  border: 1px solid white;
+  border: 1px solid rgba(255, 255, 255, 0.95);
   border-radius: 50%;
-  background: #fff;
+  background: transparent;
   box-shadow:
-    0 0 0 0.28rem rgba(217, 224, 255, 0.1),
-    0 0 0.75rem rgba(217, 224, 255, 0.5);
+    0 0 0 0.16rem rgba(217, 224, 255, 0.07),
+    0 0 0.7rem rgba(217, 224, 255, 0.35);
   pointer-events: none;
   transition:
     left 560ms var(--easing-standard),
