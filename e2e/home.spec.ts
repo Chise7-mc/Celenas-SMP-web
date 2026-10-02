@@ -178,20 +178,58 @@ test("hero celestial scene is decorative and uses CSS motion", async ({
   }
   await expect(page.locator(".orbiting-body")).toHaveCount(3);
   await expect(page.locator(".orbit-line")).toHaveCount(3);
+  for (const selector of [
+    ".satellite-one",
+    ".satellite-two",
+    ".satellite-three",
+  ]) {
+    const appearance = await page.locator(selector).evaluate((satellite) => {
+      const fill = getComputedStyle(satellite).fill;
+      const channels = fill.match(/[\d.]+/g)?.map(Number) ?? [];
+      const filter = getComputedStyle(satellite).filter;
+      return { channels, filter };
+    });
+    expect(appearance.channels).toHaveLength(3);
+    expect(Math.min(...appearance.channels)).toBeGreaterThan(220);
+    expect(appearance.filter.match(/drop-shadow/g)).toHaveLength(2);
+  }
   expect(
     await page
       .locator(".celestial-orbits")
       .evaluate((svg) => (svg as SVGSVGElement).animationsPaused()),
   ).toBe(false);
   await expect(page.locator(".nebula-layer")).toHaveCount(2);
-  await expect(page.locator(".nebula-far")).toHaveCSS(
-    "animation-name",
-    "nebula-drift",
-  );
-  await expect(page.locator(".nebula-mid")).toHaveCSS(
-    "animation-name",
-    "nebula-drift",
-  );
+  for (const [selector, animationName] of [
+    [".nebula-far", "nebula-drift-far"],
+    [".nebula-mid", "nebula-drift-mid"],
+    [".aurora-wave", "aurora-flow"],
+    [".aurora-curtains", "aurora-color-shift"],
+  ] as const) {
+    const layer = page.locator(selector);
+    await expect(layer).toHaveCSS("animation-name", animationName);
+    expect(
+      await layer.evaluate((element) => {
+        const animation = element.getAnimations()[0];
+        const duration = animation?.effect?.getTiming().duration;
+        if (!animation || typeof duration !== "number") return false;
+        animation.pause();
+        animation.currentTime = 0;
+        const start = [
+          getComputedStyle(element).transform,
+          getComputedStyle(element).opacity,
+          getComputedStyle(element).filter,
+        ].join("|");
+        animation.currentTime = duration / 2;
+        const middle = [
+          getComputedStyle(element).transform,
+          getComputedStyle(element).opacity,
+          getComputedStyle(element).filter,
+        ].join("|");
+        animation.play();
+        return start !== middle;
+      }),
+    ).toBe(true);
+  }
   await expect(page.locator(".celestial-scene")).toHaveAttribute(
     "data-cycle-duration",
     "120000",
@@ -202,11 +240,11 @@ test("hero celestial scene is decorative and uses CSS motion", async ({
   );
   await expect(page.locator(".aurora-curtains")).toHaveCSS(
     "animation-duration",
-    "96s",
+    "66s",
   );
   await expect(page.locator(".aurora-wave")).toHaveCSS(
     "animation-duration",
-    "84s",
+    "52s",
   );
   expect(
     await page.locator(".hero").evaluate((hero) => {

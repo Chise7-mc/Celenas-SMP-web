@@ -16,7 +16,7 @@ const ORBITING_BODIES = [
     rotation: -32,
     duration: "72s",
     begin: "-5.76s",
-    radius: 3.1,
+    radius: 3.4,
     satelliteClass: "satellite-one",
   },
   {
@@ -25,7 +25,7 @@ const ORBITING_BODIES = [
     rotation: 54,
     duration: "103s",
     begin: "-44.29s",
-    radius: 3.8,
+    radius: 4.1,
     satelliteClass: "satellite-two",
   },
   {
@@ -34,7 +34,7 @@ const ORBITING_BODIES = [
     rotation: -36,
     duration: "137s",
     begin: "-104.12s",
-    radius: 2.5,
+    radius: 2.8,
     satelliteClass: "satellite-three",
   },
 ] as const;
@@ -226,8 +226,8 @@ export function LunarPhaseVisual() {
         <defs>
           <linearGradient id="aurora-ribbon-color" x1="0" y1="0" x2="1" y2="0">
             <stop offset="0%" stopColor="#a7b5ff" stopOpacity="0" />
-            <stop offset="35%" stopColor="#a7b5ff" stopOpacity="0.48" />
-            <stop offset="62%" stopColor="#dce2ff" stopOpacity="0.76" />
+            <stop offset="35%" stopColor="#a7b5ff" stopOpacity="0.56" />
+            <stop offset="62%" stopColor="#dce2ff" stopOpacity="0.82" />
             <stop offset="100%" stopColor="#a7b5ff" stopOpacity="0" />
           </linearGradient>
           <filter
