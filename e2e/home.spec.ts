@@ -442,6 +442,51 @@ test("morphs the terminator geometry without rotating the texture", async ({
   );
 });
 
+test("keeps the deep-space nebula's painted right edge inside the visual frame", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const nebula = page.locator(".deep-space-nebula");
+  await expect(nebula).toHaveAttribute("preserveAspectRatio", "xMaxYMid slice");
+  await expect(nebula).toHaveAttribute("aria-hidden", "true");
+
+  for (const [width, height] of [
+    [1920, 1080],
+    [1440, 900],
+    [390, 844],
+    [375, 812],
+  ] as const) {
+    await page.setViewportSize({ width, height });
+    const geometry = await page.evaluate(() => {
+      const svg = document.querySelector<SVGSVGElement>(".deep-space-nebula")!;
+      const visual = document.querySelector(".hero-visual")!;
+      const bounds = svg.getBBox();
+      const rightmostPoint = svg.createSVGPoint();
+      rightmostPoint.x = bounds.x + bounds.width;
+      rightmostPoint.y = bounds.y + bounds.height / 2;
+      const paintedRight = rightmostPoint.matrixTransform(
+        svg.getScreenCTM()!,
+      ).x;
+      return {
+        paintedRight,
+        visualRight: visual.getBoundingClientRect().right,
+        visualWidth: visual.getBoundingClientRect().width,
+        overflow: getComputedStyle(visual).overflowX,
+        pageWidth: document.documentElement.scrollWidth,
+      };
+    });
+
+    expect(geometry.paintedRight).toBeLessThanOrEqual(
+      geometry.visualRight + 0.5,
+    );
+    expect(geometry.visualRight - geometry.paintedRight).toBeLessThanOrEqual(
+      geometry.visualWidth * 0.035,
+    );
+    expect(geometry.overflow).toBe("clip");
+    expect(geometry.pageWidth).toBe(width);
+  }
+});
+
 test("satellites move along their distinct rendered ellipse paths", async ({
   page,
 }) => {

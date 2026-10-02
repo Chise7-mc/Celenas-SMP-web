@@ -211,7 +211,7 @@ export function LunarPhaseVisual() {
       <svg
         className="deep-space-nebula"
         viewBox="0 0 1000 1000"
-        preserveAspectRatio="xMidYMid slice"
+        preserveAspectRatio="xMaxYMid slice"
         aria-hidden="true"
         focusable="false"
       >
