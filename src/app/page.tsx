@@ -232,10 +232,6 @@ export default function Home() {
                       sizes="(max-width: 48rem) 100vw, (max-width: 72rem) 50vw, 36rem"
                     />
                   </div>
-                  <figcaption>
-                    <span>{image.caption}</span>
-                    {image.location ? <span>{image.location}</span> : null}
-                  </figcaption>
                 </figure>
               ))}
             </div>

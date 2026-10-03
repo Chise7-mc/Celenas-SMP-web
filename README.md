@@ -17,11 +17,11 @@ pnpm dev
 
 1. PNG / JPG / JPEG / WebP画像を `gallery-inbox/` に入れる
 2. `pnpm gallery:add`
-3. 作品名・場所（任意）・画像の説明を入力する
+3. 画像の説明（alt）を入力する
 4. `pnpm dev` で確認する
 5. 問題なければ通常どおりcommit / pushする
 
-画像は最大1920px・WebPへ自動変換されます。元画像はGit管理外の `gallery-archive/` に移動します。Galleryは `src/content/gallery.json` を唯一のデータ源として使います。画像未登録の場合は空のGallery表示を保ちます。
+画像は最大1920px・WebPへ自動変換されます。元画像はGit管理外の `gallery-archive/` に移動します。Galleryは `src/content/gallery.json` を唯一のデータ源として使い、サイト上では画像だけを表示します。画像の説明はアクセシビリティ用altとして使います。
 
 ```sh
 pnpm gallery:list
@@ -50,7 +50,7 @@ pnpm check
 - 月明かり・軌道をモチーフにしたダークテーマと公式ロゴ
 - Minecraft Java Edition 26.3、Discord招待、6項目の公開ルール
 - サーバーアドレスはWeb非公開
-- Galleryの管理CLIは準備済み。現在、登録画像はありません
+- Galleryは画像のみを表示し、1枚の画像を登録済み
 - GitHub Pages用の静的エクスポートと品質CI
 
 ## ドキュメント

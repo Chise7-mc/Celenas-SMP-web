@@ -89,11 +89,15 @@ async function selectImage(images, readline) {
   }
 }
 
-async function askRequired(readline, prompt) {
+async function askRequired(
+  readline,
+  prompt,
+  requiredMessage = "この項目は必須です。入力してください。",
+) {
   while (true) {
     const answer = (await readline.question(prompt)).trim();
     if (answer) return answer;
-    console.log("この項目は必須です。入力してください。");
+    console.log(requiredMessage);
   }
 }
 
@@ -226,12 +230,11 @@ async function main() {
     const sourcePath = resolveContained(galleryPaths.inbox, filename);
     await rejectArchivedDuplicate(sourcePath);
 
-    const title = await askRequired(readline, "\n作品名: ");
-    const locationInput = (await readline.question("場所（任意）: ")).trim();
-    const altInput = (await readline.question("画像の説明 / alt: ")).trim();
-    const alt = altInput || title;
-    if (!altInput)
-      console.log("altが未入力のため、作品名を代わりに使用します。");
+    const alt = await askRequired(
+      readline,
+      "\n画像の説明 / alt: ",
+      "画像の説明を入力してください。",
+    );
 
     const { entries: currentEntries } = await readManifest();
     const existing = await validateManifestOnDisk(currentEntries);
@@ -276,9 +279,7 @@ async function main() {
     const finalPath = resolveContained(galleryPaths.public, outputFilename);
 
     console.log("\n--------------------------------\nGallery entry\n");
-    console.log(
-      `Source:\n${filename}\n\n作品名:\n${title}\n\n場所:\n${locationInput || "（省略）"}\n\nAlt:\n${alt}`,
-    );
+    console.log(`Source:\n${filename}\n\nAlt:\n${alt}`);
     const confirmation = (await readline.question("\n追加しますか? [Y/n]: "))
       .trim()
       .toLowerCase();
@@ -305,13 +306,7 @@ async function main() {
     console.log(
       `\nOutput\n${source}\n${verifiedOutput.width} × ${verifiedOutput.height}\n${formatGallerySize(optimized.size)} (quality ${optimized.quality})\n--------------------------------`,
     );
-    const entry = {
-      id,
-      src: source,
-      alt,
-      caption: title,
-      ...(locationInput ? { location: locationInput } : {}),
-    };
+    const entry = { id, src: source, alt };
     const updatedEntries = prependGalleryEntry(currentEntries, entry);
     const validation = validateGalleryManifest(updatedEntries, {
       imageInfoBySrc: new Map([

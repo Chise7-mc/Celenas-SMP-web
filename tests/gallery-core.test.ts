@@ -17,8 +17,6 @@ const validEntry: GalleryEntry = {
   id: "20261003-130741",
   src: "/gallery/gallery-20261003-130741.webp",
   alt: "軌道上に建つ巨大な建築物",
-  caption: "軌道建築",
-  location: "Celenas SMP",
 };
 
 const validInfo: GalleryImageInfo = {
@@ -46,16 +44,6 @@ describe("Gallery manifest helpers", () => {
     expect(validate([validEntry]).errors).toEqual([]);
   });
 
-  it("allows location to be omitted", () => {
-    const withoutLocation = {
-      id: validEntry.id,
-      src: validEntry.src,
-      alt: validEntry.alt,
-      caption: validEntry.caption,
-    };
-    expect(validate([withoutLocation]).errors).toEqual([]);
-  });
-
   it("rejects duplicate IDs", () => {
     const result = validate([validEntry, validEntry]);
     expect(result.errors.some((error) => error.includes("id が重複"))).toBe(
@@ -71,13 +59,18 @@ describe("Gallery manifest helpers", () => {
     );
   });
 
-  it("rejects missing captions and alt text", () => {
-    expect(
-      validate([{ ...validEntry, caption: " " }]).errors.join("\n"),
-    ).toContain("caption が空");
+  it("rejects missing alt text and legacy visible fields", () => {
     expect(validate([{ ...validEntry, alt: "" }]).errors.join("\n")).toContain(
       "alt が空",
     );
+    expect(
+      validate([{ ...validEntry, caption: "legacy title" }]).errors.join("\n"),
+    ).toContain("caption");
+    expect(
+      validate([{ ...validEntry, location: "legacy location" }]).errors.join(
+        "\n",
+      ),
+    ).toContain("location");
   });
 
   it("rejects an entry whose public image is missing", () => {

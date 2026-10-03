@@ -4,8 +4,6 @@ export type GalleryImage = Readonly<{
   id: string;
   src: string;
   alt: string;
-  caption: string;
-  location?: string;
 }>;
 
 const galleryImages: readonly GalleryImage[] = galleryManifest;

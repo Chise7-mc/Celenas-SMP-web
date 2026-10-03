@@ -27,7 +27,7 @@ try {
   } else {
     console.log("Celenas Gallery\n");
     entries.forEach((entry, index) =>
-      console.log(`[${index + 1}] ${entry.caption}`),
+      console.log(`[${index + 1}] gallery-${entry.id}.webp`),
     );
     const readline = createInterface({
       input: process.stdin,
@@ -58,8 +58,8 @@ try {
       }
 
       const prompt = imageExists
-        ? `「${entry.caption}」をGalleryから削除しますか? [y/N]: `
-        : `画像ファイル ${entry.src} が見つかりません。manifestから「${entry.caption}」を削除しますか? [y/N]: `;
+        ? `${filename} をGalleryから削除しますか? [y/N]: `
+        : `画像ファイル ${entry.src} が見つかりません。manifestから${filename}を削除しますか? [y/N]: `;
       const confirmation = (await readline.question(prompt))
         .trim()
         .toLowerCase();
@@ -95,7 +95,7 @@ try {
           );
         }
         console.log(
-          `✓ Galleryから「${entry.caption}」を削除しました。\n元画像archiveは変更していません。`,
+          `✓ Galleryから${filename}を削除しました。\n元画像archiveは変更していません。`,
         );
       }
     } finally {

@@ -67,7 +67,7 @@ export function validateGalleryManifest(
       continue;
     }
 
-    const allowedKeys = new Set(["id", "src", "alt", "caption", "location"]);
+    const allowedKeys = new Set(["id", "src", "alt"]);
     for (const key of Object.keys(entry)) {
       if (!allowedKeys.has(key))
         errors.push(`${label}: 未対応の項目 ${key} があります。`);
@@ -100,17 +100,8 @@ export function validateGalleryManifest(
       referencedFiles.add(entry.src.slice("/gallery/".length));
     }
 
-    if (typeof entry.caption !== "string" || entry.caption.trim() === "") {
-      errors.push(`${label}: caption が空です。`);
-    }
     if (typeof entry.alt !== "string" || entry.alt.trim() === "") {
       errors.push(`${label}: alt が空です。`);
-    }
-    if (
-      Object.hasOwn(entry, "location") &&
-      (typeof entry.location !== "string" || entry.location.trim() === "")
-    ) {
-      errors.push(`${label}: location は空でない文字列か、省略してください。`);
     }
 
     if (

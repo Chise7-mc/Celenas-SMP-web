@@ -2,11 +2,12 @@
 
 1. 画像を `gallery-inbox/` に入れる
 2. `pnpm gallery:add`
-3. 作品名・場所・説明を入力する
+3. 画像の説明（alt）を入力する
 4. `pnpm dev` で確認する
 5. 問題なければ通常どおりcommit / pushする
 
 Gallery登録情報は `src/content/gallery.json` で管理します。手でmanifestや公開ファイルを編集せず、追加・削除コマンドを使ってください。
+Galleryは画像のみを表示し、作品名や場所はサイト上に表示しません。画像説明はアクセシビリティ用のaltとして使用します。
 
 ## 対応画像
 
@@ -24,17 +25,17 @@ Galleryへ登録する画像は、Celenas SMPの建築や風景として公開�
 
 ### `pnpm gallery:add`
 
-`gallery-inbox/` の画像を1枚選び、作品名・場所（任意）・alt説明を入力します。確認後、画像を最適化して `public/gallery/` に保存し、manifestの先頭へ登録します。処理に成功した元画像は `gallery-archive/` へ移動します。altが空の場合は作品名を代用します。
+`gallery-inbox/` の画像を1枚選び、画像の説明（alt）を入力します。altは必須です。空の場合は「画像の説明を入力してください。」と案内して再入力を求めます。確認後、画像を最適化して `public/gallery/` に保存し、manifestの先頭へ登録します。処理に成功した元画像は `gallery-archive/` へ移動します。
 
 同じ元画像の二重登録、ID衝突、既存WebPの上書きを防ぎます。manifest・画像処理・archive移動のどこかで失敗した場合、可能な範囲でmanifestと出力を元に戻し、元画像をinboxに残します。
 
 ### `pnpm gallery:list`
 
-登録順に番号・ID・作品名・場所・公開パス・ファイルサイズを表示します。場所がない項目は省略して表示します。
+登録順に番号・ID・公開パス・alt・ファイルサイズを表示します。
 
 ### `pnpm gallery:remove`
 
-Gallery一覧から番号で選択します。確認の既定値はNoです。公開WebPとmanifest項目だけを削除し、`gallery-archive/` の元画像には触れません。公開画像が欠けているときも状態を示し、確認を得てからmanifestを変更します。
+Gallery一覧から番号で選択します。画像ファイル名で項目を識別し、確認の既定値はNoです。公開WebPとmanifest項目だけを削除し、`gallery-archive/` の元画像には触れません。公開画像が欠けているときも状態を示し、確認を得てからmanifestを変更します。
 
 ### `pnpm gallery:validate`
 

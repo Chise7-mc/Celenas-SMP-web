@@ -2,8 +2,6 @@ export type GalleryEntry = Readonly<{
   id: string;
   src: string;
   alt: string;
-  caption: string;
-  location?: string;
 }>;
 
 export type GalleryImageInfo = Readonly<{

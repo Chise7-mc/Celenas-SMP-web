@@ -20,17 +20,18 @@ try {
   } else if (entries.length === 0) {
     console.log("Celenas Gallery — 0 images");
   } else {
-    console.log(`Celenas Gallery — ${entries.length} images\n`);
+    const countLabel = entries.length === 1 ? "image" : "images";
+    console.log(`Celenas Gallery — ${entries.length} ${countLabel}\n`);
     for (const [index, entry] of entries.entries()) {
       const filename = entry.src.slice("/gallery/".length);
       const imagePath = resolveContained(galleryPaths.public, filename);
       const size = (await pathExists(imagePath))
         ? formatGallerySize((await stat(imagePath)).size)
         : "MISSING";
-      console.log(`${String(index + 1).padStart(2, "0")}  ${entry.id}`);
-      console.log(`    ${entry.caption}`);
-      if (entry.location) console.log(`    ${entry.location}`);
+      console.log(`${String(index + 1).padStart(2, "0")}`);
+      console.log(`    ID: ${entry.id}`);
       console.log(`    ${entry.src}`);
+      console.log(`    Alt: ${entry.alt}`);
       console.log(`    ${size}\n`);
     }
   }

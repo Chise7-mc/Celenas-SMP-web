@@ -222,7 +222,7 @@ test("keyboard users can skip to main content", async ({ page }) => {
   await expect(page.getByRole("main")).toBeFocused();
 });
 
-test("renders refreshed copy, six formal rules, and the empty gallery", async ({
+test("renders refreshed copy, six formal rules, and image-only gallery cards", async ({
   page,
 }) => {
   await page.goto("/");
@@ -294,12 +294,36 @@ test("renders refreshed copy, six formal rules, and the empty gallery", async ({
   await expect(page.locator("#gallery .section-description")).toHaveText(
     "建築、風景、装置、旅の途中で見つけた瞬間。Celenasの世界に残ったものを、少しずつここへ記録していきます。",
   );
-  await expect(page.getByText("最初の記録を準備しています。")).toBeVisible();
-  await expect(
-    page.getByText(
-      "Celenasで生まれた景色を、これから少しずつ追加していきます。",
-    ),
-  ).toBeVisible();
+  const galleryCard = page.locator("#gallery .gallery-item");
+  await expect(galleryCard).toHaveCount(1);
+  const galleryImage = galleryCard.locator("img");
+  await expect(galleryImage).toHaveAttribute(
+    "alt",
+    "エンドに建設されたブラックホール型のサンドデューパー",
+  );
+  await galleryImage.scrollIntoViewIfNeeded();
+  await expect(galleryImage).toBeVisible();
+  await expect(galleryCard.locator("figcaption")).toHaveCount(0);
+  await expect(page.getByText("black_hole", { exact: true })).toHaveCount(0);
+  await expect(page.getByText("end", { exact: true })).toHaveCount(0);
+  await expect
+    .poll(() =>
+      galleryImage.evaluate(
+        (image: HTMLImageElement) => image.complete && image.naturalWidth > 0,
+      ),
+    )
+    .toBe(true);
+  const naturalSize = await galleryImage.evaluate(
+    (image: HTMLImageElement) => ({
+      width: image.naturalWidth,
+      height: image.naturalHeight,
+    }),
+  );
+  expect(naturalSize.width / naturalSize.height).toBeCloseTo(1920 / 1009, 2);
+  await expect(galleryImage).toHaveCSS("object-fit", "contain");
+  const imageFrame = await galleryCard.locator(".gallery-image").boundingBox();
+  expect(imageFrame).not.toBeNull();
+  expect(imageFrame!.width / imageFrame!.height).toBeCloseTo(1920 / 1009, 2);
   await expect(page.locator(".join-copy")).toContainText(
     "Celenas SMPはMinecraft Java Edition 26.3で運用しています。",
   );
@@ -325,6 +349,35 @@ test("renders refreshed copy, six formal rules, and the empty gallery", async ({
       /接続情報は準備中|接続先は公開準備中|対応バージョンは確認中|正式なルールは準備中/,
     ),
   ).toHaveCount(0);
+});
+
+test("image-only Gallery has no overflow across desktop and mobile sizes", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const galleryImage = page.locator("#gallery .gallery-item img");
+  await expect(galleryImage).toBeVisible();
+
+  for (const viewport of [
+    { width: 1920, height: 1080 },
+    { width: 1440, height: 900 },
+    { width: 1366, height: 768 },
+    { width: 430, height: 932 },
+    { width: 390, height: 844 },
+    { width: 375, height: 812 },
+    { width: 320, height: 700 },
+  ]) {
+    await page.setViewportSize(viewport);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    ).toBe(true);
+    await expect(page.locator("#gallery .gallery-item")).toBeVisible();
+    await expect(page.locator("#gallery .gallery-item figcaption")).toHaveCount(
+      0,
+    );
+  }
 });
 
 test("mobile navigation is keyboard-operable and reaches page sections", async ({
