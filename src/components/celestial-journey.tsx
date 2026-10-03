@@ -139,7 +139,7 @@ export function CelestialJourney() {
           }}
           aria-hidden="true"
         >
-          <span className="orbital-fixed-node orbital-section-node" />
+          <span className="orbital-fixed-node" />
         </span>
         <span
           className="orbital-active-satellite"
@@ -159,10 +159,7 @@ export function CelestialJourney() {
             aria-current={activeHref === item.href ? "location" : undefined}
             onClick={(event) => navigateToSection(event, item.href)}
           >
-            <span
-              className="orbital-fixed-node orbital-section-node"
-              aria-hidden="true"
-            />
+            <span className="orbital-fixed-node" aria-hidden="true" />
             <span className="orbital-section-label" aria-hidden="true">
               <span>{String(index + 1).padStart(2, "0")}</span>
               {item.label}

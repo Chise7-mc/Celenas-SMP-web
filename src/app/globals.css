@@ -1195,27 +1195,13 @@ h3 {
   outline-offset: 1px;
 }
 
-.orbital-section-node {
+.orbital-fixed-node {
   width: 0.42rem;
   height: 0.42rem;
   border: 1px solid rgba(232, 237, 255, 0.7);
   border-radius: 50%;
   background: var(--color-background);
   box-shadow: 0 0 0 0.18rem rgba(167, 181, 255, 0.06);
-  transition:
-    background-color var(--motion-medium) var(--easing-standard),
-    border-color var(--motion-medium) var(--easing-standard),
-    box-shadow var(--motion-medium) var(--easing-standard),
-    transform var(--motion-medium) var(--easing-standard);
-}
-
-.orbital-section-link:hover .orbital-section-node,
-.orbital-section-link:focus-visible .orbital-section-node,
-.orbital-section-link[aria-current="location"] .orbital-section-node {
-  transform: scale(1.25);
-  border-color: var(--color-accent);
-  background: var(--color-accent);
-  box-shadow: 0 0 0 0.24rem rgba(167, 181, 255, 0.12);
 }
 
 .orbital-active-satellite {

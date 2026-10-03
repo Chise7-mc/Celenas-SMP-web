@@ -19,6 +19,28 @@ async function expectFixedNodesVisible(page: Page) {
       ),
     )
     .toBe(true);
+  await expect
+    .poll(() =>
+      page.locator(".orbital-fixed-node").evaluateAll((nodes) => {
+        const styles = nodes.map((node) => {
+          const style = getComputedStyle(node);
+          return [
+            style.width,
+            style.height,
+            style.borderWidth,
+            style.borderStyle,
+            style.borderColor,
+            style.borderRadius,
+            style.backgroundColor,
+            style.boxShadow,
+            style.opacity,
+            style.transform,
+          ].join("|");
+        });
+        return new Set(styles).size === 1;
+      }),
+    )
+    .toBe(true);
 }
 
 async function expectMarkerAligned(page: Page, href: string) {
