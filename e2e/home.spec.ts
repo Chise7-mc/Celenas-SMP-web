@@ -1,7 +1,27 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 
 const discordInviteUrl = "https://discord.gg/cuXPVNccYv";
+
+async function expectViewerImageReady(image: Locator) {
+  await expect(image).toBeVisible();
+  await expect
+    .poll(() =>
+      image.evaluate((node) => {
+        const element = node as HTMLImageElement;
+        const rect = element.getBoundingClientRect();
+
+        return (
+          element.complete &&
+          element.naturalWidth > 0 &&
+          element.naturalHeight > 0 &&
+          rect.width > 0 &&
+          rect.height > 0
+        );
+      }),
+    )
+    .toBe(true);
+}
 
 async function expectFixedNodesVisible(page: Page) {
   const orbital = page.getByRole("navigation", { name: "ページ内セクション" });
@@ -445,6 +465,8 @@ test("Gallery images open an accessible fullscreen viewer", async ({
   await imageButton.click();
 
   await expect(viewer).toBeVisible();
+  const viewerImage = viewer.locator(".gallery-viewer-image-content");
+  await expectViewerImageReady(viewerImage);
   await expect(viewer).toHaveCSS("border-width", "0px");
   await expect(viewer).toHaveCSS("padding", "0px");
   await expect(viewer).toHaveCSS("margin", "0px");
@@ -466,12 +488,12 @@ test("Gallery images open an accessible fullscreen viewer", async ({
   expect(backgroundChannels.slice(0, 3)).toEqual([3, 4, 7]);
   expect(backgroundChannels[3]).toBeCloseTo(0.985, 2);
   expect(viewerSurface.borderRadius).toBe("0px");
-  const viewerImage = viewer.getByRole("img", { name: "tree_farm" });
-  await expect(viewerImage).toBeVisible();
-  await expect(viewerImage).toHaveCSS("object-fit", "contain");
+  const viewerSemanticImage = viewer.getByRole("img", { name: "tree_farm" });
+  await expect(viewerSemanticImage).toBeVisible();
+  await expect(viewerSemanticImage).toHaveCSS("object-fit", "contain");
   expect(
     Number.parseFloat(
-      await viewerImage.evaluate(
+      await viewerSemanticImage.evaluate(
         (image) => getComputedStyle(image).borderTopLeftRadius,
       ),
     ),
@@ -597,6 +619,9 @@ test("fullscreen viewer stays aligned and edge controls stay clear on desktop", 
     await page.getByRole("button", { name: "画像を拡大: yamako_town" }).click();
     const viewer = page.getByRole("dialog", { name: "Gallery image viewer" });
     await expect(viewer).toBeVisible();
+    await expectViewerImageReady(
+      viewer.locator(".gallery-viewer-image-content"),
+    );
     const layout = await viewer.evaluate((dialog) => {
       const image = dialog.querySelector("img")!.getBoundingClientRect();
       const previous = dialog
@@ -651,6 +676,9 @@ test("mobile fullscreen viewer anchors controls safely and keeps the image tappa
     await opener.click();
     const viewer = page.getByRole("dialog", { name: "Gallery image viewer" });
     await expect(viewer).toBeVisible();
+    await expectViewerImageReady(
+      viewer.locator(".gallery-viewer-image-content"),
+    );
     const metrics = await viewer.evaluate((dialog) => {
       const image = dialog.querySelector("img")!.getBoundingClientRect();
       const imageStyle = getComputedStyle(dialog.querySelector("img")!);
