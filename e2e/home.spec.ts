@@ -323,9 +323,31 @@ test("renders refreshed copy, six formal rules, and image-only gallery cards", a
   );
   expect(naturalSize.width / naturalSize.height).toBeCloseTo(1920 / 1009, 2);
   await expect(galleryImage).toHaveCSS("object-fit", "contain");
-  const imageFrame = await galleryImage.locator("..").boundingBox();
+  expect(
+    Number.parseFloat(
+      await galleryImage.evaluate(
+        (image) => getComputedStyle(image).borderTopLeftRadius,
+      ),
+    ),
+  ).toBeGreaterThan(0);
+  const imageFrame = await galleryImage.boundingBox();
   expect(imageFrame).not.toBeNull();
   expect(imageFrame!.width / imageFrame!.height).toBeCloseTo(1920 / 1009, 2);
+  const stage = galleryImage.locator("xpath=ancestor::figure[1]");
+  const stageBox = await stage.boundingBox();
+  expect(stageBox).not.toBeNull();
+  expect(
+    await stage.evaluate((element) => getComputedStyle(element).borderWidth),
+  ).toBe("0px");
+  const stageImageCenterDelta = Math.abs(
+    stageBox!.y +
+      stageBox!.height / 2 -
+      (imageFrame!.y + imageFrame!.height / 2),
+  );
+  expect(
+    stageImageCenterDelta,
+    JSON.stringify({ stageBox, imageFrame }),
+  ).toBeLessThanOrEqual(1);
   await expect(page.locator(".join-copy")).toContainText(
     "Celenas SMPはMinecraft Java Edition 26.3で運用しています。",
   );
@@ -411,6 +433,48 @@ test("cinematic Gallery rail navigates with arrows and keyboard", async ({
   await expect(counter).toHaveText("04 / 05");
 });
 
+test("Gallery images open an accessible fullscreen viewer", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const imageButton = page.getByRole("button", {
+    name: "画像を拡大: tree_farm",
+  });
+  await imageButton.click();
+
+  const viewer = page.getByRole("dialog", { name: "Gallery image viewer" });
+  await expect(viewer).toBeVisible();
+  const viewerImage = viewer.getByRole("img", { name: "tree_farm" });
+  await expect(viewerImage).toBeVisible();
+  await expect(viewerImage).toHaveCSS("object-fit", "contain");
+  expect(
+    Number.parseFloat(
+      await viewerImage.evaluate(
+        (image) => getComputedStyle(image).borderTopLeftRadius,
+      ),
+    ),
+  ).toBeGreaterThan(0);
+  await expect(viewer.locator(".gallery-counter")).toHaveText("01 / 05");
+  const previous = viewer.getByRole("button", { name: "前の画像" });
+  const next = viewer.getByRole("button", { name: "次の画像" });
+  await expect(previous).toBeDisabled();
+  await next.click();
+  await expect(viewer.getByRole("img", { name: "yamako_town" })).toBeVisible();
+  await expect(viewer.locator(".gallery-counter")).toHaveText("02 / 05");
+  await page.keyboard.press("ArrowRight");
+  await expect(viewer.getByRole("img", { name: "sand_duper" })).toBeVisible();
+  await page.keyboard.press("ArrowLeft");
+  await expect(viewer.getByRole("img", { name: "yamako_town" })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(viewer).not.toBeVisible();
+  await expect(imageButton).toBeFocused();
+
+  await imageButton.click();
+  await viewer.getByRole("button", { name: "拡大表示を閉じる" }).click();
+  await expect(viewer).not.toBeVisible();
+  await expect(imageButton).toBeFocused();
+});
+
 test("Gallery rail supports keyboard and touch scrolling without page overflow", async ({
   page,
 }) => {
@@ -451,6 +515,30 @@ test("Gallery rail supports keyboard and touch scrolling without page overflow",
     expect(metrics.overflowX).toBe("auto");
     expect(metrics.snapType).toContain("x mandatory");
     expect(metrics.scrollWidth).toBeGreaterThan(metrics.clientWidth);
+    const stages = await track.locator(".gallery-slide").evaluateAll((slides) =>
+      slides.map((slide) => {
+        const rect = slide.getBoundingClientRect();
+        const image = slide.querySelector("img")?.getBoundingClientRect();
+        return {
+          height: rect.height,
+          centerY: rect.top + rect.height / 2,
+          imageCenterY: image ? image.top + image.height / 2 : null,
+          borderWidth: getComputedStyle(slide).borderWidth,
+          imageRadius: image
+            ? getComputedStyle(slide.querySelector("img")!).borderTopLeftRadius
+            : "0px",
+        };
+      }),
+    );
+    expect(new Set(stages.map(({ height }) => height)).size).toBe(1);
+    for (const item of stages) {
+      expect(item.borderWidth).toBe("0px");
+      expect(Number.parseFloat(item.imageRadius)).toBeGreaterThan(0);
+      expect(item.imageCenterY).not.toBeNull();
+      expect(Math.abs(item.centerY - item.imageCenterY!)).toBeLessThanOrEqual(
+        1,
+      );
+    }
     await track.evaluate((element) => {
       element.scrollLeft = 0;
     });

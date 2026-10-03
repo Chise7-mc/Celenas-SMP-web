@@ -37,7 +37,8 @@ atmospheric CSS properties.
 Browser tests load the production page, check the published Discord actions,
 Java Edition details, READY state, all six rules and the intentionally omitted
 server address, plus the canonical logo and site icon and image-only Gallery cards.
-They also cover Gallery rail snapping, arrow/keyboard controls, counter/progress,
+They also cover Gallery rail snapping, shared stage alignment, borderless rounded
+images, fullscreen viewer controls and focus restoration, counter/progress,
 image peek and responsive overflow; accessible orbital navigation and browser history, active marker
 alignment at three desktop viewport sizes,
 the 120-second waxing-crescent SVG phase morph, fixed tilt and 100ms update

@@ -14,7 +14,8 @@ The canonical logo is the official white asset at
 `public/brand/celenas-logo-white.png`, already used in the site header and hero.
 Minecraft Java Edition 26.3 and Discord are confirmed public information. The
 server address is intentionally not published. Gallery screenshots are shown
-in a horizontal, image-only rail with native scroll snapping.
+in a horizontal, image-only rail with native scroll snapping, a shared-height
+stage, rounded borderless images and a keyboard-accessible fullscreen viewer.
 
 The Hero pairs the official mark with a fictional gas giant, a soft-edged SVG
 phase mask, and three enlarged SVG ellipse paths with one satellite each. The
