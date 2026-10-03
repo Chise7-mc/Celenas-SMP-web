@@ -1,7 +1,37 @@
 [
   {
+    "id": "20261003-145840",
+    "src": "/gallery/gallery-20261003-145840.webp",
+    "alt": "tree_farm",
+    "width": 1133,
+    "height": 840
+  },
+  {
+    "id": "20261003-145821",
+    "src": "/gallery/gallery-20261003-145821.webp",
+    "alt": "yamako_town",
+    "width": 1920,
+    "height": 804
+  },
+  {
+    "id": "20261003-145753",
+    "src": "/gallery/gallery-20261003-145753.webp",
+    "alt": "sand_duper",
+    "width": 1920,
+    "height": 1081
+  },
+  {
+    "id": "20261003-145728",
+    "src": "/gallery/gallery-20261003-145728.webp",
+    "alt": "island",
+    "width": 1920,
+    "height": 1080
+  },
+  {
     "id": "20261003-141450",
     "src": "/gallery/gallery-20261003-141450.webp",
-    "alt": "エンドに建設されたブラックホール型のサンドデューパー"
+    "alt": "エンドに建設されたブラックホール型のサンドデューパー",
+    "width": 1920,
+    "height": 1009
   }
 ]

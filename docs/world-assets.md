@@ -17,6 +17,7 @@ Galleryは画像のみを表示し、作品名や場所はサイト上に表示�
 - WebPへ自動変換し、quality 84から800 KiBを目安に再圧縮します
 - quality 76でも800 KiBを超える場合は、画質を優先して警告付きで保存します
 - EXIFなどの個人情報につながるmetadataは取り除き、ICCプロファイルは色変化を抑えるため保持します
+- 変換後のwidth / heightもmanifestへ保存し、画像ごとの比率を保って表示します
 - 元画像はGit管理外の `gallery-archive/` へ移動します
 
 Galleryへ登録する画像は、Celenas SMPの建築や風景として公開してよいものを選んでください。ユーザー名、チャット、座標、個人情報などが画像内に写っていないことも確認してください。
@@ -46,6 +47,6 @@ manifestの必須項目・重複・パス・WebPの存在とデコード可否�
 - `gallery-inbox/`: 登録前の画像置き場。`.gitkeep`以外はGit管理しません。
 - `gallery-archive/`: 最適化前の元画像保管場所。ディレクトリごとGit管理外です。
 - `public/gallery/`: Galleryで配信する最適化済みWebP。Git管理対象です。
-- `src/content/gallery.json`: Galleryの唯一のmanifestです。新しい項目は先頭に追加されます。
+- `src/content/gallery.json`: Galleryの唯一のmanifestです。`id` / `src` / `alt` / `width` / `height`を保持し、新しい項目は先頭に追加されます。
 
 `sharp`はNode.js 24環境で使う画像変換ライブラリです。外部CLIには依存しません。

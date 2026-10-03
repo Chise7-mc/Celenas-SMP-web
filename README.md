@@ -50,7 +50,7 @@ pnpm check
 - 月明かり・軌道をモチーフにしたダークテーマと公式ロゴ
 - Minecraft Java Edition 26.3、Discord招待、6項目の公開ルール
 - サーバーアドレスはWeb非公開
-- Galleryは画像のみを表示し、1枚の画像を登録済み
+- Galleryは画像のみを横スライド表示し、5枚の画像を登録済み
 - GitHub Pages用の静的エクスポートと品質CI
 
 ## ドキュメント

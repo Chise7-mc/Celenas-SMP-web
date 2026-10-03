@@ -306,7 +306,13 @@ async function main() {
     console.log(
       `\nOutput\n${source}\n${verifiedOutput.width} × ${verifiedOutput.height}\n${formatGallerySize(optimized.size)} (quality ${optimized.quality})\n--------------------------------`,
     );
-    const entry = { id, src: source, alt };
+    const entry = {
+      id,
+      src: source,
+      alt,
+      width: verifiedOutput.width,
+      height: verifiedOutput.height,
+    };
     const updatedEntries = prependGalleryEntry(currentEntries, entry);
     const validation = validateGalleryManifest(updatedEntries, {
       imageInfoBySrc: new Map([

@@ -8,13 +8,13 @@ with subtle orbit and glass-like interaction layers rather than a generic game
 server template. Minecraft screenshots remain content, not the dominant UI
 language.
 
-The current implementation delivers the public Web v1 landing experience:
+The current implementation delivers the public landing experience:
 Hero / About / World / Community / Rules / Gallery / Join / Footer.
 The canonical logo is the official white asset at
 `public/brand/celenas-logo-white.png`, already used in the site header and hero.
 Minecraft Java Edition 26.3 and Discord are confirmed public information. The
-server address is intentionally not published. The Gallery remains in a
-polished pending state until approved screenshots exist.
+server address is intentionally not published. Gallery screenshots are shown
+in a horizontal, image-only rail with native scroll snapping.
 
 The Hero pairs the official mark with a fictional gas giant, a soft-edged SVG
 phase mask, and three enlarged SVG ellipse paths with one satellite each. The
@@ -27,8 +27,9 @@ and one periwinkle accent.
 The planet's restrained amber cloud bands stay within the illustration. The
 scene is decorative, not a substitute logo or a representation of the actual
 Minecraft world. World themes describe the intended play style; the six concise
-Rules establish shared expectations. The Gallery stays in a polished pending
-state until approved screenshots exist.
+Rules establish shared expectations. The Gallery keeps screenshots prominent
+without visible titles or location labels; descriptive alt text remains for
+assistive technology.
 
 ## Tokens and components
 

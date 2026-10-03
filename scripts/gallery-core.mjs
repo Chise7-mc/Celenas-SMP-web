@@ -67,7 +67,7 @@ export function validateGalleryManifest(
       continue;
     }
 
-    const allowedKeys = new Set(["id", "src", "alt"]);
+    const allowedKeys = new Set(["id", "src", "alt", "width", "height"]);
     for (const key of Object.keys(entry)) {
       if (!allowedKeys.has(key))
         errors.push(`${label}: 未対応の項目 ${key} があります。`);
@@ -103,6 +103,14 @@ export function validateGalleryManifest(
     if (typeof entry.alt !== "string" || entry.alt.trim() === "") {
       errors.push(`${label}: alt が空です。`);
     }
+    const validDimensions =
+      Number.isInteger(entry.width) &&
+      entry.width > 0 &&
+      Number.isInteger(entry.height) &&
+      entry.height > 0;
+    if (!validDimensions) {
+      errors.push(`${label}: width / height は正の整数である必要があります。`);
+    }
 
     if (
       !checkImages ||
@@ -136,6 +144,16 @@ export function validateGalleryManifest(
     } else if (Math.max(imageInfo.width, imageInfo.height) > 1920) {
       errors.push(
         `${label}: 画像の長辺が1920pxを超えています (${entry.src})。`,
+      );
+    }
+    if (
+      validDimensions &&
+      Number.isInteger(imageInfo.width) &&
+      Number.isInteger(imageInfo.height) &&
+      (entry.width !== imageInfo.width || entry.height !== imageInfo.height)
+    ) {
+      errors.push(
+        `${label}: manifestのwidth / heightが画像と一致しません (${entry.src})。`,
       );
     }
     if (imageInfo.exif || imageInfo.iptc || imageInfo.xmp) {

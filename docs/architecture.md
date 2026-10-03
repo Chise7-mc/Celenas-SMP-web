@@ -39,7 +39,10 @@ rules. `src/content/gallery.json` is the single source of Gallery metadata and
 is imported with the `GalleryImage` type. Confirmed public facts remain in
 `src/config/site.ts`. Minecraft Java Edition 26.3 and the Discord invitation are
 public; the server address is intentionally not part of the site data model.
-The Gallery starts empty and renders an intentional pending state. To add a
+When no images are registered, the Gallery renders its intentional pending
+state. Registered screenshots appear in a client-side horizontal rail with
+scroll snapping, a compact position/progress display and keyboard/arrow
+navigation. The page retains a single horizontal scroll region. To add a
 screen capture, put PNG/JPEG/WebP files in `gallery-inbox/` and run
 `pnpm gallery:add`. The CLI optimizes them into `public/gallery/`, updates the
 manifest and archives the original locally. `pnpm gallery:validate` checks the

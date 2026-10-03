@@ -294,16 +294,18 @@ test("renders refreshed copy, six formal rules, and image-only gallery cards", a
   await expect(page.locator("#gallery .section-description")).toHaveText(
     "建築、風景、装置、旅の途中で見つけた瞬間。Celenasの世界に残ったものを、少しずつここへ記録していきます。",
   );
-  const galleryCard = page.locator("#gallery .gallery-item");
-  await expect(galleryCard).toHaveCount(1);
-  const galleryImage = galleryCard.locator("img");
+  const galleryCards = page.locator("#gallery .gallery-slide");
+  await expect(galleryCards).toHaveCount(5);
+  const galleryImage = page.locator(
+    '#gallery .gallery-slide img[alt="エンドに建設されたブラックホール型のサンドデューパー"]',
+  );
   await expect(galleryImage).toHaveAttribute(
     "alt",
     "エンドに建設されたブラックホール型のサンドデューパー",
   );
   await galleryImage.scrollIntoViewIfNeeded();
   await expect(galleryImage).toBeVisible();
-  await expect(galleryCard.locator("figcaption")).toHaveCount(0);
+  await expect(page.locator("#gallery figcaption")).toHaveCount(0);
   await expect(page.getByText("black_hole", { exact: true })).toHaveCount(0);
   await expect(page.getByText("end", { exact: true })).toHaveCount(0);
   await expect
@@ -321,7 +323,7 @@ test("renders refreshed copy, six formal rules, and image-only gallery cards", a
   );
   expect(naturalSize.width / naturalSize.height).toBeCloseTo(1920 / 1009, 2);
   await expect(galleryImage).toHaveCSS("object-fit", "contain");
-  const imageFrame = await galleryCard.locator(".gallery-image").boundingBox();
+  const imageFrame = await galleryImage.locator("..").boundingBox();
   expect(imageFrame).not.toBeNull();
   expect(imageFrame!.width / imageFrame!.height).toBeCloseTo(1920 / 1009, 2);
   await expect(page.locator(".join-copy")).toContainText(
@@ -351,12 +353,78 @@ test("renders refreshed copy, six formal rules, and image-only gallery cards", a
   ).toHaveCount(0);
 });
 
-test("image-only Gallery has no overflow across desktop and mobile sizes", async ({
+test("cinematic Gallery rail navigates with arrows and keyboard", async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name === "mobile-chromium");
+  await page.goto("/");
+  const track = page.getByRole("region", { name: "Celenas Gallery" });
+  const counter = page.locator(".gallery-counter");
+  const previous = page.getByRole("button", { name: "前の画像" });
+  const next = page.getByRole("button", { name: "次の画像" });
+
+  await expect(track.locator(".gallery-slide")).toHaveCount(5);
+  await expect(counter).toHaveText("01 / 05");
+  await expect(previous).toBeDisabled();
+  await expect(next).toBeEnabled();
+  const railMetrics = await track.evaluate((element) => {
+    const style = getComputedStyle(element);
+    const trackRect = element.getBoundingClientRect();
+    const secondRect = element.children[1]?.getBoundingClientRect();
+    return {
+      scrollSnapType: style.scrollSnapType,
+      overflowX: style.overflowX,
+      clientWidth: element.clientWidth,
+      scrollWidth: element.scrollWidth,
+      nextPeekRatio: secondRect
+        ? Math.max(0, trackRect.right - secondRect.left) / secondRect.width
+        : 0,
+    };
+  });
+  expect(railMetrics.scrollSnapType).toContain("x mandatory");
+  expect(railMetrics.overflowX).toBe("auto");
+  expect(railMetrics.scrollWidth).toBeGreaterThan(railMetrics.clientWidth);
+  expect(railMetrics.nextPeekRatio).toBeGreaterThan(0.12);
+  expect(railMetrics.nextPeekRatio).toBeLessThan(0.4);
+
+  const progress = page.getByRole("progressbar", { name: "Gallery progress" });
+  await expect(progress).toHaveAttribute("aria-valuenow", "1");
+  await next.click();
+  await expect(counter).toHaveText("02 / 05");
+  await expect(previous).toBeEnabled();
+  await expect(progress).toHaveAttribute("aria-valuenow", "2");
+
+  await track.focus();
+  await page.keyboard.press("ArrowRight");
+  await expect(counter).toHaveText("03 / 05");
+  await page.keyboard.press("ArrowLeft");
+  await expect(counter).toHaveText("02 / 05");
+
+  for (const expected of ["03 / 05", "04 / 05", "05 / 05"]) {
+    await next.click();
+    await expect(counter).toHaveText(expected);
+  }
+  await expect(counter).toHaveText("05 / 05");
+  await expect(next).toBeDisabled();
+  await expect(progress).toHaveAttribute("aria-valuenow", "5");
+  await previous.click();
+  await expect(counter).toHaveText("04 / 05");
+});
+
+test("Gallery rail supports keyboard and touch scrolling without page overflow", async ({
   page,
 }) => {
   await page.goto("/");
-  const galleryImage = page.locator("#gallery .gallery-item img");
-  await expect(galleryImage).toBeVisible();
+  const track = page.getByRole("region", { name: "Celenas Gallery" });
+  const counter = page.locator(".gallery-counter");
+  await expect(track.locator(".gallery-slide")).toHaveCount(5);
+  await expect(page.locator("#gallery figcaption")).toHaveCount(0);
+
+  await track.focus();
+  await page.keyboard.press("ArrowRight");
+  await expect(counter).toHaveText("02 / 05");
+  await page.keyboard.press("ArrowLeft");
+  await expect(counter).toHaveText("01 / 05");
 
   for (const viewport of [
     { width: 1920, height: 1080 },
@@ -373,11 +441,35 @@ test("image-only Gallery has no overflow across desktop and mobile sizes", async
         () => document.documentElement.scrollWidth <= window.innerWidth,
       ),
     ).toBe(true);
-    await expect(page.locator("#gallery .gallery-item")).toBeVisible();
-    await expect(page.locator("#gallery .gallery-item figcaption")).toHaveCount(
-      0,
-    );
+    await expect(track.locator(".gallery-slide").first()).toBeVisible();
+    const metrics = await track.evaluate((element) => ({
+      overflowX: getComputedStyle(element).overflowX,
+      snapType: getComputedStyle(element).scrollSnapType,
+      scrollWidth: element.scrollWidth,
+      clientWidth: element.clientWidth,
+    }));
+    expect(metrics.overflowX).toBe("auto");
+    expect(metrics.snapType).toContain("x mandatory");
+    expect(metrics.scrollWidth).toBeGreaterThan(metrics.clientWidth);
+    await track.evaluate((element) => {
+      element.scrollLeft = 0;
+    });
+    await expect(counter).toHaveText("01 / 05");
+    await track.evaluate((element) => {
+      element.scrollLeft = element.clientWidth;
+    });
+    await expect(counter).not.toHaveText("01 / 05");
   }
+
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  expect(
+    await track.evaluate((element) => getComputedStyle(element).scrollBehavior),
+  ).toBe("auto");
+  expect(
+    await page
+      .locator(".gallery-progress-value")
+      .evaluate((element) => getComputedStyle(element).transitionDuration),
+  ).toBe("0s");
 });
 
 test("mobile navigation is keyboard-operable and reaches page sections", async ({

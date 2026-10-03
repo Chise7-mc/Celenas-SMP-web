@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { CelestialJourney } from "@/components/celestial-journey";
 import { GlassSurface } from "@/components/glass-surface";
+import { GalleryRail } from "@/components/gallery-rail";
 import {
   LunarPhaseBackground,
   LunarPhaseScene,
@@ -221,20 +222,7 @@ export default function Home() {
             description={homeContent.gallery.description}
           />
           {homeContent.gallery.images.length > 0 ? (
-            <div className="gallery-grid">
-              {homeContent.gallery.images.map((image) => (
-                <figure key={image.id} className="gallery-item">
-                  <div className="gallery-image">
-                    <Image
-                      src={withBasePath(image.src)}
-                      alt={image.alt}
-                      fill
-                      sizes="(max-width: 48rem) 100vw, (max-width: 72rem) 50vw, 36rem"
-                    />
-                  </div>
-                </figure>
-              ))}
-            </div>
+            <GalleryRail images={homeContent.gallery.images} />
           ) : (
             <GlassSurface className="gallery-empty">
               <div className="gallery-orbit" aria-hidden="true">

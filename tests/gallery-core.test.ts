@@ -17,6 +17,8 @@ const validEntry: GalleryEntry = {
   id: "20261003-130741",
   src: "/gallery/gallery-20261003-130741.webp",
   alt: "軌道上に建つ巨大な建築物",
+  width: 1920,
+  height: 1009,
 };
 
 const validInfo: GalleryImageInfo = {
@@ -71,6 +73,15 @@ describe("Gallery manifest helpers", () => {
         "\n",
       ),
     ).toContain("location");
+  });
+
+  it("requires positive dimensions and checks them against the image", () => {
+    expect(validate([{ ...validEntry, width: 0 }]).errors.join("\n")).toContain(
+      "width / height は正の整数",
+    );
+    expect(
+      validate([{ ...validEntry, height: 1000 }]).errors.join("\n"),
+    ).toContain("width / heightが画像と一致しません");
   });
 
   it("rejects an entry whose public image is missing", () => {
