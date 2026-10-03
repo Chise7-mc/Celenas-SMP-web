@@ -390,17 +390,22 @@ h3 {
 }
 
 .hero-description {
-  max-width: 36rem;
+  max-inline-size: 18em;
   margin-top: var(--space-3);
   font-size: clamp(1.25rem, 2.2vw, 1.7rem);
   line-height: 1.55;
-  text-wrap: pretty;
+  text-wrap: balance;
+  line-break: strict;
+  word-break: normal;
 }
 
 .hero-supporting {
-  max-width: 38rem;
+  max-inline-size: 34em;
   margin-top: 0.85rem;
   color: var(--color-muted);
+  text-wrap: pretty;
+  line-break: strict;
+  word-break: normal;
 }
 
 .hero-actions {
@@ -1307,13 +1312,18 @@ h3 {
 }
 
 .section-heading h2 {
-  max-width: 24ch;
+  max-inline-size: 18em;
+  text-wrap: balance;
+  line-break: strict;
+  word-break: normal;
 }
 
 .section-description {
-  max-width: 58ch;
+  max-inline-size: 36em;
   margin-top: var(--space-2);
   text-wrap: pretty;
+  line-break: strict;
+  word-break: normal;
 }
 
 .split-layout {
@@ -1324,9 +1334,12 @@ h3 {
 }
 
 .about-copy {
-  max-width: 62ch;
+  max-inline-size: 34em;
   color: var(--color-muted);
   font-size: 1.08rem;
+  text-wrap: pretty;
+  line-break: strict;
+  word-break: normal;
 }
 
 .about-copy p + p {
@@ -1388,9 +1401,12 @@ h3 {
 }
 
 .world-themes p {
-  max-width: 30ch;
+  max-inline-size: 30em;
   color: var(--color-muted);
   font-size: var(--text-small);
+  text-wrap: pretty;
+  line-break: strict;
+  word-break: normal;
 }
 
 .rules-list {
@@ -1435,10 +1451,13 @@ h3 {
   color: var(--color-muted);
   font-size: var(--text-small);
   line-height: 1.7;
+  text-wrap: pretty;
+  line-break: strict;
+  word-break: normal;
 }
 
 .rules-footnote {
-  max-width: 60ch;
+  max-inline-size: 36em;
   margin-top: 1.25rem;
   color: var(--color-muted);
   font-size: var(--text-small);
@@ -1461,8 +1480,8 @@ h3 {
   border-radius: 1.1rem;
   background-color: var(--glass-background-fallback);
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.012) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.012) 1px, transparent 1px);
+    linear-gradient(rgba(255, 255, 255, 0.026) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.026) 1px, transparent 1px);
   background-size: 24px 24px;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
 }
@@ -1484,7 +1503,7 @@ h3 {
   background: linear-gradient(
     180deg,
     transparent,
-    rgba(167, 181, 255, 0.045),
+    rgba(167, 181, 255, 0.075),
     transparent
   );
   content: "";
@@ -1554,10 +1573,26 @@ h3 {
   gap: 1.25rem;
 }
 
-.transmission-access p {
-  max-width: 42ch;
+.transmission-discord {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+}
+
+.discord-mark {
+  flex: 0 0 auto;
+  width: clamp(2.25rem, 3vw, 2.75rem);
+  height: auto;
+}
+
+.transmission-discord p {
+  max-inline-size: 34em;
   margin: 0;
   color: var(--color-muted);
+  text-wrap: pretty;
+  line-break: strict;
+  word-break: normal;
 }
 
 .transmission-footnote {
@@ -1583,8 +1618,11 @@ h3 {
 }
 
 .community-note p {
-  max-width: 32ch;
+  max-inline-size: 32em;
   color: var(--color-muted);
+  text-wrap: pretty;
+  line-break: strict;
+  word-break: normal;
 }
 
 .community-details {
@@ -1604,6 +1642,9 @@ h3 {
 
 .community-details dd {
   margin: 0.2rem 0 0;
+  text-wrap: pretty;
+  line-break: strict;
+  word-break: normal;
 }
 
 .community-details a {
@@ -1985,10 +2026,17 @@ h3 {
 
 .join-copy h2 {
   margin-bottom: 0.7rem;
+  max-inline-size: 18em;
+  text-wrap: balance;
+  line-break: strict;
+  word-break: normal;
 }
 
 .join-copy .muted {
-  max-width: 34ch;
+  max-inline-size: 34em;
+  text-wrap: pretty;
+  line-break: strict;
+  word-break: normal;
 }
 
 .site-footer {
@@ -2148,7 +2196,7 @@ h3 {
   }
 
   .hero-description {
-    max-width: 26ch;
+    max-inline-size: 18em;
     font-size: clamp(1.18rem, 5.5vw, 1.6rem);
   }
 

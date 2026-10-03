@@ -13,58 +13,58 @@ const galleryImages: readonly GalleryImage[] = galleryManifest;
 export const homeContent = {
   hero: {
     eyebrow: "MINECRAFT JAVA 26.3 / SURVIVAL SMP",
-    description: "それぞれのペースが、ひとつの世界をつくっていく。",
+    description: "好きなことを、好きなペースで。",
     supportingText:
-      "建築、探索、装置づくり。ひとりで過ごす日も、誰かと進める日も。積み重ねた時間がCelenasの景色になります。",
-    primaryAction: "Discord に参加する",
+      "建築、探索、装置づくり。ひとりで黙々と遊ぶのも、みんなで何かを作るのも自由です。",
+    primaryAction: "Discordに参加する",
     secondaryAction: "Celenasについて",
   },
   about: {
-    title: "自由に遊ぶ。ゆっくり世界を育てる。",
+    title: "気軽に遊べて、長く続けられるSMP。",
     description:
-      "Celenas SMPは、Minecraft Java Edition 26.3のサバイバルをベースに、建築・探索・装置づくりを楽しむコミュニティです。",
+      "Celenas SMPは、Minecraft Java Edition 26.3で遊ぶサバイバルサーバーです。建築や探索、装置づくりなど、それぞれ好きなことを楽しんでいます。",
     paragraphs: [
-      "大きな建築に集中する日も、遠くまで探索する日も、何も決めずに世界を歩く日も。Celenasでは、遊び方や進める速さをひとつに決めません。",
-      "ひとりでつくった拠点も、誰かと進めた装置や共同プロジェクトも、少しずつ同じ世界に積み重なっていきます。長く残る景色を、みんなでゆっくり育てていくSMPです。",
+      "大きな建築にこもる人も、遠くまで探索する人も、装置を作り続ける人もいます。遊び方やログイン頻度を合わせる必要はありません。",
+      "ひとりで遊ぶのも、誰かと一緒に進めるのも自由です。作ったものがそのまま残っていく、長く遊べるワールドを目指しています。",
     ],
     values: [
-      "自分のペースを尊重する",
-      "つくったものを大切にする",
-      "ひとりでも、誰かとでも",
+      "無理せず、自分のペースで",
+      "人の建築や持ち物を大切に",
+      "ひとりでも、みんなでも",
     ],
   },
   world: {
-    title: "建てる。探す。仕組みをつくる。",
+    title: "建築も、探索も、装置も。",
     description:
-      "Celenasの遊び方に決まった正解はありません。好きなことを、自分のペースで世界に積み重ねていけます。",
+      "何をするかは自由です。やりたいことを見つけて、そのまま遊んでください。",
     themes: [
       {
         number: "01",
         title: "BUILD / 建築",
-        body: "小さな拠点から街、巨大建築まで。時間をかけてつくったものが、少しずつCelenasの景色になっていきます。",
+        body: "拠点づくりから街づくり、巨大建築まで。規模もジャンルも自由です。",
       },
       {
         number: "02",
         title: "EXPLORE / 探索",
-        body: "まだ歩いたことのない場所へ。新しい地形や資源を探しながら、自分だけの発見を世界に増やしていきます。",
+        body: "新しい地形や資源を探したり、遠くまで旅したり。気になる場所へ自由に出かけられます。",
       },
       {
         number: "03",
         title: "CREATE / ものづくり",
-        body: "便利な装置やインフラ、共同プロジェクトまで。アイデアを仕組みに変えて、世界を少しずつ便利にしていきます。",
+        body: "自動化装置や交通網、共有設備など。便利なものを作るのもCelenasの遊び方のひとつです。",
       },
     ],
   },
   community: {
-    title: "参加の入口は、Discordから。",
+    title: "参加・連絡はDiscordから。",
     description:
-      "参加申請、サーバーからのお知らせ、情報共有はDiscordを中心に行います。ゲームの中でも外でも、自分に合った距離感でコミュニティに参加できます。",
-    note: "Minecraftへの参加方法や必要な案内はDiscordで確認できます。Webサイトではサーバーアドレスを公開していません。",
+      "参加申請、お知らせ、質問や情報共有はDiscordで行っています。まずはDiscordに参加してください。",
+    note: "Minecraftへの参加手順はDiscordで案内しています。サーバーアドレスはWebでは公開していません。",
   },
   rules: {
-    title: "同じ世界で、気持ちよく遊ぶために。",
+    title: "みんなで遊ぶためのルール。",
     description:
-      "細かく縛るためではなく、長く同じ世界を楽しむための基本ルールです。",
+      "難しい決まりはありません。人の建築やアイテムを大切にして、困ったときは運営へ相談してください。",
     items: [
       {
         number: "01",
@@ -101,15 +101,15 @@ export const homeContent = {
       "状況に応じてルールを追加・調整する場合があります。重要な変更はDiscordでお知らせします。",
   },
   gallery: {
-    title: "積み重なった景色を、記録する。",
-    description:
-      "建築、風景、装置、旅の途中で見つけた瞬間。Celenasの世界に残ったものを、少しずつここへ記録していきます。",
-    pending: "最初の記録を準備しています。",
+    title: "Celenasのスクリーンショット。",
+    description: "建築、装置、風景など、ワールドで撮った写真を載せています。",
+    pending: "まだ画像はありません。",
+    emptyDescription: "ワールドのスクリーンショットをここに追加していきます。",
     images: galleryImages,
   },
   join: {
-    title: "Celenas SMPに参加する。",
+    title: "Celenas SMPに参加する",
     description:
-      "Celenas SMPはMinecraft Java Edition 26.3で運用しています。参加申請や参加に必要な案内はDiscordから確認できます。",
+      "参加申請はDiscordで受け付けています。Minecraft Java Edition 26.3で参加できます。",
   },
 } as const;

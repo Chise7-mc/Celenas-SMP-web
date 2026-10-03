@@ -232,9 +232,7 @@ export default function Home() {
               <div>
                 <p className="panel-label">ARCHIVE / 00</p>
                 <h3>{homeContent.gallery.pending}</h3>
-                <p>
-                  Celenasで生まれた景色を、これから少しずつ追加していきます。
-                </p>
+                <p>{homeContent.gallery.emptyDescription}</p>
               </div>
             </GlassSurface>
           )}
@@ -258,7 +256,7 @@ export default function Home() {
         <Link href="/" aria-label="Celenas SMP ホーム">
           Celenas SMP
         </Link>
-        <p>Celenas SMP — A world built together, over time.</p>
+        <p>Celenas SMP · Minecraft Java 26.3</p>
       </footer>
     </>
   );

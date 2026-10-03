@@ -26,11 +26,12 @@ describe("transmission panel", () => {
     expect(container.firstElementChild).toHaveAttribute("data-state", "ready");
     expect(screen.getByText("JOIN / ACCESS")).toBeVisible();
     expect(
-      screen.getByText(
-        "参加申請とMinecraftへの参加案内はDiscordから確認できます。",
-      ),
+      screen.getByText("参加申請と接続方法はDiscordで案内しています。"),
     ).toBeVisible();
-    const invite = screen.getByRole("link", { name: "Discordに参加する" });
+    const discordLogo = container.querySelector("img.discord-mark");
+    expect(discordLogo).not.toBeNull();
+    expect(discordLogo).toHaveAttribute("alt", "");
+    const invite = screen.getByRole("link", { name: "Discordで参加申請" });
     expect(invite).toHaveAttribute("href", site.connection.discordUrl);
     expect(invite).toHaveAttribute("target", "_blank");
     expect(invite).toHaveAttribute("rel", "noreferrer");

@@ -131,17 +131,15 @@ test("home exposes the current edition and Discord action with no runtime errors
   await expect(
     page.getByText("MINECRAFT JAVA 26.3 / SURVIVAL SMP"),
   ).toBeVisible();
-  await expect(
-    page.getByText("それぞれのペースが、ひとつの世界をつくっていく。"),
-  ).toBeVisible();
+  await expect(page.getByText("好きなことを、好きなペースで。")).toBeVisible();
   await expect(page.locator(".hero-supporting")).toHaveText(
-    "建築、探索、装置づくり。ひとりで過ごす日も、誰かと進める日も。積み重ねた時間がCelenasの景色になります。",
+    "建築、探索、装置づくり。ひとりで黙々と遊ぶのも、みんなで何かを作るのも自由です。",
   );
   await expect(page.locator(".hero-note")).toHaveText(
     "Minecraft Java Edition 26.3",
   );
   await expect(
-    page.getByRole("link", { name: "Discord に参加する" }),
+    page.getByRole("link", { name: "Discordに参加する" }),
   ).toHaveAttribute("href", discordInviteUrl);
   expect(errors).toEqual([]);
 });
@@ -157,9 +155,9 @@ test("publishes edition and Discord information without a server address", async
   await page.goto("/");
 
   const links = [
-    page.getByRole("link", { name: "Discord に参加する" }),
-    page.getByRole("link", { name: "Discord コミュニティへ参加 ↗" }),
     page.getByRole("link", { name: "Discordに参加する" }),
+    page.getByRole("link", { name: "Discord コミュニティへ参加 ↗" }),
+    page.getByRole("link", { name: "Discordで参加申請" }),
   ];
   for (const link of links) {
     await expect(link).toBeVisible();
@@ -182,7 +180,7 @@ test("publishes edition and Discord information without a server address", async
     "サーバーアドレス",
   );
   await expect(page.locator(".community-note")).toContainText(
-    "Webサイトではサーバーアドレスを公開していません。",
+    "Minecraftへの参加手順はDiscordで案内しています。サーバーアドレスはWebでは公開していません。",
   );
   await expect(page.locator(".transmission-panel-community")).toHaveAttribute(
     "data-state",
@@ -196,8 +194,55 @@ test("publishes edition and Discord information without a server address", async
     "ready",
   );
   await expect(page.locator(".transmission-panel-join")).toContainText(
-    "参加申請とMinecraftへの参加案内はDiscordから確認できます。",
+    "参加申請と接続方法はDiscordで案内しています。",
   );
+  const discordLogo = page.locator("#join .discord-mark");
+  await expect(discordLogo).toBeVisible();
+  await expect(discordLogo).toHaveAttribute("alt", "");
+  await expect(discordLogo).toHaveAttribute("src", /discord-mark\.png/);
+  const discordLogoWidth = await discordLogo.evaluate(
+    (image) => image.getBoundingClientRect().width,
+  );
+  expect(discordLogoWidth).toBeGreaterThanOrEqual(36);
+  expect(discordLogoWidth).toBeLessThanOrEqual(44);
+  await expect(
+    page.locator(".transmission-panel-join .glass-button-primary img"),
+  ).toHaveCount(0);
+  const discordLogoResponse = await page.request.get(
+    new URL("/brand/discord-mark.png", page.url()).toString(),
+  );
+  expect(discordLogoResponse.status()).toBe(200);
+  expect(discordLogoResponse.headers()["content-type"]).toContain("image/png");
+  const joinDiscordLink = page.getByRole("link", {
+    name: "Discordで参加申請",
+  });
+  await expect(joinDiscordLink).toHaveAttribute("href", discordInviteUrl);
+  await expect(joinDiscordLink).toHaveAttribute("target", "_blank");
+  await expect(joinDiscordLink).toHaveAttribute("rel", "noreferrer");
+  await expect(
+    page.locator(".transmission-panel-join .glass-button-primary"),
+  ).toHaveAttribute("target", "_blank");
+  await expect(
+    page.locator(".transmission-panel-join .glass-button-primary"),
+  ).toHaveAttribute("rel", "noreferrer");
+  const transmissionTreatment = await page
+    .locator(".transmission-panel-community")
+    .evaluate((panel) => {
+      const grid = getComputedStyle(panel).backgroundImage;
+      const scan = getComputedStyle(panel, "::after").backgroundImage;
+      return {
+        gridOpacity: Number(grid.match(/rgba\(255, 255, 255, ([\d.]+)\)/)?.[1]),
+        scanOpacity: Number(scan.match(/rgba\(167, 181, 255, ([\d.]+)\)/)?.[1]),
+        scanAnimation: getComputedStyle(panel, "::after").animationName,
+      };
+    });
+  expect(transmissionTreatment.gridOpacity).toBeCloseTo(0.026, 2);
+  expect(transmissionTreatment.scanOpacity).toBeCloseTo(0.075, 2);
+  if (isMobile) {
+    expect(transmissionTreatment.scanAnimation).toBe("none");
+  } else {
+    expect(transmissionTreatment.scanAnimation).toBe("transmission-scan");
+  }
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= window.innerWidth,
@@ -251,36 +296,57 @@ test("renders refreshed copy, six formal rules, and image-only gallery cards", a
   );
   await expect(
     page.getByRole("heading", {
-      name: "自由に遊ぶ。ゆっくり世界を育てる。",
+      name: "気軽に遊べて、長く続けられるSMP。",
     }),
   ).toBeVisible();
   await expect(
     page.getByText("Minecraft Java 26.3 · Survival SMP"),
   ).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "建てる。探す。仕組みをつくる。" }),
+    page.getByRole("heading", { name: "建築も、探索も、装置も。" }),
   ).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "参加の入口は、Discordから。" }),
+    page.getByRole("heading", { name: "参加・連絡はDiscordから。" }),
   ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Celenas SMPに参加する" }),
+  ).toBeVisible();
+  await expect(page.locator(".hero-description")).toHaveCSS(
+    "line-break",
+    "strict",
+  );
+  await expect(page.locator(".hero-description")).toHaveCSS(
+    "word-break",
+    "normal",
+  );
+  await expect(page.locator("#rules .section-heading h2")).toHaveCSS(
+    "text-wrap",
+    "balance",
+  );
   await expect(page.locator("#about .section-description")).toHaveText(
-    "Celenas SMPは、Minecraft Java Edition 26.3のサバイバルをベースに、建築・探索・装置づくりを楽しむコミュニティです。",
+    "Celenas SMPは、Minecraft Java Edition 26.3で遊ぶサバイバルサーバーです。建築や探索、装置づくりなど、それぞれ好きなことを楽しんでいます。",
   );
   await expect(page.locator(".value-list li")).toHaveText([
-    "01自分のペースを尊重する",
-    "02つくったものを大切にする",
-    "03ひとりでも、誰かとでも",
+    "01無理せず、自分のペースで",
+    "02人の建築や持ち物を大切に",
+    "03ひとりでも、みんなでも",
   ]);
   await expect(page.locator("#world .section-description")).toHaveText(
-    "Celenasの遊び方に決まった正解はありません。好きなことを、自分のペースで世界に積み重ねていけます。",
+    "何をするかは自由です。やりたいことを見つけて、そのまま遊んでください。",
   );
   await expect(page.locator("#community .section-description")).toHaveText(
-    "参加申請、サーバーからのお知らせ、情報共有はDiscordを中心に行います。ゲームの中でも外でも、自分に合った距離感でコミュニティに参加できます。",
+    "参加申請、お知らせ、質問や情報共有はDiscordで行っています。まずはDiscordに参加してください。",
   );
   await expect(page.locator(".join-copy .muted")).toHaveText(
-    "Celenas SMPはMinecraft Java Edition 26.3で運用しています。参加申請や参加に必要な案内はDiscordから確認できます。",
+    "参加申請はDiscordで受け付けています。Minecraft Java Edition 26.3で参加できます。",
   );
   await expect(page.locator(".rules-list > li")).toHaveCount(6);
+  await expect(
+    page.getByRole("heading", { name: "みんなで遊ぶためのルール。" }),
+  ).toBeVisible();
+  await expect(page.locator("#rules .section-description")).toHaveText(
+    "難しい決まりはありません。人の建築やアイテムを大切にして、困ったときは運営へ相談してください。",
+  );
   await expect(page.locator(".rule-number")).toHaveText([
     "01",
     "02",
@@ -309,10 +375,14 @@ test("renders refreshed copy, six formal rules, and image-only gallery cards", a
     "重要な変更はDiscordでお知らせします。",
   );
   await expect(
-    page.getByRole("heading", { name: "積み重なった景色を、記録する。" }),
+    page.getByRole("heading", { name: "Celenasのスクリーンショット。" }),
   ).toBeVisible();
   await expect(page.locator("#gallery .section-description")).toHaveText(
-    "建築、風景、装置、旅の途中で見つけた瞬間。Celenasの世界に残ったものを、少しずつここへ記録していきます。",
+    "建築、装置、風景など、ワールドで撮った写真を載せています。",
+  );
+  await expect(page.locator("#gallery .section-heading h2")).toHaveCSS(
+    "line-break",
+    "strict",
   );
   const galleryCards = page.locator("#gallery .gallery-slide");
   await expect(galleryCards).toHaveCount(5);
@@ -369,14 +439,14 @@ test("renders refreshed copy, six formal rules, and image-only gallery cards", a
     JSON.stringify({ stageBox, imageFrame }),
   ).toBeLessThanOrEqual(1);
   await expect(page.locator(".join-copy")).toContainText(
-    "Celenas SMPはMinecraft Java Edition 26.3で運用しています。",
+    "参加申請はDiscordで受け付けています。Minecraft Java Edition 26.3で参加できます。",
   );
   await expect(page.locator(".site-footer")).toContainText(
-    "Celenas SMP — A world built together, over time.",
+    "Celenas SMP · Minecraft Java 26.3",
   );
   await expect(page.locator(".about-copy p")).toHaveText([
-    "大きな建築に集中する日も、遠くまで探索する日も、何も決めずに世界を歩く日も。Celenasでは、遊び方や進める速さをひとつに決めません。",
-    "ひとりでつくった拠点も、誰かと進めた装置や共同プロジェクトも、少しずつ同じ世界に積み重なっていきます。長く残る景色を、みんなでゆっくり育てていくSMPです。",
+    "大きな建築にこもる人も、遠くまで探索する人も、装置を作り続ける人もいます。遊び方やログイン頻度を合わせる必要はありません。",
+    "ひとりで遊ぶのも、誰かと一緒に進めるのも自由です。作ったものがそのまま残っていく、長く遊べるワールドを目指しています。",
   ]);
   await expect(page.locator(".world-themes h3")).toHaveText([
     "BUILD / 建築",
@@ -384,9 +454,9 @@ test("renders refreshed copy, six formal rules, and image-only gallery cards", a
     "CREATE / ものづくり",
   ]);
   await expect(page.locator(".world-themes p")).toHaveText([
-    "小さな拠点から街、巨大建築まで。時間をかけてつくったものが、少しずつCelenasの景色になっていきます。",
-    "まだ歩いたことのない場所へ。新しい地形や資源を探しながら、自分だけの発見を世界に増やしていきます。",
-    "便利な装置やインフラ、共同プロジェクトまで。アイデアを仕組みに変えて、世界を少しずつ便利にしていきます。",
+    "拠点づくりから街づくり、巨大建築まで。規模もジャンルも自由です。",
+    "新しい地形や資源を探したり、遠くまで旅したり。気になる場所へ自由に出かけられます。",
+    "自動化装置や交通網、共有設備など。便利なものを作るのもCelenasの遊び方のひとつです。",
   ]);
   await expect(
     page.getByText(
@@ -975,7 +1045,7 @@ test("transmission shows READY public information and distinguishes Join access"
   await expect(community.getByText("READY", { exact: true })).toBeVisible();
   await expect(community.getByText(/PUBLIC INFO \/ READY/)).toBeVisible();
   await expect(page.locator(".transmission-panel-join")).toContainText(
-    "参加申請とMinecraftへの参加案内はDiscordから確認できます。",
+    "参加申請と接続方法はDiscordで案内しています。",
   );
   await expect(
     page.locator(".transmission-panel-join").getByRole("link"),
@@ -1684,7 +1754,7 @@ test("supports narrow screens and enlarged text without horizontal overflow", as
     ).toBe(true);
   }
   await expect(
-    page.getByRole("link", { name: "Discord に参加する" }),
+    page.getByRole("link", { name: "Discordに参加する" }),
   ).toBeVisible();
 });
 
@@ -1710,7 +1780,7 @@ test("keeps the planetary scene framed on target desktop and mobile sizes", asyn
       `expected no horizontal overflow at ${width}x${height}`,
     ).toBe(true);
     await expect(
-      page.getByRole("link", { name: "Discord に参加する" }),
+      page.getByRole("link", { name: "Discordに参加する" }),
     ).toBeVisible();
 
     await expect(page.locator(".hero-space-background")).toBeAttached();

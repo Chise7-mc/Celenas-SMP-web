@@ -1,5 +1,7 @@
+import Image from "next/image";
 import type { CommunityConnection } from "@/config/site";
 import { CommunityDetails } from "@/components/community-details";
+import { withBasePath } from "@/lib/asset-path";
 
 export function TransmissionPanel({
   connection,
@@ -36,14 +38,23 @@ export function TransmissionPanel({
 
       {isJoin ? (
         <div className="transmission-access">
-          <p>参加申請とMinecraftへの参加案内はDiscordから確認できます。</p>
+          <div className="transmission-discord">
+            <Image
+              className="discord-mark"
+              src={withBasePath("/brand/discord-mark.png")}
+              alt=""
+              width={320}
+              height={320}
+            />
+            <p>参加申請と接続方法はDiscordで案内しています。</p>
+          </div>
           <a
             className="glass-button glass-button-primary"
             href={connection.discordUrl}
             target="_blank"
             rel="noreferrer"
           >
-            Discordに参加する <span aria-hidden="true">↗</span>
+            Discordで参加申請 <span aria-hidden="true">↗</span>
           </a>
         </div>
       ) : (
