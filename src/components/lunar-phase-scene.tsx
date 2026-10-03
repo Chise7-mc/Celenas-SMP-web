@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import type { CSSProperties } from "react";
 import { withBasePath } from "@/lib/asset-path";
 
 export const LUNAR_CYCLE_DURATION_MS = 120_000;
+export const PHASE_UPDATE_INTERVAL_MS = 100;
 export const INITIAL_PHASE = 0.125;
 export const REDUCED_MOTION_PHASE = INITIAL_PHASE;
 export const SHADOW_TILT_DEGREES = 12;
@@ -38,22 +38,6 @@ const ORBITING_BODIES = [
     satelliteClass: "satellite-three",
   },
 ] as const;
-
-type SceneStyle = CSSProperties & {
-  "--moon-glow-opacity": string;
-  "--moonlight-opacity": string;
-  "--star-field-far-opacity": string;
-  "--star-field-mid-opacity": string;
-  "--stardust-opacity": string;
-};
-
-const INITIAL_SCENE_STYLE: SceneStyle = {
-  "--moon-glow-opacity": "0.078",
-  "--moonlight-opacity": "0.244",
-  "--star-field-far-opacity": "0.425",
-  "--star-field-mid-opacity": "0.583",
-  "--stardust-opacity": "0.228",
-};
 
 export function getCycleFraction(elapsedMs: number): number {
   const cyclePosition =
@@ -168,7 +152,7 @@ export function LunarPhaseBackground() {
             <feTurbulence
               type="fractalNoise"
               baseFrequency="0.008 0.014"
-              numOctaves="3"
+              numOctaves="2"
               seed="23"
               result="cloud-noise"
             />
@@ -231,7 +215,7 @@ export function LunarPhaseBackground() {
           ry="260"
           fill="url(#nebula-planet-separation)"
         />
-        <g className="nebula-far-cloud" filter="url(#nebula-cloud-texture)">
+        <g className="nebula-far-cloud">
           <path
             d="M 176 505 C 231 442, 284 382, 348 370 C 399 360, 423 401, 481 386 C 545 369, 582 302, 650 317 C 724 332, 763 374, 827 350 C 873 333, 912 365, 963 343 C 944 405, 908 433, 920 473 C 932 516, 875 543, 828 559 C 762 582, 708 549, 654 572 C 592 598, 539 647, 471 628 C 398 608, 369 558, 304 579 C 251 596, 211 557, 176 505 Z"
             fill="url(#nebula-far-color)"
@@ -277,7 +261,7 @@ export function LunarPhaseBackground() {
             opacity="0.42"
           />
         </g>
-        <g className="nebula-near-gas" filter="url(#nebula-cloud-texture)">
+        <g className="nebula-near-gas">
           <path
             d="M 525 330 C 580 295, 614 302, 653 325 C 692 348, 720 343, 763 320 C 804 299, 839 308, 875 333 C 824 325, 802 361, 758 365 C 704 370, 679 340, 640 340 C 597 339, 568 362, 525 330 Z"
             fill="url(#nebula-filament-color)"
@@ -355,101 +339,145 @@ export function LunarPhaseVisual() {
       "(prefers-reduced-motion: reduce)",
     );
     let animationFrame: number | null = null;
-    let cycleStart: number | null = null;
+    const cycleStart = performance.now();
+    let lastPhaseUpdate = Number.NEGATIVE_INFINITY;
+    let heroIsVisible = false;
+    let reducedPhaseApplied = false;
+    let motionActive: boolean | null = null;
+
+    const setAttributeIfChanged = (
+      element: Element,
+      name: string,
+      value: string,
+    ) => {
+      if (element.getAttribute(name) !== value) {
+        element.setAttribute(name, value);
+      }
+    };
+
+    const setDataIfChanged = (
+      element: HTMLElement,
+      name: string,
+      value: string,
+    ) => {
+      if (element.dataset[name] !== value) element.dataset[name] = value;
+    };
+
+    const setHeroStyleIfChanged = (name: string, value: string) => {
+      if (hero.style.getPropertyValue(name) !== value) {
+        hero.style.setProperty(name, value);
+      }
+    };
 
     const updatePhase = (phaseFraction: number) => {
       const illumination = getIllumination(phaseFraction);
-      shadow.setAttribute("d", getShadowPath(phaseFraction));
+      setAttributeIfChanged(shadow, "d", getShadowPath(phaseFraction));
       const transform = getShadowTransform(phaseFraction);
       if (transform) {
-        direction.setAttribute("transform", transform);
-      } else {
+        setAttributeIfChanged(direction, "transform", transform);
+      } else if (direction.hasAttribute("transform")) {
         direction.removeAttribute("transform");
       }
 
-      moon.dataset.phase = getPhaseName(phaseFraction);
-      moon.dataset.illumination = illumination.toFixed(3);
-      moon.dataset.cyclePosition = phaseFraction.toFixed(3);
-      scene.style.setProperty(
+      setDataIfChanged(moon, "phase", getPhaseName(phaseFraction));
+      setDataIfChanged(moon, "illumination", illumination.toFixed(3));
+      setDataIfChanged(moon, "cyclePosition", phaseFraction.toFixed(3));
+      setHeroStyleIfChanged(
         "--moon-glow-opacity",
         (0.06 + illumination * 0.12).toFixed(3),
       );
-      hero.style.setProperty(
-        "--moon-glow-opacity",
-        (0.06 + illumination * 0.12).toFixed(3),
-      );
-      scene.style.setProperty(
+      setHeroStyleIfChanged(
         "--moonlight-opacity",
         (0.2 + illumination * 0.3).toFixed(3),
       );
-      hero.style.setProperty(
-        "--moonlight-opacity",
-        (0.2 + illumination * 0.3).toFixed(3),
-      );
-      scene.style.setProperty(
+      setHeroStyleIfChanged(
         "--star-field-far-opacity",
         (0.34 + (1 - illumination) * 0.1).toFixed(3),
       );
-      hero.style.setProperty(
-        "--star-field-far-opacity",
-        (0.34 + (1 - illumination) * 0.1).toFixed(3),
-      );
-      scene.style.setProperty(
+      setHeroStyleIfChanged(
         "--star-field-mid-opacity",
         (0.48 + (1 - illumination) * 0.12).toFixed(3),
       );
-      hero.style.setProperty(
-        "--star-field-mid-opacity",
-        (0.48 + (1 - illumination) * 0.12).toFixed(3),
-      );
-      scene.style.setProperty(
-        "--stardust-opacity",
-        (0.16 + (1 - illumination) * 0.08).toFixed(3),
-      );
-      hero.style.setProperty(
+      setHeroStyleIfChanged(
         "--stardust-opacity",
         (0.16 + (1 - illumination) * 0.08).toFixed(3),
       );
     };
 
     const animate = (timestamp: number) => {
-      cycleStart ??= timestamp;
-      updatePhase(getPhaseFraction(timestamp - cycleStart));
+      if (timestamp - lastPhaseUpdate >= PHASE_UPDATE_INTERVAL_MS) {
+        updatePhase(getPhaseFraction(timestamp - cycleStart));
+        lastPhaseUpdate = timestamp;
+      }
       animationFrame = window.requestAnimationFrame(animate);
     };
 
-    const startAnimation = () => {
-      cycleStart = null;
-      animationFrame = window.requestAnimationFrame(animate);
-    };
-
-    const applyMotionPreference = () => {
+    const setMotionActive = (active: boolean) => {
+      if (motionActive === active) return;
+      motionActive = active;
+      if (hero.dataset.motionActive !== String(active)) {
+        hero.dataset.motionActive = String(active);
+      }
       if (animationFrame !== null) {
         window.cancelAnimationFrame(animationFrame);
         animationFrame = null;
       }
 
-      if (motionPreference.matches) {
+      if (!active) {
         if (typeof orbits.pauseAnimations === "function") {
           orbits.pauseAnimations();
         }
-        updatePhase(REDUCED_MOTION_PHASE);
-      } else {
-        if (typeof orbits.unpauseAnimations === "function") {
-          orbits.unpauseAnimations();
-        }
-        startAnimation();
+        return;
       }
+
+      if (typeof orbits.unpauseAnimations === "function") {
+        orbits.unpauseAnimations();
+      }
+      const now = performance.now();
+      updatePhase(getPhaseFraction(now - cycleStart));
+      lastPhaseUpdate = now;
+      animationFrame = window.requestAnimationFrame(animate);
     };
 
-    applyMotionPreference();
-    motionPreference.addEventListener("change", applyMotionPreference);
+    const updateMotionState = () => {
+      if (motionPreference.matches) {
+        setMotionActive(false);
+        if (!reducedPhaseApplied) {
+          updatePhase(REDUCED_MOTION_PHASE);
+          reducedPhaseApplied = true;
+        }
+        return;
+      }
+
+      reducedPhaseApplied = false;
+      setMotionActive(document.visibilityState === "visible" && heroIsVisible);
+    };
+
+    hero.dataset.motionActive = "false";
+    const visibilityObserver = new IntersectionObserver(
+      (entries) => {
+        const entry = entries.find(({ target }) => target === hero);
+        if (entry) {
+          heroIsVisible =
+            entry.isIntersecting && entry.intersectionRatio >= 0.01;
+          updateMotionState();
+        }
+      },
+      { threshold: [0, 0.01] },
+    );
+    visibilityObserver.observe(hero);
+    const updateForVisibility = () => updateMotionState();
+    motionPreference.addEventListener("change", updateMotionState);
+    document.addEventListener("visibilitychange", updateForVisibility);
+    updateMotionState();
 
     return () => {
       if (animationFrame !== null) {
         window.cancelAnimationFrame(animationFrame);
       }
-      motionPreference.removeEventListener("change", applyMotionPreference);
+      visibilityObserver.disconnect();
+      motionPreference.removeEventListener("change", updateMotionState);
+      document.removeEventListener("visibilitychange", updateForVisibility);
     };
   }, []);
 
@@ -457,7 +485,6 @@ export function LunarPhaseVisual() {
     <div
       className="celestial-scene"
       ref={sceneRef}
-      style={INITIAL_SCENE_STYLE}
       data-cycle-duration={LUNAR_CYCLE_DURATION_MS}
       data-initial-phase={INITIAL_PHASE}
     >

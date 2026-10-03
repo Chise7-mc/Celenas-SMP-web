@@ -34,14 +34,15 @@ decorative SVG output and phase-driven atmospheric CSS properties.
 
 Browser tests load the production page, follow the participation anchor, check
 missing information, the canonical logo and site icon, pending gallery state,
-the 120-second waxing-crescent SVG phase morph and fixed tilt, CSS orbit periods,
+the 120-second waxing-crescent SVG phase morph, fixed tilt and 100ms update
+limit, offscreen / hidden-document pause and phase resume, CSS orbit periods,
 satellite positions on their ellipse paths, the decorative fixed-seed SVG
-nebula filters and dust lanes, distinct gas-layer and aurora motion,
+nebula filters and dust lanes, mobile motion reductions, static aurora color,
 keyboard-operable mobile menu navigation and close-on-selection, destination
 focus, keyboard skip navigation, runtime errors, layout overflow from 320px
 through wide desktop at 200% text scaling, reduced motion and axe WCAG A/AA
-rules. Desktop and mobile projects
-both use Chromium; this is not Safari or Firefox coverage.
+rules. Desktop and mobile projects both use Chromium; this is not Safari or
+Firefox coverage.
 
 To validate the GitHub Pages output locally on PowerShell:
 
