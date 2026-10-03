@@ -435,15 +435,37 @@ test("cinematic Gallery rail navigates with arrows and keyboard", async ({
 
 test("Gallery images open an accessible fullscreen viewer", async ({
   page,
-}) => {
+}, testInfo) => {
   await page.goto("/");
   const imageButton = page.getByRole("button", {
     name: "画像を拡大: tree_farm",
   });
+  const viewer = page.getByRole("dialog", { name: "Gallery image viewer" });
+  await expect(viewer.locator("img")).toHaveCount(0);
   await imageButton.click();
 
-  const viewer = page.getByRole("dialog", { name: "Gallery image viewer" });
   await expect(viewer).toBeVisible();
+  await expect(viewer).toHaveCSS("border-width", "0px");
+  await expect(viewer).toHaveCSS("padding", "0px");
+  await expect(viewer).toHaveCSS("margin", "0px");
+  const viewerSurface = await viewer.evaluate((element) => {
+    const bounds = element.getBoundingClientRect();
+    const styles = getComputedStyle(element);
+    return {
+      width: bounds.width,
+      height: bounds.height,
+      background: styles.backgroundColor,
+      borderRadius: styles.borderRadius,
+    };
+  });
+  expect(viewerSurface.width).toBe(page.viewportSize()!.width);
+  expect(viewerSurface.height).toBe(page.viewportSize()!.height);
+  const backgroundChannels = viewerSurface.background
+    .match(/[\d.]+/g)!
+    .map(Number);
+  expect(backgroundChannels.slice(0, 3)).toEqual([3, 4, 7]);
+  expect(backgroundChannels[3]).toBeCloseTo(0.985, 2);
+  expect(viewerSurface.borderRadius).toBe("0px");
   const viewerImage = viewer.getByRole("img", { name: "tree_farm" });
   await expect(viewerImage).toBeVisible();
   await expect(viewerImage).toHaveCSS("object-fit", "contain");
@@ -455,24 +477,251 @@ test("Gallery images open an accessible fullscreen viewer", async ({
     ),
   ).toBeGreaterThan(0);
   await expect(viewer.locator(".gallery-counter")).toHaveText("01 / 05");
+  const desktopLayout = await viewer.evaluate((dialog) => {
+    const image = dialog.querySelector("img")!.getBoundingClientRect();
+    const previous = dialog
+      .querySelector(".gallery-viewer-prev")!
+      .getBoundingClientRect();
+    const next = dialog
+      .querySelector(".gallery-viewer-next")!
+      .getBoundingClientRect();
+    const close = dialog
+      .querySelector(".gallery-viewer-close")!
+      .getBoundingClientRect();
+    const counter = dialog
+      .querySelector(".gallery-viewer-counter")!
+      .getBoundingClientRect();
+    return {
+      imageCenterX: image.left + image.width / 2,
+      imageCenterY: image.top + image.height / 2,
+      previousLeft: previous.left,
+      nextRight: window.innerWidth - next.right,
+      closeTop: close.top,
+      closeRight: window.innerWidth - close.right,
+      counterCenterX: counter.left + counter.width / 2,
+      counterBottom: window.innerHeight - counter.bottom,
+    };
+  });
+  expect(
+    Math.abs(desktopLayout.imageCenterX - page.viewportSize()!.width / 2),
+  ).toBeLessThanOrEqual(1);
+  expect(
+    Math.abs(desktopLayout.imageCenterY - page.viewportSize()!.height / 2),
+  ).toBeLessThanOrEqual(1);
+  if (page.viewportSize()!.width >= 768) {
+    expect(desktopLayout.previousLeft).toBeLessThanOrEqual(50);
+    expect(desktopLayout.nextRight).toBeLessThanOrEqual(50);
+    expect(desktopLayout.closeTop).toBeLessThanOrEqual(25);
+    expect(desktopLayout.closeRight).toBeLessThanOrEqual(25);
+    expect(
+      Math.abs(desktopLayout.counterCenterX - page.viewportSize()!.width / 2),
+    ).toBeLessThanOrEqual(1);
+    expect(desktopLayout.counterBottom).toBeLessThanOrEqual(30);
+  }
+  await expect(viewer.locator(".gallery-viewer-image-content")).toHaveCSS(
+    "animation-name",
+    "gallery-viewer-reveal",
+  );
+  await expect(viewer.locator(".gallery-viewer-image-content")).toHaveCSS(
+    "animation-duration",
+    "0.18s",
+  );
+  await viewer.locator(".gallery-viewer-counter").click();
+  await expect(viewer).toBeVisible();
   const previous = viewer.getByRole("button", { name: "前の画像" });
-  const next = viewer.getByRole("button", { name: "次の画像" });
+  const next = viewer.getByRole("button", {
+    name: "次の画像",
+    exact: true,
+  });
   await expect(previous).toBeDisabled();
-  await next.click();
-  await expect(viewer.getByRole("img", { name: "yamako_town" })).toBeVisible();
+  await viewer.getByRole("button", { name: "次の画像を表示" }).click();
   await expect(viewer.locator(".gallery-counter")).toHaveText("02 / 05");
-  await page.keyboard.press("ArrowRight");
-  await expect(viewer.getByRole("img", { name: "sand_duper" })).toBeVisible();
-  await page.keyboard.press("ArrowLeft");
   await expect(viewer.getByRole("img", { name: "yamako_town" })).toBeVisible();
+  await next.click();
+  await expect(viewer.locator(".gallery-counter")).toHaveText("03 / 05");
+  if (testInfo.project.name === "desktop-chromium") {
+    await page.keyboard.press("ArrowRight");
+    await expect(viewer.locator(".gallery-counter")).toHaveText("04 / 05");
+    await page.keyboard.press("ArrowLeft");
+    await expect(viewer.locator(".gallery-counter")).toHaveText("03 / 05");
+  }
+  await next.click();
+  await next.click();
+  await expect(viewer.locator(".gallery-counter")).toHaveText("05 / 05");
+  await expect(next).toBeDisabled();
+  await expect(
+    viewer.getByRole("button", { name: "次の画像を表示" }),
+  ).toBeDisabled();
+  await expect(viewer.getByRole("button", { name: "前の画像" })).toBeEnabled();
+  if (testInfo.project.name === "desktop-chromium") {
+    await page.keyboard.press("ArrowRight");
+    await expect(viewer.locator(".gallery-counter")).toHaveText("05 / 05");
+    await page.keyboard.press("ArrowLeft");
+  } else {
+    await viewer.getByRole("button", { name: "前の画像" }).click();
+  }
+  await expect(viewer.locator(".gallery-counter")).toHaveText("04 / 05");
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await expect(viewer.locator(".gallery-viewer-image-content")).toHaveCSS(
+    "animation-name",
+    "none",
+  );
   await page.keyboard.press("Escape");
   await expect(viewer).not.toBeVisible();
   await expect(imageButton).toBeFocused();
 
   await imageButton.click();
-  await viewer.getByRole("button", { name: "拡大表示を閉じる" }).click();
+  await viewer.getByRole("button", { name: "画像ビューアーを閉じる" }).click();
   await expect(viewer).not.toBeVisible();
   await expect(imageButton).toBeFocused();
+
+  await imageButton.click();
+  await page.mouse.click(5, 200);
+  await expect(viewer).not.toBeVisible();
+  await expect(imageButton).toBeFocused();
+});
+
+test("fullscreen viewer stays aligned and edge controls stay clear on desktop", async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name === "mobile-chromium");
+  const viewports = [
+    { width: 1920, height: 1080 },
+    { width: 1440, height: 900 },
+    { width: 1366, height: 768 },
+  ];
+
+  for (const viewport of viewports) {
+    await page.setViewportSize(viewport);
+    await page.goto("/");
+    await page.getByRole("button", { name: "画像を拡大: yamako_town" }).click();
+    const viewer = page.getByRole("dialog", { name: "Gallery image viewer" });
+    await expect(viewer).toBeVisible();
+    const layout = await viewer.evaluate((dialog) => {
+      const image = dialog.querySelector("img")!.getBoundingClientRect();
+      const previous = dialog
+        .querySelector(".gallery-viewer-prev")!
+        .getBoundingClientRect();
+      const next = dialog
+        .querySelector(".gallery-viewer-next")!
+        .getBoundingClientRect();
+      return {
+        imageCenterX: image.left + image.width / 2,
+        imageCenterY: image.top + image.height / 2,
+        imageRatio: image.width / image.height,
+        previousRight: previous.right,
+        nextLeft: next.left,
+        width: window.innerWidth,
+        height: window.innerHeight,
+        pageWidth: document.documentElement.scrollWidth,
+      };
+    });
+    expect(
+      Math.abs(layout.imageCenterX - viewport.width / 2),
+    ).toBeLessThanOrEqual(1);
+    expect(
+      Math.abs(layout.imageCenterY - viewport.height / 2),
+    ).toBeLessThanOrEqual(1);
+    expect(layout.imageRatio).toBeCloseTo(1920 / 804, 2);
+    expect(layout.previousRight).toBeLessThan(layout.width / 2);
+    expect(layout.nextLeft).toBeGreaterThan(layout.width / 2);
+    expect(layout.width).toBe(viewport.width);
+    expect(layout.height).toBe(viewport.height);
+    expect(layout.pageWidth).toBeLessThanOrEqual(viewport.width);
+    await page.keyboard.press("Escape");
+    await expect(viewer).not.toBeVisible();
+  }
+});
+
+test("mobile fullscreen viewer anchors controls safely and keeps the image tappable", async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name !== "mobile-chromium");
+  const viewports = [
+    { width: 430, height: 932 },
+    { width: 390, height: 844 },
+    { width: 375, height: 812 },
+    { width: 320, height: 700 },
+  ];
+
+  for (const viewport of viewports) {
+    await page.setViewportSize(viewport);
+    await page.goto("/");
+    const opener = page.getByRole("button", { name: "画像を拡大: tree_farm" });
+    await opener.click();
+    const viewer = page.getByRole("dialog", { name: "Gallery image viewer" });
+    await expect(viewer).toBeVisible();
+    const metrics = await viewer.evaluate((dialog) => {
+      const image = dialog.querySelector("img")!.getBoundingClientRect();
+      const imageStyle = getComputedStyle(dialog.querySelector("img")!);
+      const close = dialog
+        .querySelector(".gallery-viewer-close")!
+        .getBoundingClientRect();
+      const previous = dialog
+        .querySelector(".gallery-viewer-prev")!
+        .getBoundingClientRect();
+      const next = dialog
+        .querySelector(".gallery-viewer-next")!
+        .getBoundingClientRect();
+      const counter = dialog
+        .querySelector(".gallery-viewer-counter")!
+        .getBoundingClientRect();
+      return {
+        dialog: dialog.getBoundingClientRect().toJSON(),
+        image: image.toJSON(),
+        imageRatio: image.width / image.height,
+        imageObjectFit: imageStyle.objectFit,
+        touchAction: imageStyle.touchAction,
+        close: close.toJSON(),
+        previous: previous.toJSON(),
+        next: next.toJSON(),
+        counter: counter.toJSON(),
+        pageWidth: document.documentElement.scrollWidth,
+      };
+    });
+    expect(metrics.dialog.width).toBe(viewport.width);
+    expect(metrics.dialog.height).toBe(viewport.height);
+    expect(metrics.imageRatio).toBeCloseTo(1133 / 840, 2);
+    expect(metrics.imageObjectFit).toBe("contain");
+    expect(metrics.touchAction).not.toBe("none");
+    expect(
+      Math.abs(metrics.image.x + metrics.image.width / 2 - viewport.width / 2),
+    ).toBeLessThanOrEqual(1);
+    expect(
+      Math.abs(
+        metrics.image.y + metrics.image.height / 2 - viewport.height / 2,
+      ),
+    ).toBeLessThanOrEqual(1);
+    expect(metrics.previous.height).toBeGreaterThanOrEqual(48);
+    expect(metrics.next.height).toBeGreaterThanOrEqual(48);
+    expect(metrics.counter.y).toBeGreaterThan(metrics.previous.y);
+    expect(Math.abs(metrics.previous.y - metrics.next.y)).toBeLessThanOrEqual(
+      1,
+    );
+    expect(
+      Math.abs(
+        metrics.counter.x + metrics.counter.width / 2 - viewport.width / 2,
+      ),
+    ).toBeLessThanOrEqual(1);
+    expect(metrics.close.x + metrics.close.width).toBeLessThanOrEqual(
+      viewport.width - 12,
+    );
+    expect(metrics.close.y).toBeGreaterThanOrEqual(0);
+    expect(metrics.pageWidth).toBeLessThanOrEqual(viewport.width);
+
+    const imageButton = viewer.getByRole("button", { name: "次の画像を表示" });
+    await imageButton.tap();
+    await expect(viewer.locator(".gallery-viewer-counter")).toHaveText(
+      "02 / 05",
+    );
+    await viewer.getByRole("button", { name: "次の画像", exact: true }).tap();
+    await expect(viewer.locator(".gallery-viewer-counter")).toHaveText(
+      "03 / 05",
+    );
+    await viewer.getByRole("button", { name: "画像ビューアーを閉じる" }).tap();
+    await expect(viewer).not.toBeVisible();
+    await expect(opener).toBeFocused();
+  }
 });
 
 test("Gallery rail supports keyboard and touch scrolling without page overflow", async ({

@@ -16,6 +16,8 @@ Minecraft Java Edition 26.3 and Discord are confirmed public information. The
 server address is intentionally not published. Gallery screenshots are shown
 in a horizontal, image-only rail with native scroll snapping, a shared-height
 stage, rounded borderless images and a keyboard-accessible fullscreen viewer.
+The viewer keeps its counter and compact controls anchored to the viewport,
+shows a brief reduced-motion-aware image fade, and leaves screenshots uncropped.
 
 The Hero pairs the official mark with a fictional gas giant, a soft-edged SVG
 phase mask, and three enlarged SVG ellipse paths with one satellite each. The

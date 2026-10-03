@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import type { KeyboardEvent } from "react";
+import type { KeyboardEvent as ReactKeyboardEvent } from "react";
 import type { GalleryImage } from "@/content/home";
 import { withBasePath } from "@/lib/asset-path";
 
@@ -10,7 +10,43 @@ type GalleryRailProps = Readonly<{
   images: readonly GalleryImage[];
 }>;
 
+type GalleryViewerImageProps = Readonly<{
+  image: GalleryImage;
+  canAdvance: boolean;
+  onAdvance: () => void;
+}>;
+
 const padIndex = (index: number) => String(index + 1).padStart(2, "0");
+
+function GalleryViewerImage({
+  image,
+  canAdvance,
+  onAdvance,
+}: GalleryViewerImageProps) {
+  const content = (
+    <Image
+      key={image.id}
+      className="gallery-viewer-image-content"
+      src={withBasePath(image.src)}
+      alt={image.alt}
+      width={image.width}
+      height={image.height}
+      sizes="min(92vw, 120rem)"
+    />
+  );
+
+  return (
+    <button
+      className="gallery-viewer-image"
+      type="button"
+      aria-label="次の画像を表示"
+      disabled={!canAdvance}
+      onClick={onAdvance}
+    >
+      {content}
+    </button>
+  );
+}
 
 export function GalleryRail({ images }: GalleryRailProps) {
   const trackRef = useRef<HTMLDivElement>(null);
@@ -54,6 +90,28 @@ export function GalleryRail({ images }: GalleryRailProps) {
     if (viewerIndex !== null && dialog && !dialog.open) dialog.showModal();
   }, [viewerIndex]);
 
+  useEffect(() => {
+    if (viewerIndex === null) return;
+
+    function handleViewerKeyDown(event: KeyboardEvent) {
+      if (event.key === "ArrowRight") {
+        event.preventDefault();
+        setViewerIndex((index) =>
+          index === null ? null : Math.min(images.length - 1, index + 1),
+        );
+      } else if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        setViewerIndex((index) =>
+          index === null ? null : Math.max(0, index - 1),
+        );
+      }
+    }
+
+    window.addEventListener("keydown", handleViewerKeyDown, true);
+    return () =>
+      window.removeEventListener("keydown", handleViewerKeyDown, true);
+  }, [images.length, viewerIndex]);
+
   function scrollToSlide(index: number) {
     const slide = slidesRef.current[index];
     if (!slide) return;
@@ -67,7 +125,7 @@ export function GalleryRail({ images }: GalleryRailProps) {
     });
   }
 
-  function handleTrackKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+  function handleTrackKeyDown(event: ReactKeyboardEvent<HTMLDivElement>) {
     if (event.key === "ArrowRight" && activeIndex < images.length - 1) {
       event.preventDefault();
       scrollToSlide(activeIndex + 1);
@@ -77,22 +135,13 @@ export function GalleryRail({ images }: GalleryRailProps) {
     }
   }
 
-  function handleViewerKeyDown(event: KeyboardEvent<HTMLDialogElement>) {
-    if (event.key === "ArrowRight" && viewerIndex !== null) {
-      event.preventDefault();
-      setViewerIndex(Math.min(images.length - 1, viewerIndex + 1));
-    } else if (event.key === "ArrowLeft" && viewerIndex !== null) {
-      event.preventDefault();
-      setViewerIndex(Math.max(0, viewerIndex - 1));
-    }
-  }
-
   function closeViewer() {
     viewerRef.current?.close();
     setViewerIndex(null);
   }
 
   const progress = images.length === 0 ? 0 : (activeIndex + 1) / images.length;
+  const viewerImage = viewerIndex === null ? null : images[viewerIndex];
 
   return (
     <div className="gallery-rail">
@@ -185,59 +234,56 @@ export function GalleryRail({ images }: GalleryRailProps) {
         ref={viewerRef}
         aria-label="Gallery image viewer"
         onClose={() => setViewerIndex(null)}
-        onKeyDown={handleViewerKeyDown}
         onClick={(event) => {
           if (event.target === event.currentTarget) closeViewer();
         }}
       >
-        {viewerIndex !== null && images[viewerIndex] ? (
+        {viewerIndex !== null && viewerImage ? (
           <>
-            <div className="gallery-viewer-toolbar">
-              <output className="gallery-counter" aria-live="polite">
-                {padIndex(viewerIndex)} /{" "}
-                {String(images.length).padStart(2, "0")}
-              </output>
-              <button
-                className="gallery-rail-button gallery-viewer-close"
-                type="button"
-                aria-label="拡大表示を閉じる"
-                onClick={closeViewer}
-              >
-                <span aria-hidden="true">×</span>
-              </button>
-            </div>
-            <div className="gallery-viewer-content">
-              <button
-                className="gallery-rail-button gallery-viewer-nav"
-                type="button"
-                aria-label="前の画像"
-                disabled={viewerIndex === 0}
-                onClick={() => setViewerIndex(Math.max(0, viewerIndex - 1))}
-              >
-                <span aria-hidden="true">←</span>
-              </button>
-              <div className="gallery-viewer-image">
-                <Image
-                  src={withBasePath(images[viewerIndex].src)}
-                  alt={images[viewerIndex].alt}
-                  width={images[viewerIndex].width}
-                  height={images[viewerIndex].height}
-                  sizes="100vw"
-                  priority
-                />
-              </div>
-              <button
-                className="gallery-rail-button gallery-viewer-nav"
-                type="button"
-                aria-label="次の画像"
-                disabled={viewerIndex >= images.length - 1}
-                onClick={() =>
+            <div className="gallery-viewer-media">
+              <GalleryViewerImage
+                image={viewerImage}
+                canAdvance={viewerIndex < images.length - 1}
+                onAdvance={() =>
                   setViewerIndex(Math.min(images.length - 1, viewerIndex + 1))
                 }
-              >
-                <span aria-hidden="true">→</span>
-              </button>
+              />
             </div>
+            <button
+              className="gallery-rail-button gallery-viewer-nav gallery-viewer-prev"
+              type="button"
+              aria-label="前の画像"
+              disabled={viewerIndex === 0}
+              onClick={() => setViewerIndex(Math.max(0, viewerIndex - 1))}
+            >
+              <span aria-hidden="true">←</span>
+            </button>
+            <button
+              className="gallery-rail-button gallery-viewer-nav gallery-viewer-next"
+              type="button"
+              aria-label="次の画像"
+              disabled={viewerIndex >= images.length - 1}
+              onClick={() =>
+                setViewerIndex(Math.min(images.length - 1, viewerIndex + 1))
+              }
+            >
+              <span aria-hidden="true">→</span>
+            </button>
+            <output
+              className="gallery-counter gallery-viewer-counter"
+              aria-live="polite"
+              aria-atomic="true"
+            >
+              {padIndex(viewerIndex)} / {String(images.length).padStart(2, "0")}
+            </output>
+            <button
+              className="gallery-rail-button gallery-viewer-close"
+              type="button"
+              aria-label="画像ビューアーを閉じる"
+              onClick={closeViewer}
+            >
+              <span aria-hidden="true">×</span>
+            </button>
           </>
         ) : null}
       </dialog>
