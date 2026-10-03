@@ -69,13 +69,11 @@ export default function Home() {
             <div className="hero-actions">
               <a
                 className="glass-button glass-button-primary"
-                href={site.connection.discordUrl ?? "#join"}
-                target={site.connection.discordUrl ? "_blank" : undefined}
-                rel={site.connection.discordUrl ? "noreferrer" : undefined}
+                href={site.connection.discordUrl}
+                target="_blank"
+                rel="noreferrer"
               >
-                {site.connection.discordUrl
-                  ? "Discord に参加する"
-                  : homeContent.hero.primaryAction}
+                {homeContent.hero.primaryAction}
                 <span aria-hidden="true">↗</span>
               </a>
               <a className="glass-button glass-button-secondary" href="#about">
@@ -84,7 +82,7 @@ export default function Home() {
             </div>
             <p className="hero-note">
               <span className="status-indicator" aria-hidden="true" />
-              接続情報は準備中
+              Minecraft Java Edition 26.3
             </p>
           </div>
 
@@ -117,7 +115,7 @@ export default function Home() {
             />
             <span>
               <strong>Celenas SMP</strong>
-              <small>Minecraft survival, over time</small>
+              <small>Minecraft Java 26.3 · Survival SMP</small>
             </span>
           </div>
           <div className="split-layout">
@@ -196,12 +194,18 @@ export default function Home() {
             title={homeContent.rules.title}
             description={homeContent.rules.description}
           />
-          <GlassSurface className="pending-panel">
-            <span className="pending-mark" aria-hidden="true">
-              <span />
-            </span>
-            <p>{homeContent.rules.pending}</p>
-          </GlassSurface>
+          <ol className="rules-list">
+            {homeContent.rules.items.map((rule) => (
+              <li key={rule.number}>
+                <span className="rule-number">{rule.number}</span>
+                <div>
+                  <h3>{rule.title}</h3>
+                  <p>{rule.body}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+          <p className="rules-footnote">{homeContent.rules.footnote}</p>
         </section>
 
         <section
@@ -244,7 +248,9 @@ export default function Home() {
               <div>
                 <p className="panel-label">ARCHIVE / 00</p>
                 <h3>{homeContent.gallery.pending}</h3>
-                <p>公開できる景色から、少しずつここに記録していきます。</p>
+                <p>
+                  Celenasで生まれた景色を、これから少しずつ追加していきます。
+                </p>
               </div>
             </GlassSurface>
           )}
@@ -268,7 +274,7 @@ export default function Home() {
         <Link href="/" aria-label="Celenas SMP ホーム">
           Celenas SMP
         </Link>
-        <p>Celenas SMP — A Minecraft world built over time.</p>
+        <p>Celenas SMP — A world built together, over time.</p>
       </footer>
     </>
   );

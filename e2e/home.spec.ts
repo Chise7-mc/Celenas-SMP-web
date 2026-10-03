@@ -96,7 +96,7 @@ async function expectMarkerAligned(page: Page, href: string) {
     .toEqual({ horizontal: true, vertical: true });
 }
 
-test("home exposes honest connection details with no runtime errors", async ({
+test("home exposes the current edition and Discord action with no runtime errors", async ({
   page,
 }) => {
   const errors: string[] = [];
@@ -104,19 +104,29 @@ test("home exposes honest connection details with no runtime errors", async ({
   const response = await page.goto("/");
 
   expect(response?.status()).toBe(200);
-  await expect(page).toHaveTitle(
-    "Celenas SMP | Minecraftサバイバルを、時間とともに",
-  );
+  await expect(page).toHaveTitle("Celenas SMP | Minecraft Java Edition 26.3");
   await expect(
     page.getByRole("heading", { level: 1, name: "Celenas SMP" }),
   ).toBeVisible();
+  await expect(
+    page.getByText("MINECRAFT JAVA 26.3 / SURVIVAL SMP"),
+  ).toBeVisible();
+  await expect(
+    page.getByText("それぞれのペースが、ひとつの世界をつくっていく。"),
+  ).toBeVisible();
+  await expect(page.locator(".hero-supporting")).toHaveText(
+    "建築、探索、装置づくり。ひとりで過ごす日も、誰かと進める日も。積み重ねた時間がCelenasの景色になります。",
+  );
+  await expect(page.locator(".hero-note")).toHaveText(
+    "Minecraft Java Edition 26.3",
+  );
   await expect(
     page.getByRole("link", { name: "Discord に参加する" }),
   ).toHaveAttribute("href", discordInviteUrl);
   expect(errors).toEqual([]);
 });
 
-test("publishes Discord access while Minecraft connection details remain pending", async ({
+test("publishes edition and Discord information without a server address", async ({
   page,
 }, testInfo) => {
   const isMobile = testInfo.project.name === "mobile-chromium";
@@ -139,18 +149,34 @@ test("publishes Discord access while Minecraft connection details remain pending
     await expect(link).toHaveAttribute("rel", "noreferrer");
   }
 
-  const community = page.locator(".transmission-panel-community");
-  await expect(community).toHaveAttribute("data-state", "partial");
-  await expect(community.getByText("PARTIAL", { exact: true })).toBeVisible();
-  await expect(community).toContainText("接続先は公開準備中です。");
-  await expect(community).toContainText("対応バージョンは確認中です。");
-  await expect(community).not.toContainText("Discordの案内は準備中です。");
-
-  const join = page.locator(".transmission-panel-join");
-  await expect(join).toHaveAttribute("data-state", "partial");
-  await expect(join).toContainText("参加案内をDiscordで確認できます。");
+  await expect(page.locator(".community-details dt")).toHaveText([
+    "エディション",
+    "バージョン",
+    "参加窓口",
+  ]);
+  await expect(page.locator(".community-details")).toContainText(
+    "Minecraft Java Edition",
+  );
+  await expect(page.locator(".community-details")).toContainText("26.3");
+  await expect(page.locator(".community-details")).not.toContainText(
+    "サーバーアドレス",
+  );
   await expect(page.locator(".community-note")).toContainText(
-    "Minecraftの接続情報は確認でき次第お知らせします。",
+    "Webサイトではサーバーアドレスを公開していません。",
+  );
+  await expect(page.locator(".transmission-panel-community")).toHaveAttribute(
+    "data-state",
+    "ready",
+  );
+  await expect(page.locator(".transmission-panel-community")).toContainText(
+    "PUBLIC INFO / READY",
+  );
+  await expect(page.locator(".transmission-panel-join")).toHaveAttribute(
+    "data-state",
+    "ready",
+  );
+  await expect(page.locator(".transmission-panel-join")).toContainText(
+    "参加申請とMinecraftへの参加案内はDiscordから確認できます。",
   );
   expect(
     await page.evaluate(
@@ -196,7 +222,7 @@ test("keyboard users can skip to main content", async ({ page }) => {
   await expect(page.getByRole("main")).toBeFocused();
 });
 
-test("uses the canonical logo and keeps unconfirmed content pending", async ({
+test("renders refreshed copy, six formal rules, and the empty gallery", async ({
   page,
 }) => {
   await page.goto("/");
@@ -204,18 +230,101 @@ test("uses the canonical logo and keeps unconfirmed content pending", async ({
     3,
   );
   await expect(
+    page.getByRole("heading", {
+      name: "自由に遊ぶ。ゆっくり世界を育てる。",
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Minecraft Java 26.3 · Survival SMP"),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "建てる。探す。仕組みをつくる。" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "参加の入口は、Discordから。" }),
+  ).toBeVisible();
+  await expect(page.locator("#about .section-description")).toHaveText(
+    "Celenas SMPは、Minecraft Java Edition 26.3のサバイバルをベースに、建築・探索・装置づくりを楽しむコミュニティです。",
+  );
+  await expect(page.locator(".value-list li")).toHaveText([
+    "01自分のペースを尊重する",
+    "02つくったものを大切にする",
+    "03ひとりでも、誰かとでも",
+  ]);
+  await expect(page.locator("#world .section-description")).toHaveText(
+    "Celenasの遊び方に決まった正解はありません。好きなことを、自分のペースで世界に積み重ねていけます。",
+  );
+  await expect(page.locator("#community .section-description")).toHaveText(
+    "参加申請、サーバーからのお知らせ、情報共有はDiscordを中心に行います。ゲームの中でも外でも、自分に合った距離感でコミュニティに参加できます。",
+  );
+  await expect(page.locator(".join-copy .muted")).toHaveText(
+    "Celenas SMPはMinecraft Java Edition 26.3で運用しています。参加申請や参加に必要な案内はDiscordから確認できます。",
+  );
+  await expect(page.locator(".rules-list > li")).toHaveCount(6);
+  await expect(page.locator(".rule-number")).toHaveText([
+    "01",
+    "02",
+    "03",
+    "04",
+    "05",
+    "06",
+  ]);
+  await expect(page.locator(".rules-list h3")).toHaveText([
+    "他の人のものを大切に",
+    "荒らし・嫌がらせは禁止",
+    "不正なプレイをしない",
+    "PvPは相手の同意を",
+    "大規模な装置は周囲に配慮",
+    "困ったときは運営へ",
+  ]);
+  await expect(page.locator(".rules-list li p")).toHaveText([
+    "他のプレイヤーの建築・装置・アイテムを、許可なく壊したり持ち出したりしないでください。",
+    "意図的な破壊、妨害、迷惑行為、過度な煽りや嫌がらせなど、他の人が遊びにくくなる行為は禁止です。",
+    "チート、不正クライアント、運営が認めていない意図的なバグ悪用など、公平性を大きく損なう行為は禁止です。",
+    "通常時のPvPや他プレイヤーへの攻撃は、お互いが了承している場合に行ってください。イベント時はそのイベントのルールを優先します。",
+    "大規模装置やサーバー負荷の高い設備をつくる場合は、周囲への影響を確認し、必要に応じて運営へ相談してください。",
+    "トラブルや判断に迷うことがあれば、当事者同士で無理に解決せずDiscordから運営へ相談してください。",
+  ]);
+  await expect(page.locator(".rules-footnote")).toContainText(
+    "重要な変更はDiscordでお知らせします。",
+  );
+  await expect(
+    page.getByRole("heading", { name: "積み重なった景色を、記録する。" }),
+  ).toBeVisible();
+  await expect(page.locator("#gallery .section-description")).toHaveText(
+    "建築、風景、装置、旅の途中で見つけた瞬間。Celenasの世界に残ったものを、少しずつここへ記録していきます。",
+  );
+  await expect(page.getByText("最初の記録を準備しています。")).toBeVisible();
+  await expect(
     page.getByText(
-      "正式なルールは準備中です。確定した内容をこちらに掲載します。",
+      "Celenasで生まれた景色を、これから少しずつ追加していきます。",
     ),
   ).toBeVisible();
-  await expect(page.getByText("景色の記録は準備中です。")).toBeVisible();
+  await expect(page.locator(".join-copy")).toContainText(
+    "Celenas SMPはMinecraft Java Edition 26.3で運用しています。",
+  );
+  await expect(page.locator(".site-footer")).toContainText(
+    "Celenas SMP — A world built together, over time.",
+  );
+  await expect(page.locator(".about-copy p")).toHaveText([
+    "大きな建築に集中する日も、遠くまで探索する日も、何も決めずに世界を歩く日も。Celenasでは、遊び方や進める速さをひとつに決めません。",
+    "ひとりでつくった拠点も、誰かと進めた装置や共同プロジェクトも、少しずつ同じ世界に積み重なっていきます。長く残る景色を、みんなでゆっくり育てていくSMPです。",
+  ]);
+  await expect(page.locator(".world-themes h3")).toHaveText([
+    "BUILD / 建築",
+    "EXPLORE / 探索",
+    "CREATE / ものづくり",
+  ]);
+  await expect(page.locator(".world-themes p")).toHaveText([
+    "小さな拠点から街、巨大建築まで。時間をかけてつくったものが、少しずつCelenasの景色になっていきます。",
+    "まだ歩いたことのない場所へ。新しい地形や資源を探しながら、自分だけの発見を世界に増やしていきます。",
+    "便利な装置やインフラ、共同プロジェクトまで。アイデアを仕組みに変えて、世界を少しずつ便利にしていきます。",
+  ]);
   await expect(
-    page.getByText("ひとつのMinecraft世界を、みんなで少しずつ育てていく。"),
-  ).toBeVisible();
-  await expect(
-    page.getByText("Minecraftサバイバルを、それぞれのペースで。"),
-  ).toBeVisible();
-  await expect(page.getByText(/Java版|Bedrock版|whitelist/i)).toHaveCount(0);
+    page.getByText(
+      /接続情報は準備中|接続先は公開準備中|対応バージョンは確認中|正式なルールは準備中/,
+    ),
+  ).toHaveCount(0);
 });
 
 test("mobile navigation is keyboard-operable and reaches page sections", async ({
@@ -347,16 +456,16 @@ test("celestial journey supports direct hashes and keeps mobile navigation", asy
   ).toBeVisible();
 });
 
-test("transmission shows partial public information and distinguishes Join access", async ({
+test("transmission shows READY public information and distinguishes Join access", async ({
   page,
 }) => {
   await page.goto("/");
   const community = page.locator(".transmission-panel-community");
-  await expect(community).toHaveAttribute("data-state", "partial");
-  await expect(community.getByText("PARTIAL", { exact: true })).toBeVisible();
-  await expect(community.getByText(/PUBLIC LINK \/ PARTIAL/)).toBeVisible();
+  await expect(community).toHaveAttribute("data-state", "ready");
+  await expect(community.getByText("READY", { exact: true })).toBeVisible();
+  await expect(community.getByText(/PUBLIC INFO \/ READY/)).toBeVisible();
   await expect(page.locator(".transmission-panel-join")).toContainText(
-    "参加案内をDiscordで確認できます。",
+    "参加申請とMinecraftへの参加案内はDiscordから確認できます。",
   );
   await expect(
     page.locator(".transmission-panel-join").getByRole("link"),
@@ -1050,6 +1159,13 @@ test("supports narrow screens and enlarged text without horizontal overflow", as
   });
   for (const width of [320, 360, 375, 390, 430, 768, 1024, 1280, 1440, 1920]) {
     await page.setViewportSize({ width, height: 900 });
+    const rulesColumnCount = await page
+      .locator(".rules-list")
+      .evaluate(
+        (list) =>
+          getComputedStyle(list).gridTemplateColumns.trim().split(/\s+/).length,
+      );
+    expect(rulesColumnCount).toBe(width <= 768 ? 1 : 2);
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= window.innerWidth,

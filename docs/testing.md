@@ -25,17 +25,17 @@ an existing listener. Free that port instead of changing reuse behavior.
 
 ## Coverage
 
-Component tests verify unavailable information has no fabricated join action and
-configured values produce readable details and a usable HTTPS link. Fixtures
-use reserved `.test` domains; those are never production defaults. Lunar phase
-unit tests use fixed UTC dates and verify phase sectors, waxing/waning,
-illumination bounds and deterministic output. Visual component tests check
-decorative SVG output and phase-driven atmospheric CSS properties.
+Component tests verify the published edition, Minecraft version, Discord link
+and READY transmission state. Lunar phase unit tests use fixed UTC dates and
+verify phase sectors, waxing/waning, illumination bounds and deterministic
+output. Visual component tests check decorative SVG output and phase-driven
+atmospheric CSS properties.
 
-Browser tests load the production page, follow the participation anchor, check
-missing information, the canonical logo and site icon, pending gallery state,
-accessible orbital navigation and browser history, active marker alignment at
-three desktop viewport sizes,
+Browser tests load the production page, check the published Discord actions,
+Java Edition details, READY state, all six rules and the intentionally omitted
+server address, plus the canonical logo and site icon and pending gallery state.
+They also cover accessible orbital navigation and browser history, active marker
+alignment at three desktop viewport sizes,
 the 120-second waxing-crescent SVG phase morph, fixed tilt and 100ms update
 limit, offscreen / hidden-document pause and phase resume, CSS orbit periods,
 satellite positions on their ellipse paths, the baked WebP nebula, absence of

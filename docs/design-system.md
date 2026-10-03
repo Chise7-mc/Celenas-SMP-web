@@ -9,11 +9,12 @@ server template. Minecraft screenshots remain content, not the dominant UI
 language.
 
 The current implementation delivers the public Web v1 landing experience:
-Hero / About / World / Server / Rules pending state / Gallery / Join / Footer.
+Hero / About / World / Community / Rules / Gallery / Join / Footer.
 The canonical logo is the official white asset at
 `public/brand/celenas-logo-white.png`, already used in the site header and hero.
-The site remains intentionally modest about unverified server/community data and
-keeps confirmed values separate from pending placeholders.
+Minecraft Java Edition 26.3 and Discord are confirmed public information. The
+server address is intentionally not published. The Gallery remains in a
+polished pending state until approved screenshots exist.
 
 The Hero pairs the official mark with a fictional gas giant, a soft-edged SVG
 phase mask, and three enlarged SVG ellipse paths with one satellite each. The
@@ -25,9 +26,9 @@ behind the planet while keeping the copy side dark. The page uses black, white,
 and one periwinkle accent.
 The planet's restrained amber cloud bands stay within the illustration. The
 scene is decorative, not a substitute logo or a representation of the actual
-Minecraft world. World themes are editorial
-aspirations; the Gallery stays in a polished pending state until approved
-screenshots exist.
+Minecraft world. World themes describe the intended play style; the six concise
+Rules establish shared expectations. The Gallery stays in a polished pending
+state until approved screenshots exist.
 
 ## Tokens and components
 
@@ -42,7 +43,7 @@ fallback and applies restrained blur only where supported. Use the shared
 `GlassSurface` component for substantial interactive or pending surfaces; do
 not turn every section into a card.
 
-Use system sans-serif for copy and monospace only for connection addresses.
+Use system sans-serif for copy and monospace for compact status and index labels.
 The page uses a floating desktop glass header and an accessible expandable
 mobile menu. The Hero combines a large official mark with a fictional gas
 giant: a banded cloud texture masked by fixed-tilt SVG terminator geometry,

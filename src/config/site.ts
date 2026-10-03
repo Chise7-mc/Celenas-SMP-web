@@ -1,16 +1,14 @@
 export type CommunityConnection = Readonly<{
-  serverAddress: string | null;
-  minecraftVersion: string | null;
-  discordUrl: `https://${string}` | null;
+  minecraftVersion: string;
+  discordUrl: `https://${string}`;
 }>;
 
 export const site = {
   name: "Celenas SMP",
   description:
-    "Celenas SMP — Minecraftサバイバルを、それぞれのペースで楽しむコミュニティ。",
+    "Celenas SMP — Minecraft Java Edition 26.3で、建築・探索・ものづくりをそれぞれのペースで楽しむサバイバルコミュニティ。",
   connection: {
-    serverAddress: null,
-    minecraftVersion: null,
+    minecraftVersion: "26.3",
     discordUrl: "https://discord.gg/cuXPVNccYv",
   } satisfies CommunityConnection,
 } as const;
