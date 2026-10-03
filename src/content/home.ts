@@ -101,7 +101,7 @@ export const homeContent = {
       "状況に応じてルールを追加・調整する場合があります。重要な変更はDiscordでお知らせします。",
   },
   gallery: {
-    title: "Celenasのスクリーンショット。",
+    title: "ワールドの様子。",
     description: "建築、装置、風景など、ワールドで撮った写真を載せています。",
     pending: "まだ画像はありません。",
     emptyDescription: "ワールドのスクリーンショットをここに追加していきます。",

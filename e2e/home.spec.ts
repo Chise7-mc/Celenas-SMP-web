@@ -375,7 +375,7 @@ test("renders refreshed copy, six formal rules, and image-only gallery cards", a
     "重要な変更はDiscordでお知らせします。",
   );
   await expect(
-    page.getByRole("heading", { name: "Celenasのスクリーンショット。" }),
+    page.getByRole("heading", { name: "ワールドの様子。" }),
   ).toBeVisible();
   await expect(page.locator("#gallery .section-description")).toHaveText(
     "建築、装置、風景など、ワールドで撮った写真を載せています。",
