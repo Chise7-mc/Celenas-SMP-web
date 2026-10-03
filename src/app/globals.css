@@ -2202,10 +2202,44 @@ h3 {
 }
 
 @media (max-width: 48rem), (pointer: coarse) {
+  .glass-surface {
+    background: rgba(5, 6, 10, 0.94);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .transmission-panel {
+    background-color: rgba(7, 8, 13, 0.94);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .hero::after,
   .nebula-far-cloud,
+  .nebula-main-cloud,
   .nebula-near-gas,
-  .stardust-near {
+  .aurora-curtains,
+  .aurora-wave,
+  .stardust-layer,
+  .star-twinkle,
+  .celestial-stage,
+  .moon::after {
     animation: none;
+  }
+
+  .nebula-main-cloud,
+  .nebula-dust-lanes,
+  .nebula-filament {
+    filter: none;
+  }
+
+  .nebula-planet-separation {
+    filter: blur(6px);
+  }
+
+  .hero::after,
+  .aurora-wave {
+    filter: none;
   }
 
   .nebula-far-cloud {
@@ -2214,6 +2248,22 @@ h3 {
 
   .nebula-near-gas {
     filter: blur(1px);
+  }
+
+  .celestial-journey-atmosphere::after,
+  .journey-horizon {
+    display: none;
+  }
+
+  .celestial-journey-atmosphere::before,
+  .journey-starfield {
+    transform: none !important;
+    transition: opacity 800ms ease;
+  }
+
+  .transmission-panel::after,
+  .transmission-light {
+    animation: none;
   }
 }
 

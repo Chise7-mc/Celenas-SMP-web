@@ -39,7 +39,8 @@ three desktop viewport sizes,
 the 120-second waxing-crescent SVG phase morph, fixed tilt and 100ms update
 limit, offscreen / hidden-document pause and phase resume, CSS orbit periods,
 satellite positions on their ellipse paths, the decorative fixed-seed SVG
-nebula filters and dust lanes, mobile motion reductions, static aurora color,
+nebula filters and dust lanes, mobile low-cost glass / nebula / Journey
+rendering, 200ms phase updates with orbit motion retained, static aurora color,
 keyboard-operable mobile menu navigation and close-on-selection, destination
 focus, keyboard skip navigation, runtime errors, layout overflow from 320px
 through wide desktop at 200% text scaling, reduced motion and axe WCAG A/AA

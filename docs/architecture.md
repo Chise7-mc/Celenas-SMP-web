@@ -45,12 +45,13 @@ Desktop navigation is server-rendered. Mobile navigation is a small client
 boundary only to close the menu after selection, update the hash and focus its
 destination. One small client scene updates the SVG terminator path directly on
 a 120-second cycle from a waxing crescent, at most every 100ms and without React
-state updates. Its animation frame loop, SVG orbits and Hero CSS motion pause
+state updates. On narrow or coarse-pointer devices it uses a 200ms interval;
+ambient CSS effects are static while the lunar phase and three SVG orbit paths
+remain animated. Its animation frame loop, SVG orbits and Hero CSS motion pause
 when the Hero is offscreen, the document is hidden, or reduced motion is
 requested. A decorative inline SVG builds the fixed-seed procedural nebula and
-dark dust lanes; only the main cloud uses the turbulence / displacement filter,
-while surrounding gas uses simple blur. SVG motion paths handle the three
-satellites. The Hero does not use date-based lunar data, an API or geolocation.
+dark dust lanes; mobile disables its filters while preserving the paths and
+gradients. The Hero does not use date-based lunar data, an API or geolocation.
 
 ## GitHub Pages deployment
 

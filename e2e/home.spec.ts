@@ -371,10 +371,13 @@ test("hero celestial scene is decorative and uses CSS motion", async ({
 }) => {
   await page.goto("/");
   const hero = page.locator(".hero-visual");
+  const mobilePerformanceMode = await page.evaluate(
+    () => matchMedia("(max-width: 48rem), (pointer: coarse)").matches,
+  );
   await expect(hero).toHaveAttribute("aria-hidden", "true");
   await expect(page.locator(".celestial-stage")).toHaveCSS(
     "animation-name",
-    "celestial-drift",
+    mobilePerformanceMode ? "none" : "celestial-drift",
   );
   await expect(page.locator(".moon-svg")).toHaveAttribute(
     "viewBox",
@@ -386,13 +389,9 @@ test("hero celestial scene is decorative and uses CSS motion", async ({
     /^\d\.\d{3}$/,
   );
   await expect(page.locator(".stardust-layer")).toHaveCount(3);
-  const mobilePerformanceMode = await page.evaluate(
-    () => matchMedia("(max-width: 48rem), (pointer: coarse)").matches,
-  );
   for (const selector of [".stardust-mid", ".stardust-near"]) {
     const dust = page.locator(selector);
-    const isStaticOnMobile =
-      mobilePerformanceMode && selector === ".stardust-near";
+    const isStaticOnMobile = mobilePerformanceMode;
     await expect(dust).toHaveCSS(
       "animation-name",
       isStaticOnMobile ? "none" : /^stardust-drift-/,
@@ -428,7 +427,7 @@ test("hero celestial scene is decorative and uses CSS motion", async ({
     await page.locator(".star-twinkle-one").evaluate((star) => {
       return getComputedStyle(star).animationName;
     }),
-  ).toBe("star-breathe");
+  ).toBe(mobilePerformanceMode ? "none" : "star-breathe");
   const orbitBodies = [
     [".satellite-one animateMotion", "72s", "-5.76s"],
     [".satellite-two animateMotion", "103s", "-44.29s"],
@@ -474,7 +473,11 @@ test("hero celestial scene is decorative and uses CSS motion", async ({
     [".aurora-wave", "aurora-flow"],
   ] as const) {
     const layer = page.locator(selector);
-    await expect(layer).toHaveCSS("animation-name", animationName);
+    await expect(layer).toHaveCSS(
+      "animation-name",
+      mobilePerformanceMode ? "none" : animationName,
+    );
+    if (mobilePerformanceMode) continue;
     expect(
       await layer.evaluate((element) => {
         const animation = element.getAnimations()[0];
@@ -515,6 +518,14 @@ test("hero celestial scene is decorative and uses CSS motion", async ({
     "filter",
     "url(#nebula-cloud-texture)",
   );
+  await expect(page.locator(".nebula-main-cloud")).toHaveCSS(
+    "filter",
+    mobilePerformanceMode ? "none" : /url\(/,
+  );
+  await expect(page.locator(".nebula-dust-lanes")).toHaveCSS(
+    "filter",
+    mobilePerformanceMode ? "none" : /url\(/,
+  );
   await expect(
     proceduralNebula.locator("#nebula-cloud-texture feTurbulence"),
   ).toHaveAttribute("numOctaves", "2");
@@ -533,7 +544,7 @@ test("hero celestial scene is decorative and uses CSS motion", async ({
   );
   await expect(page.locator(".aurora-wave")).toHaveCSS(
     "animation-duration",
-    "74s",
+    mobilePerformanceMode ? "0s" : "74s",
   );
   await expect(page.locator(".nebula-far-cloud")).toHaveCSS(
     "animation-duration",
@@ -541,7 +552,7 @@ test("hero celestial scene is decorative and uses CSS motion", async ({
   );
   await expect(page.locator(".nebula-main-cloud")).toHaveCSS(
     "animation-duration",
-    "96s",
+    mobilePerformanceMode ? "0s" : "96s",
   );
   await expect(page.locator(".nebula-near-gas")).toHaveCSS(
     "animation-duration",
@@ -551,14 +562,16 @@ test("hero celestial scene is decorative and uses CSS motion", async ({
     [".stardust-mid", "112s"],
     [".stardust-near", "60s"],
   ] as const) {
-    if (mobilePerformanceMode && selector === ".stardust-near") {
+    if (mobilePerformanceMode) {
       await expect(page.locator(selector)).toHaveCSS("animation-name", "none");
+      await expect(page.locator(selector)).toHaveCSS(
+        "animation-duration",
+        "0s",
+      );
     } else {
       await expect(page.locator(selector)).toHaveCSS(
         "animation-duration",
-        mobilePerformanceMode && selector === ".stardust-near"
-          ? "0s"
-          : duration,
+        duration,
       );
     }
   }
@@ -566,12 +579,156 @@ test("hero celestial scene is decorative and uses CSS motion", async ({
     await page.locator(".hero").evaluate((hero) => {
       return getComputedStyle(hero, "::after").animationName;
     }),
-  ).toBe("hero-ambient-drift");
+  ).toBe(mobilePerformanceMode ? "none" : "hero-ambient-drift");
   expect(
     await page.locator(".hero").evaluate((hero) => {
       return getComputedStyle(hero, "::after").animationDuration;
     }),
-  ).toBe("72s");
+  ).toBe(mobilePerformanceMode ? "0s" : "72s");
+});
+
+test("mobile low-cost rendering keeps the nebula and essential motion", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  expect(
+    await page.evaluate(
+      () => matchMedia("(max-width: 48rem), (pointer: coarse)").matches,
+    ),
+  ).toBe(true);
+
+  await expect(page.locator(".header-bar")).toHaveCSS(
+    "backdrop-filter",
+    "none",
+  );
+  await expect(page.locator(".header-bar")).toHaveCSS(
+    "background-color",
+    "rgba(5, 6, 10, 0.94)",
+  );
+  await expect(page.locator(".transmission-panel").first()).toHaveCSS(
+    "backdrop-filter",
+    "none",
+  );
+  await expect(page.locator(".transmission-panel").first()).toHaveCSS(
+    "background-color",
+    "rgba(7, 8, 13, 0.94)",
+  );
+
+  await expect(page.locator(".deep-space-nebula")).toBeVisible();
+  await expect(page.locator(".nebula-main-cloud")).toHaveCSS("filter", "none");
+  await expect(page.locator(".nebula-dust-lanes")).toHaveCSS("filter", "none");
+  await expect(page.locator(".nebula-filament").first()).toHaveCSS(
+    "filter",
+    "none",
+  );
+  await expect(page.locator(".aurora-wave")).toHaveCSS("filter", "none");
+  await expect(page.locator(".nebula-planet-separation")).toHaveCSS(
+    "filter",
+    "blur(6px)",
+  );
+  await expect(page.locator(".nebula-main-cloud path")).toHaveCount(3);
+  await expect(page.locator(".nebula-dust-lanes path")).toHaveCount(2);
+  await expect(page.locator(".hero-space-background")).not.toHaveCSS(
+    "mask-image",
+    "none",
+  );
+
+  const journey = page.locator(".celestial-journey-atmosphere");
+  await expect(page.locator(".journey-horizon")).toBeHidden();
+  const journeyEffects = await journey.evaluate((element) => {
+    const nebula = getComputedStyle(element, "::before");
+    const highlight = getComputedStyle(element, "::after");
+    const stars = getComputedStyle(
+      element.querySelector(".journey-starfield")!,
+    );
+    return {
+      nebulaTransform: nebula.transform,
+      nebulaTransitionProperty: nebula.transitionProperty,
+      nebulaTransitionDuration: nebula.transitionDuration,
+      highlightDisplay: highlight.display,
+      starsTransform: stars.transform,
+      starsTransitionProperty: stars.transitionProperty,
+    };
+  });
+  expect(journeyEffects).toEqual({
+    nebulaTransform: "none",
+    nebulaTransitionProperty: "opacity",
+    nebulaTransitionDuration: "0.8s",
+    highlightDisplay: "none",
+    starsTransform: "none",
+    starsTransitionProperty: "opacity",
+  });
+
+  for (const selector of [
+    ".celestial-stage",
+    ".nebula-far-cloud",
+    ".nebula-main-cloud",
+    ".nebula-near-gas",
+    ".aurora-curtains",
+    ".aurora-wave",
+    ".stardust-layer",
+    ".star-twinkle",
+  ]) {
+    const elements = await page.locator(selector).all();
+    expect(elements.length).toBeGreaterThan(0);
+    for (const element of elements) {
+      await expect(element).toHaveCSS("animation-name", "none");
+    }
+  }
+  expect(
+    await page.locator(".hero").evaluate((element) => ({
+      animation: getComputedStyle(element, "::after").animationName,
+      filter: getComputedStyle(element, "::after").filter,
+    })),
+  ).toEqual({ animation: "none", filter: "none" });
+  expect(
+    await page
+      .locator(".moon")
+      .evaluate(
+        (element) => getComputedStyle(element, "::after").animationName,
+      ),
+  ).toBe("none");
+  expect(
+    await page
+      .locator(".transmission-panel")
+      .first()
+      .evaluate(
+        (element) => getComputedStyle(element, "::after").animationName,
+      ),
+  ).toBe("none");
+  await expect(page.locator(".transmission-light").first()).toHaveCSS(
+    "animation-name",
+    "none",
+  );
+  for (const selector of [
+    ".header-bar",
+    ".hero-space-background",
+    ".celestial-stage",
+    ".deep-space-nebula",
+    ".journey-starfield",
+    ".transmission-panel",
+  ]) {
+    await expect(page.locator(selector).first()).toHaveCSS(
+      "will-change",
+      "auto",
+    );
+  }
+
+  await expect(page.locator(".moon")).toHaveAttribute(
+    "data-cycle-duration",
+    "120000",
+  );
+  await expect(page.locator(".moon image")).toHaveAttribute(
+    "href",
+    /lunar-surface\.webp/,
+  );
+  await expect(page.locator(".orbiting-body")).toHaveCount(3);
+  expect(
+    await page
+      .locator(".celestial-orbits")
+      .evaluate((svg) => (svg as SVGSVGElement).animationsPaused()),
+  ).toBe(false);
 });
 
 test("throttles phase updates and pauses hero motion offscreen or in hidden tabs", async ({
@@ -626,7 +783,10 @@ test("throttles phase updates and pauses hero motion offscreen or in hidden tabs
     ).__heroMotionMetrics;
     return metrics.phaseUpdates / (duration / 1000);
   });
-  expect(rate).toBeLessThanOrEqual(15);
+  const mobilePerformanceMode = await page.evaluate(
+    () => matchMedia("(max-width: 48rem), (pointer: coarse)").matches,
+  );
+  expect(rate).toBeLessThanOrEqual(mobilePerformanceMode ? 6 : 15);
   await page.evaluate(() => {
     const about = document.querySelector<HTMLElement>("#about");
     if (about)

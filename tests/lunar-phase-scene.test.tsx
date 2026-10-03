@@ -10,6 +10,7 @@ import {
   LunarPhaseBackground,
   LunarPhaseScene,
   LunarPhaseVisual,
+  MOBILE_PHASE_UPDATE_INTERVAL_MS,
   PHASE_UPDATE_INTERVAL_MS,
   REDUCED_MOTION_PHASE,
   SHADOW_TILT_DEGREES,
@@ -42,6 +43,7 @@ describe("hero phase cycle", () => {
 
     expect(LUNAR_CYCLE_DURATION_MS).toBe(120_000);
     expect(PHASE_UPDATE_INTERVAL_MS).toBe(100);
+    expect(MOBILE_PHASE_UPDATE_INTERVAL_MS).toBe(200);
     expect(INITIAL_PHASE).toBe(0.125);
     expect(fractions).toEqual([0.125, 0.375, 0.625, 0.875, 0.125]);
     expect(cycleFractions).toEqual([0, 0.25, 0.5, 0.75, 0]);

@@ -51,17 +51,21 @@ white stars, three deterministic radial-gradient stardust depth layers, and a
 procedural SVG nebula. Fixed-seed low-frequency fractal noise, displacement and
 bounded blur give the main blue-indigo cloud irregular edges and internal
 variation; surrounding gas uses simple blur and two dark dust lanes interrupt
-the cloud. Far stardust is static; the other two layers drift slowly on desktop
-and one drifts on mobile. A restrained moving aurora with static color, three
-fixed SVG paths with white orbiting satellites, and a slowly morphing planetary
-shadow complete the scene. Hero motion pauses when it is offscreen or the
-document is hidden.
+the cloud. Far stardust is static; the other layers drift slowly on desktop.
+Mobile uses a low-cost static rendering mode for ambient layers, Journey
+background movement, glass blur and procedural SVG filters; it preserves the
+nebula paths and gradients, planet, 200ms lunar phase updates and three animated
+satellites. Desktop retains its restrained moving aurora with static color,
+three fixed SVG paths with white orbiting satellites, and slowly morphing
+planetary shadow. Hero motion pauses when it is offscreen or the document is
+hidden.
 Stardust opacity responds subtly to the animated phase;
 its layers drift with transforms rather than animating individual particles or
 background positions. Motion is intentionally low-key and is disabled when the
 user requests reduced motion, while a static waxing-crescent shape, atmosphere
 and dust remain visible. The client boundary updates one SVG shadow path at
-most every 100ms without React state updates. No animation library is needed; see
+most every 100ms on desktop and 200ms on mobile without React state updates. No
+animation library is needed; see
 [lunar phase](lunar-phase.md).
 
 ## Interaction and accessibility

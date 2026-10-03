@@ -3,8 +3,9 @@
 The fictional gas giant's textured image remains fixed. The Hero starts at a
 waxing crescent (`0.125`) and animates the SVG shadow path and its horizontal
 direction through a 120-second cycle. A `requestAnimationFrame` loop checks the
-phase at most every 100ms; it writes only changed attributes and CSS variables,
-and React does not render during the cycle. The fixed 12-degree tilt is applied
+phase at most every 100ms on desktop and 200ms on narrow or coarse-pointer
+devices; it writes only changed attributes and CSS variables, and React does
+not render during the cycle. The fixed 12-degree tilt is applied
 by a separate outer SVG group, so the phase morph never rotates the texture or
 the terminator's tilt. At 120 seconds the visual returns to the same waxing
 crescent without a jump.

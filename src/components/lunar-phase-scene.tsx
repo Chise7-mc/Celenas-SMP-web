@@ -5,6 +5,7 @@ import { withBasePath } from "@/lib/asset-path";
 
 export const LUNAR_CYCLE_DURATION_MS = 120_000;
 export const PHASE_UPDATE_INTERVAL_MS = 100;
+export const MOBILE_PHASE_UPDATE_INTERVAL_MS = 200;
 export const INITIAL_PHASE = 0.125;
 export const REDUCED_MOTION_PHASE = INITIAL_PHASE;
 export const SHADOW_TILT_DEGREES = 12;
@@ -338,6 +339,9 @@ export function LunarPhaseVisual() {
     const motionPreference = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     );
+    const mobilePerformancePreference = window.matchMedia(
+      "(max-width: 48rem), (pointer: coarse)",
+    );
     let animationFrame: number | null = null;
     const cycleStart = performance.now();
     let lastPhaseUpdate = Number.NEGATIVE_INFINITY;
@@ -405,7 +409,10 @@ export function LunarPhaseVisual() {
     };
 
     const animate = (timestamp: number) => {
-      if (timestamp - lastPhaseUpdate >= PHASE_UPDATE_INTERVAL_MS) {
+      const updateInterval = mobilePerformancePreference.matches
+        ? MOBILE_PHASE_UPDATE_INTERVAL_MS
+        : PHASE_UPDATE_INTERVAL_MS;
+      if (timestamp - lastPhaseUpdate >= updateInterval) {
         updatePhase(getPhaseFraction(timestamp - cycleStart));
         lastPhaseUpdate = timestamp;
       }
