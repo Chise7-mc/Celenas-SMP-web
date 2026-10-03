@@ -46,19 +46,17 @@ Use system sans-serif for copy and monospace only for connection addresses.
 The page uses a floating desktop glass header and an accessible expandable
 mobile menu. The Hero combines a large official mark with a fictional gas
 giant: a banded cloud texture masked by fixed-tilt SVG terminator geometry,
-deterministic, non-tiled far/mid star layers, a few asynchronously twinkling
-white stars, three deterministic radial-gradient stardust depth layers, and a
-procedural SVG nebula. Fixed-seed low-frequency fractal noise, displacement and
-bounded blur give the main blue-indigo cloud irregular edges and internal
-variation; surrounding gas uses simple blur and two dark dust lanes interrupt
-the cloud. Far stardust is static; the other layers drift slowly on desktop.
-Mobile uses a low-cost static rendering mode for ambient layers, Journey
-background movement, glass blur and procedural SVG filters; it preserves the
-nebula paths and gradients, planet, 200ms lunar phase updates and three animated
-satellites. Desktop retains its restrained moving aurora with static color,
-three fixed SVG paths with white orbiting satellites, and slowly morphing
-planetary shadow. Hero motion pauses when it is offscreen or the document is
-hidden.
+deterministic, non-tiled far/mid star layers, one softly twinkling white star,
+three deterministic radial-gradient stardust depth layers, and a fixed-seed
+blue-indigo nebula baked into a transparent WebP. The baked image preserves the
+irregular cloud, dust lanes, filaments and soft planetary separation without
+runtime turbulence, displacement or blur filters. The 1920 × 1920 image is
+272,404 bytes. Its single layer drifts very slowly; only mid stardust and one
+star twinkle animate on desktop. Mobile keeps the nebula, planet, 200ms lunar
+phase updates and three animated satellites while ambient effects remain
+static. Aurora stays visible without movement, and Journey layers change
+opacity without transform motion. Hero motion pauses when the Hero is offscreen
+or the document is hidden.
 Stardust opacity responds subtly to the animated phase;
 its layers drift with transforms rather than animating individual particles or
 background positions. Motion is intentionally low-key and is disabled when the

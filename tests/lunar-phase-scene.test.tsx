@@ -153,9 +153,11 @@ describe("lunar phase visual", () => {
       container.querySelector(".celestial-scene .deep-space-backdrop"),
     ).toBeNull();
     expect(container.querySelector(".aurora-curtains")).toBeInTheDocument();
-    const nebula = container.querySelector(".deep-space-nebula");
+    const nebula = container.querySelector(".deep-space-nebula-baked");
     expect(nebula).toHaveAttribute("aria-hidden", "true");
-    expect(nebula?.querySelectorAll("feTurbulence")).toHaveLength(2);
-    expect(nebula?.querySelectorAll(".nebula-dust-lanes path")).toHaveLength(2);
+    expect(nebula).toHaveStyle({
+      backgroundImage: 'url("/space/hero-nebula.webp")',
+    });
+    expect(container.querySelector(".deep-space-nebula")).toBeNull();
   });
 });

@@ -540,9 +540,7 @@ h3 {
 }
 
 .hero[data-motion-active="false"]::after,
-.hero[data-motion-active="false"] .nebula-far-cloud,
-.hero[data-motion-active="false"] .nebula-main-cloud,
-.hero[data-motion-active="false"] .nebula-near-gas,
+.hero[data-motion-active="false"] .deep-space-nebula-baked,
 .hero[data-motion-active="false"] .aurora-curtains,
 .hero[data-motion-active="false"] .aurora-wave,
 .hero[data-motion-active="false"] .stardust-layer,
@@ -602,9 +600,7 @@ h3 {
 }
 
 .aurora-wave {
-  transform-box: view-box;
-  transform-origin: center;
-  animation: aurora-flow 74s ease-in-out infinite alternate;
+  animation: none;
 }
 
 .aurora-ribbon {
@@ -628,56 +624,27 @@ h3 {
   opacity: 0.2;
 }
 
-.deep-space-nebula {
+.deep-space-nebula-baked {
   position: absolute;
   z-index: 2;
   inset: 0;
   width: 100%;
   height: 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  overflow: hidden;
   pointer-events: none;
-  mix-blend-mode: screen;
-  overflow: visible;
+  animation: nebula-baked-drift 120s ease-in-out infinite alternate;
 }
 
-.nebula-planet-separation {
-  opacity: 0.56;
-  filter: blur(26px);
-}
-
-.nebula-far-cloud,
-.nebula-main-cloud,
-.nebula-near-gas {
-  transform-box: fill-box;
-  transform-origin: center;
-}
-
-.nebula-far-cloud {
-  opacity: 0.46;
-  filter: blur(3.5px);
-  animation: nebula-far-drift 148s ease-in-out -32s infinite alternate;
-}
-
-.nebula-main-cloud {
-  opacity: 0.9;
-  animation: nebula-main-drift 96s ease-in-out -21s infinite alternate;
-}
-
-.nebula-dust-lanes {
-  opacity: 0.92;
-}
-
-.nebula-near-gas {
-  opacity: 0.62;
-  filter: blur(2px);
-  animation: nebula-near-drift 62s ease-in-out -11s infinite alternate-reverse;
-}
-
-.nebula-filament {
-  filter: blur(7px);
-}
-
-.nebula-filament-faint {
-  opacity: 0.72;
+@keyframes nebula-baked-drift {
+  from {
+    transform: translate3d(-0.35%, 0.15%, 0) scale(1);
+  }
+  to {
+    transform: translate3d(0.35%, -0.15%, 0) scale(1.006);
+  }
 }
 
 .star-field {
@@ -883,7 +850,6 @@ h3 {
     32rem 28rem,
     35rem 31rem,
     29rem 34rem;
-  animation: stardust-drift-near 60s ease-in-out -14s infinite;
 }
 
 .star-accents {
@@ -915,7 +881,6 @@ h3 {
   right: 15%;
   width: 0.13rem;
   height: 0.13rem;
-  animation: star-breathe 16s 7s ease-in-out infinite;
 }
 
 .star-twinkle-three {
@@ -923,7 +888,6 @@ h3 {
   left: 31%;
   width: 0.08rem;
   height: 0.08rem;
-  animation: star-breathe 11s 4.5s ease-in-out infinite;
 }
 
 .star-steady-one {
@@ -951,7 +915,6 @@ h3 {
   place-items: center;
   border-radius: 50%;
   background: none;
-  animation: celestial-drift 12s ease-in-out infinite;
 }
 
 .moon {
@@ -976,7 +939,6 @@ h3 {
   );
   content: "";
   opacity: var(--moon-glow-opacity);
-  animation: moon-glow 12s ease-in-out infinite;
   pointer-events: none;
 }
 
@@ -1060,8 +1022,6 @@ h3 {
 .celestial-journey-atmosphere {
   --journey-nebula-opacity: 0.22;
   --journey-stars-opacity: 0.18;
-  --journey-nebula-x: 0%;
-  --journey-nebula-y: 0%;
   position: fixed;
   z-index: 0;
   inset: 0;
@@ -1070,15 +1030,12 @@ h3 {
 }
 
 .celestial-journey-atmosphere::before,
-.celestial-journey-atmosphere::after,
 .journey-starfield,
 .journey-horizon {
   position: absolute;
   inset: -8%;
   pointer-events: none;
-  transition:
-    opacity 1.8s var(--easing-standard),
-    transform 2.2s var(--easing-standard);
+  transition: opacity 1.8s var(--easing-standard);
 }
 
 .celestial-journey-atmosphere::before {
@@ -1100,22 +1057,6 @@ h3 {
     );
   content: "";
   opacity: var(--journey-nebula-opacity);
-  transform: translate3d(var(--journey-nebula-x), var(--journey-nebula-y), 0);
-}
-
-.celestial-journey-atmosphere::after {
-  background: radial-gradient(
-    ellipse at 86% 45%,
-    rgba(207, 215, 255, 0.055),
-    transparent 26%
-  );
-  content: "";
-  opacity: calc(var(--journey-nebula-opacity) * 0.75);
-  transform: translate3d(
-    calc(var(--journey-nebula-x) * -0.45),
-    var(--journey-nebula-y),
-    0
-  );
 }
 
 .journey-starfield {
@@ -1158,14 +1099,11 @@ h3 {
     transparent 67%
   );
   opacity: 0.24;
-  transform: translate3d(var(--journey-nebula-x), 0, 0);
 }
 
 .celestial-journey-atmosphere[data-stage="about"] {
   --journey-nebula-opacity: 0.3;
   --journey-stars-opacity: 0.23;
-  --journey-nebula-x: -2%;
-  --journey-nebula-y: 1%;
 }
 
 .celestial-journey-atmosphere[data-stage="hero"] {
@@ -1176,36 +1114,26 @@ h3 {
 .celestial-journey-atmosphere[data-stage="world"] {
   --journey-nebula-opacity: 0.35;
   --journey-stars-opacity: 0.28;
-  --journey-nebula-x: 2%;
-  --journey-nebula-y: -2%;
 }
 
 .celestial-journey-atmosphere[data-stage="community"] {
   --journey-nebula-opacity: 0.31;
   --journey-stars-opacity: 0.25;
-  --journey-nebula-x: -1%;
-  --journey-nebula-y: -1%;
 }
 
 .celestial-journey-atmosphere[data-stage="rules"] {
   --journey-nebula-opacity: 0.2;
   --journey-stars-opacity: 0.17;
-  --journey-nebula-x: -3%;
-  --journey-nebula-y: 1%;
 }
 
 .celestial-journey-atmosphere[data-stage="gallery"] {
   --journey-nebula-opacity: 0.34;
   --journey-stars-opacity: 0.31;
-  --journey-nebula-x: 2%;
-  --journey-nebula-y: 2%;
 }
 
 .celestial-journey-atmosphere[data-stage="join"] {
   --journey-nebula-opacity: 0.32;
   --journey-stars-opacity: 0.28;
-  --journey-nebula-x: 0%;
-  --journey-nebula-y: -2%;
 }
 
 .page-shell,
@@ -1872,16 +1800,6 @@ h3 {
   }
 }
 
-@keyframes celestial-drift {
-  0%,
-  100% {
-    transform: translateY(5px);
-  }
-  50% {
-    transform: translateY(-5px);
-  }
-}
-
 @keyframes hero-ambient-drift {
   from {
     opacity: 0.025;
@@ -1890,58 +1808,6 @@ h3 {
   to {
     opacity: 0.055;
     transform: rotate(20deg) translateY(1%);
-  }
-}
-
-@keyframes aurora-flow {
-  from {
-    transform: translateY(-3%);
-  }
-  to {
-    transform: translateY(3%);
-  }
-}
-
-@keyframes nebula-far-drift {
-  from {
-    transform: translate3d(-1.5%, 1%, 0) scale(0.985);
-    opacity: 0.38;
-  }
-  to {
-    transform: translate3d(1.5%, -1%, 0) scale(1.02);
-    opacity: 0.5;
-  }
-}
-
-@keyframes nebula-main-drift {
-  from {
-    transform: translate3d(2%, -1.5%, 0) scale(0.98);
-    opacity: 0.78;
-  }
-  to {
-    transform: translate3d(-2%, 1.5%, 0) scale(1.035);
-    opacity: 0.92;
-  }
-}
-
-@keyframes nebula-near-drift {
-  from {
-    transform: translate3d(-2.5%, -1%, 0) scale(0.98);
-    opacity: 0.48;
-  }
-  to {
-    transform: translate3d(2.5%, 1%, 0) scale(1.025);
-    opacity: 0.64;
-  }
-}
-
-@keyframes moon-glow {
-  0%,
-  100% {
-    filter: brightness(0.9);
-  }
-  50% {
-    filter: brightness(1.12);
   }
 }
 
@@ -1958,20 +1824,10 @@ h3 {
 @keyframes stardust-drift-mid {
   0%,
   100% {
-    transform: translate3d(3px, -2px, 0);
+    transform: translate3d(1.5px, -1px, 0);
   }
   50% {
-    transform: translate3d(-3px, 2px, 0);
-  }
-}
-
-@keyframes stardust-drift-near {
-  0%,
-  100% {
-    transform: translate3d(-4px, -2px, 0);
-  }
-  50% {
-    transform: translate3d(4px, 2px, 0);
+    transform: translate3d(-1.5px, 1px, 0);
   }
 }
 
@@ -2110,13 +1966,8 @@ h3 {
     );
   }
 
-  .deep-space-nebula {
+  .deep-space-nebula-baked {
     opacity: 0.76;
-  }
-
-  .nebula-planet-separation {
-    filter: blur(18px);
-    opacity: 0.46;
   }
 
   .celestial-stage {
@@ -2215,9 +2066,7 @@ h3 {
   }
 
   .hero::after,
-  .nebula-far-cloud,
-  .nebula-main-cloud,
-  .nebula-near-gas,
+  .deep-space-nebula-baked,
   .aurora-curtains,
   .aurora-wave,
   .stardust-layer,
@@ -2227,27 +2076,9 @@ h3 {
     animation: none;
   }
 
-  .nebula-main-cloud,
-  .nebula-dust-lanes,
-  .nebula-filament {
-    filter: none;
-  }
-
-  .nebula-planet-separation {
-    filter: blur(6px);
-  }
-
   .hero::after,
   .aurora-wave {
     filter: none;
-  }
-
-  .nebula-far-cloud {
-    filter: blur(1.5px);
-  }
-
-  .nebula-near-gas {
-    filter: blur(1px);
   }
 
   .celestial-journey-atmosphere::after,

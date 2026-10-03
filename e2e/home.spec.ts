@@ -377,7 +377,7 @@ test("hero celestial scene is decorative and uses CSS motion", async ({
   await expect(hero).toHaveAttribute("aria-hidden", "true");
   await expect(page.locator(".celestial-stage")).toHaveCSS(
     "animation-name",
-    mobilePerformanceMode ? "none" : "celestial-drift",
+    "none",
   );
   await expect(page.locator(".moon-svg")).toHaveAttribute(
     "viewBox",
@@ -389,16 +389,14 @@ test("hero celestial scene is decorative and uses CSS motion", async ({
     /^\d\.\d{3}$/,
   );
   await expect(page.locator(".stardust-layer")).toHaveCount(3);
-  for (const selector of [".stardust-mid", ".stardust-near"]) {
-    const dust = page.locator(selector);
-    const isStaticOnMobile = mobilePerformanceMode;
-    await expect(dust).toHaveCSS(
-      "animation-name",
-      isStaticOnMobile ? "none" : /^stardust-drift-/,
-    );
-    if (isStaticOnMobile) continue;
+  const movingDust = page.locator(".stardust-mid");
+  await expect(movingDust).toHaveCSS(
+    "animation-name",
+    mobilePerformanceMode ? "none" : "stardust-drift-mid",
+  );
+  if (!mobilePerformanceMode) {
     expect(
-      await dust.evaluate((layer) => {
+      await movingDust.evaluate((layer) => {
         const animation = layer.getAnimations()[0];
         const duration = animation?.effect?.getTiming().duration;
         if (!animation || typeof duration !== "number") {
@@ -416,6 +414,10 @@ test("hero celestial scene is decorative and uses CSS motion", async ({
       }),
     ).toBe(true);
   }
+  await expect(page.locator(".stardust-near")).toHaveCSS(
+    "animation-name",
+    "none",
+  );
   await expect(page.locator(".stardust-far")).toHaveCSS(
     "animation-name",
     "none",
@@ -428,6 +430,14 @@ test("hero celestial scene is decorative and uses CSS motion", async ({
       return getComputedStyle(star).animationName;
     }),
   ).toBe(mobilePerformanceMode ? "none" : "star-breathe");
+  await expect(page.locator(".star-twinkle-two")).toHaveCSS(
+    "animation-name",
+    "none",
+  );
+  await expect(page.locator(".star-twinkle-three")).toHaveCSS(
+    "animation-name",
+    "none",
+  );
   const orbitBodies = [
     [".satellite-one animateMotion", "72s", "-5.76s"],
     [".satellite-two animateMotion", "103s", "-44.29s"],
@@ -461,74 +471,27 @@ test("hero celestial scene is decorative and uses CSS motion", async ({
       .evaluate((svg) => (svg as SVGSVGElement).animationsPaused()),
   ).toBe(false);
   await expect(page.locator(".deep-space-backdrop")).toHaveCount(1);
-  const proceduralNebula = page.locator(".deep-space-nebula");
-  await expect(proceduralNebula).toHaveAttribute("aria-hidden", "true");
-  await expect(proceduralNebula.locator("feTurbulence")).toHaveCount(2);
-  await expect(page.locator(".nebula-far-cloud")).toHaveCount(1);
-  await expect(page.locator(".nebula-main-cloud")).toHaveCount(1);
-  await expect(page.locator(".nebula-dust-lanes path")).toHaveCount(2);
-  await expect(page.locator(".nebula-near-gas")).toHaveCount(1);
-  for (const [selector, animationName] of [
-    [".nebula-main-cloud", "nebula-main-drift"],
-    [".aurora-wave", "aurora-flow"],
-  ] as const) {
-    const layer = page.locator(selector);
-    await expect(layer).toHaveCSS(
-      "animation-name",
-      mobilePerformanceMode ? "none" : animationName,
-    );
-    if (mobilePerformanceMode) continue;
-    expect(
-      await layer.evaluate((element) => {
-        const animation = element.getAnimations()[0];
-        const duration = animation?.effect?.getTiming().duration;
-        if (!animation || typeof duration !== "number") return false;
-        animation.pause();
-        animation.currentTime = 0;
-        const start = [
-          getComputedStyle(element).transform,
-          getComputedStyle(element).opacity,
-          getComputedStyle(element).filter,
-        ].join("|");
-        animation.currentTime = duration / 2;
-        const middle = [
-          getComputedStyle(element).transform,
-          getComputedStyle(element).opacity,
-          getComputedStyle(element).filter,
-        ].join("|");
-        animation.play();
-        return start !== middle;
-      }),
-    ).toBe(true);
-  }
-  const expectedGasAnimation = mobilePerformanceMode ? "none" : undefined;
-  for (const [selector, animationName] of [
-    [".nebula-far-cloud", "nebula-far-drift"],
-    [".nebula-near-gas", "nebula-near-drift"],
-  ] as const) {
-    const layer = page.locator(selector);
-    if (expectedGasAnimation) {
-      await expect(layer).toHaveCSS("animation-name", expectedGasAnimation);
-    } else {
-      await expect(layer).toHaveCSS("animation-name", animationName);
-    }
-    await expect(layer).not.toHaveAttribute("filter", /nebula-cloud-texture/);
-  }
-  await expect(page.locator(".nebula-main-cloud")).toHaveAttribute(
-    "filter",
-    "url(#nebula-cloud-texture)",
+  const nebula = page.locator(".deep-space-nebula-baked");
+  await expect(nebula).toHaveAttribute("aria-hidden", "true");
+  await expect(nebula).toHaveCSS("mix-blend-mode", "normal");
+  await expect(nebula).toHaveCSS("background-image", /hero-nebula\.webp/);
+  await expect(nebula).toHaveCSS(
+    "animation-name",
+    mobilePerformanceMode ? "none" : "nebula-baked-drift",
   );
-  await expect(page.locator(".nebula-main-cloud")).toHaveCSS(
-    "filter",
-    mobilePerformanceMode ? "none" : /url\(/,
+  await expect(nebula).toHaveCSS("filter", "none");
+  const nebulaResponse = await page.request.get("/space/hero-nebula.webp");
+  expect(nebulaResponse.ok()).toBe(true);
+  expect(nebulaResponse.headers()["content-type"]).toContain("image/webp");
+  expect(await page.locator(".deep-space-nebula").count()).toBe(0);
+  await expect(page.locator(".stardust-near")).toHaveCSS(
+    "animation-name",
+    "none",
   );
-  await expect(page.locator(".nebula-dust-lanes")).toHaveCSS(
-    "filter",
-    mobilePerformanceMode ? "none" : /url\(/,
+  await expect(page.locator(".aurora-wave")).toHaveCSS(
+    "animation-name",
+    "none",
   );
-  await expect(
-    proceduralNebula.locator("#nebula-cloud-texture feTurbulence"),
-  ).toHaveAttribute("numOctaves", "2");
   await expect(page.locator(".aurora-curtains")).toHaveCSS(
     "animation-name",
     "none",
@@ -544,37 +507,12 @@ test("hero celestial scene is decorative and uses CSS motion", async ({
   );
   await expect(page.locator(".aurora-wave")).toHaveCSS(
     "animation-duration",
-    mobilePerformanceMode ? "0s" : "74s",
+    "0s",
   );
-  await expect(page.locator(".nebula-far-cloud")).toHaveCSS(
+  await expect(page.locator(".stardust-mid")).toHaveCSS(
     "animation-duration",
-    mobilePerformanceMode ? "0s" : "148s",
+    mobilePerformanceMode ? "0s" : "112s",
   );
-  await expect(page.locator(".nebula-main-cloud")).toHaveCSS(
-    "animation-duration",
-    mobilePerformanceMode ? "0s" : "96s",
-  );
-  await expect(page.locator(".nebula-near-gas")).toHaveCSS(
-    "animation-duration",
-    mobilePerformanceMode ? "0s" : "62s",
-  );
-  for (const [selector, duration] of [
-    [".stardust-mid", "112s"],
-    [".stardust-near", "60s"],
-  ] as const) {
-    if (mobilePerformanceMode) {
-      await expect(page.locator(selector)).toHaveCSS("animation-name", "none");
-      await expect(page.locator(selector)).toHaveCSS(
-        "animation-duration",
-        "0s",
-      );
-    } else {
-      await expect(page.locator(selector)).toHaveCSS(
-        "animation-duration",
-        duration,
-      );
-    }
-  }
   expect(
     await page.locator(".hero").evaluate((hero) => {
       return getComputedStyle(hero, "::after").animationName;
@@ -615,20 +553,16 @@ test("mobile low-cost rendering keeps the nebula and essential motion", async ({
     "rgba(7, 8, 13, 0.94)",
   );
 
-  await expect(page.locator(".deep-space-nebula")).toBeVisible();
-  await expect(page.locator(".nebula-main-cloud")).toHaveCSS("filter", "none");
-  await expect(page.locator(".nebula-dust-lanes")).toHaveCSS("filter", "none");
-  await expect(page.locator(".nebula-filament").first()).toHaveCSS(
+  await expect(page.locator(".deep-space-nebula-baked")).toBeVisible();
+  await expect(page.locator(".deep-space-nebula-baked")).toHaveCSS(
+    "background-image",
+    /hero-nebula\.webp/,
+  );
+  await expect(page.locator(".deep-space-nebula-baked")).toHaveCSS(
     "filter",
     "none",
   );
   await expect(page.locator(".aurora-wave")).toHaveCSS("filter", "none");
-  await expect(page.locator(".nebula-planet-separation")).toHaveCSS(
-    "filter",
-    "blur(6px)",
-  );
-  await expect(page.locator(".nebula-main-cloud path")).toHaveCount(3);
-  await expect(page.locator(".nebula-dust-lanes path")).toHaveCount(2);
   await expect(page.locator(".hero-space-background")).not.toHaveCSS(
     "mask-image",
     "none",
@@ -662,9 +596,7 @@ test("mobile low-cost rendering keeps the nebula and essential motion", async ({
 
   for (const selector of [
     ".celestial-stage",
-    ".nebula-far-cloud",
-    ".nebula-main-cloud",
-    ".nebula-near-gas",
+    ".deep-space-nebula-baked",
     ".aurora-curtains",
     ".aurora-wave",
     ".stardust-layer",
@@ -705,7 +637,7 @@ test("mobile low-cost rendering keeps the nebula and essential motion", async ({
     ".header-bar",
     ".hero-space-background",
     ".celestial-stage",
-    ".deep-space-nebula",
+    ".deep-space-nebula-baked",
     ".journey-starfield",
     ".transmission-panel",
   ]) {
@@ -805,16 +737,14 @@ test("throttles phase updates and pauses hero motion offscreen or in hidden tabs
     "animation-play-state",
     "paused",
   );
-  await expect(page.locator(".nebula-main-cloud")).toHaveCSS(
+  await expect(page.locator(".deep-space-nebula-baked")).toHaveCSS(
     "animation-play-state",
     "paused",
   );
   const pausedHeroAnimations = await page.evaluate(() => {
     const hero = document.querySelector(".hero");
     const selectors = [
-      ".nebula-far-cloud",
-      ".nebula-main-cloud",
-      ".nebula-near-gas",
+      ".deep-space-nebula-baked",
       ".aurora-curtains",
       ".aurora-wave",
       ".stardust-layer",
@@ -833,7 +763,7 @@ test("throttles phase updates and pauses hero motion offscreen or in hidden tabs
         .animationPlayState,
     ];
   });
-  expect(pausedHeroAnimations).toEqual(Array(10).fill("paused"));
+  expect(pausedHeroAnimations).toEqual(Array(8).fill("paused"));
   await page.evaluate(() => {
     (
       window as unknown as Window & { __resetHeroMotionMetrics: () => void }
@@ -939,9 +869,12 @@ test("contains the full-hero deep-space background with a faded mask", async ({
   page,
 }) => {
   await page.goto("/");
-  const nebula = page.locator(".deep-space-nebula");
-  await expect(nebula).toHaveAttribute("preserveAspectRatio", "xMaxYMid slice");
+  const nebula = page.locator(".deep-space-nebula-baked");
   await expect(nebula).toHaveAttribute("aria-hidden", "true");
+  await expect(nebula).toHaveCSS("background-size", "cover");
+  const asset = await page.request.get("/space/hero-nebula.webp");
+  expect(asset.ok()).toBe(true);
+  expect(asset.headers()["content-type"]).toContain("image/webp");
 
   for (const [width, height] of [
     [1920, 1080],
@@ -951,19 +884,16 @@ test("contains the full-hero deep-space background with a faded mask", async ({
   ] as const) {
     await page.setViewportSize({ width, height });
     const geometry = await page.evaluate(() => {
-      const svg = document.querySelector<SVGSVGElement>(".deep-space-nebula")!;
+      const baked = document.querySelector<HTMLElement>(
+        ".deep-space-nebula-baked",
+      )!;
       const background = document.querySelector(".hero-space-background")!;
       const visual = document.querySelector(".hero-visual")!;
-      const bounds = svg.getBBox();
-      const rightmostPoint = svg.createSVGPoint();
-      rightmostPoint.x = bounds.x + bounds.width;
-      rightmostPoint.y = bounds.y + bounds.height / 2;
-      const paintedRight = rightmostPoint.matrixTransform(
-        svg.getScreenCTM()!,
-      ).x;
+      const bakedBounds = baked.getBoundingClientRect();
       return {
-        paintedRight,
+        bakedRight: bakedBounds.right,
         backgroundRight: background.getBoundingClientRect().right,
+        bakedOverflow: getComputedStyle(baked).overflow,
         backgroundOverflow: getComputedStyle(background).overflow,
         backgroundMask: getComputedStyle(background).maskImage,
         visualOverflow: getComputedStyle(visual).overflowX,
@@ -971,9 +901,10 @@ test("contains the full-hero deep-space background with a faded mask", async ({
       };
     });
 
-    expect(geometry.paintedRight).toBeLessThanOrEqual(
+    expect(geometry.bakedRight).toBeLessThanOrEqual(
       geometry.backgroundRight + 0.5,
     );
+    expect(geometry.bakedOverflow).toBe("hidden");
     expect(geometry.backgroundOverflow).toBe("hidden");
     expect(geometry.backgroundMask).toContain("radial-gradient");
     expect(geometry.visualOverflow).toBe("visible");
@@ -1161,10 +1092,7 @@ test("respects reduced motion", async ({ page }) => {
     ".moon",
     ".aurora-curtains",
     ".aurora-wave",
-    ".nebula-far-cloud",
-    ".nebula-main-cloud",
-    ".nebula-dust-lanes",
-    ".nebula-near-gas",
+    ".deep-space-nebula-baked",
     ".star-twinkle-one",
     ".stardust-far",
     ".stardust-mid",
