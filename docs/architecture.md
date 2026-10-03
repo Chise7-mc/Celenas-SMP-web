@@ -17,11 +17,12 @@ Internal anchors provide navigation without a custom library.
 | `src/components/lunar-phase-scene.tsx` | Client boundary for the Hero's 120-second SVG phase morph |
 | `src/components/mobile-navigation.tsx` | Small client boundary for closing mobile navigation       |
 | `src/config/site.ts`                   | Reviewed, public product configuration                    |
-| `src/content/home.ts`                  | Editable editorial copy and approved gallery entries      |
+| `src/content/home.ts`                  | Editable editorial copy and typed gallery manifest import |
+| `src/content/gallery.json`             | Single source of approved Gallery entries                 |
 | `src/content/navigation.ts`            | Shared anchor navigation definitions                      |
 | `src/lib/lunar-phase.ts`               | Pure UTC lunar phase approximation                        |
 | `src/lib/asset-path.ts`                | Public asset paths for the optional Pages base path       |
-| `docs/world-assets.md`                 | Approved world screenshot asset convention                |
+| `docs/world-assets.md`                 | Gallery image intake and management commands              |
 | `src/styles/tokens.css`                | Shared visual tokens                                      |
 | `tests/`                               | Component behavior and lunar domain tests                 |
 | `e2e/`                                 | Production page in Playwright                             |
@@ -33,14 +34,16 @@ Server components are the default. Add a client boundary only for an implemented
 interaction needing browser state or APIs. Do not introduce state stores,
 animation engines, 3D libraries or data-query clients speculatively.
 
-`src/content/home.ts` owns brand/editorial language, the six public community
-rules and typed gallery metadata. Confirmed public facts remain in
+`src/content/home.ts` owns brand/editorial language and the six public community
+rules. `src/content/gallery.json` is the single source of Gallery metadata and
+is imported with the `GalleryImage` type. Confirmed public facts remain in
 `src/config/site.ts`. Minecraft Java Edition 26.3 and the Discord invitation are
 public; the server address is intentionally not part of the site data model.
-The gallery starts empty and renders an intentional pending state. To add
-approved screenshots, place optimized files in `public/world/` and add their
-public path, meaningful alt text and approved caption to the gallery content.
-This is a lightweight source model, not a CMS or a source of live server data.
+The Gallery starts empty and renders an intentional pending state. To add a
+screen capture, put PNG/JPEG/WebP files in `gallery-inbox/` and run
+`pnpm gallery:add`. The CLI optimizes them into `public/gallery/`, updates the
+manifest and archives the original locally. `pnpm gallery:validate` checks the
+manifest and all published image files before quality checks and deployment.
 
 The glass surface is a small server component backed by shared CSS tokens.
 Desktop navigation is server-rendered. Mobile navigation is a small client

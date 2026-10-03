@@ -12,6 +12,10 @@
     "build": "node scripts/next.mjs build",
     "verify:pages": "node scripts/verify-pages-export.mjs",
     "start": "node scripts/next.mjs start --hostname 127.0.0.1",
+    "gallery:add": "node scripts/gallery-add.mjs",
+    "gallery:list": "node scripts/gallery-list.mjs",
+    "gallery:remove": "node scripts/gallery-remove.mjs",
+    "gallery:validate": "node scripts/gallery-validate.mjs",
     "lint": "eslint . --max-warnings=0",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -19,7 +23,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm test:e2e"
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm gallery:validate && pnpm test && pnpm build && pnpm test:e2e"
   },
   "dependencies": {
     "next": "16.3.7",
@@ -40,6 +44,7 @@
     "eslint-config-next": "16.3.7",
     "jsdom": "30.1.1",
     "prettier": "3.9.9",
+    "sharp": "^0.35.5",
     "typescript": "6.0.3",
     "vitest": "5.0.2"
   }

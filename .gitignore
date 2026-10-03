@@ -2,6 +2,9 @@ node_modules/
 .pnpm-store/
 .next/
 out/
+gallery-archive/
+gallery-inbox/*
+!gallery-inbox/.gitkeep
 coverage/
 playwright-report/
 test-results/

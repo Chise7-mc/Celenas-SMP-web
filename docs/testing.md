@@ -7,17 +7,18 @@ Install Chromium once with `pnpm exec playwright install chromium` (Linux CI use
 `--with-deps`). If a Windows shell cannot resolve the pnpm-exec shim, use
 `.\node_modules\.bin\playwright.cmd install chromium`.
 
-| Command             | Evidence                                                 |
-| ------------------- | -------------------------------------------------------- |
-| `pnpm format:check` | Formatting consistency                                   |
-| `pnpm lint`         | Next.js, React and TypeScript lint; warnings fail        |
-| `pnpm typecheck`    | Next route types and strict TypeScript, including tests  |
-| `pnpm test`         | Component behavior with Vitest and React Testing Library |
-| `pnpm test:watch`   | Focused local feedback                                   |
-| `pnpm build`        | Production compilation and static generation             |
-| `pnpm test:e2e`     | Fresh production server, desktop/mobile Chromium         |
-| `pnpm check`        | All gates, ending in production browser checks           |
-| `pnpm verify:pages` | Verify the Pages static export after its build           |
+| Command                 | Evidence                                                 |
+| ----------------------- | -------------------------------------------------------- |
+| `pnpm format:check`     | Formatting consistency                                   |
+| `pnpm lint`             | Next.js, React and TypeScript lint; warnings fail        |
+| `pnpm typecheck`        | Next route types and strict TypeScript, including tests  |
+| `pnpm test`             | Component behavior with Vitest and React Testing Library |
+| `pnpm gallery:validate` | Gallery manifest and published image integrity           |
+| `pnpm test:watch`       | Focused local feedback                                   |
+| `pnpm build`            | Production compilation and static generation             |
+| `pnpm test:e2e`         | Fresh production server, desktop/mobile Chromium         |
+| `pnpm check`            | All gates, ending in production browser checks           |
+| `pnpm verify:pages`     | Verify the Pages static export after its build           |
 
 Run `pnpm build` before standalone `pnpm test:e2e`; `pnpm check` does this for
 you. Playwright starts its own server on loopback port 3100 and refuses to reuse
@@ -26,7 +27,9 @@ an existing listener. Free that port instead of changing reuse behavior.
 ## Coverage
 
 Component tests verify the published edition, Minecraft version, Discord link
-and READY transmission state. Lunar phase unit tests use fixed UTC dates and
+and READY transmission state. Gallery core tests cover manifest shape,
+duplicate IDs and paths, image metadata, path traversal and insertion order.
+Lunar phase unit tests use fixed UTC dates and
 verify phase sectors, waxing/waning, illumination bounds and deterministic
 output. Visual component tests check decorative SVG output and phase-driven
 atmospheric CSS properties.

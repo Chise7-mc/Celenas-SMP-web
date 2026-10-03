@@ -223,7 +223,7 @@ export default function Home() {
           {homeContent.gallery.images.length > 0 ? (
             <div className="gallery-grid">
               {homeContent.gallery.images.map((image) => (
-                <figure key={image.src} className="gallery-item">
+                <figure key={image.id} className="gallery-item">
                   <div className="gallery-image">
                     <Image
                       src={withBasePath(image.src)}

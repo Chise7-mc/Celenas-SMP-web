@@ -1,11 +1,14 @@
+import galleryManifest from "./gallery.json";
+
 export type GalleryImage = Readonly<{
+  id: string;
   src: string;
   alt: string;
   caption: string;
   location?: string;
 }>;
 
-const galleryImages: readonly GalleryImage[] = [];
+const galleryImages: readonly GalleryImage[] = galleryManifest;
 
 export const homeContent = {
   hero: {
