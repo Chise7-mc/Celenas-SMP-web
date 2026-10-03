@@ -34,6 +34,8 @@ decorative SVG output and phase-driven atmospheric CSS properties.
 
 Browser tests load the production page, follow the participation anchor, check
 missing information, the canonical logo and site icon, pending gallery state,
+accessible orbital navigation and browser history, active marker alignment at
+three desktop viewport sizes,
 the 120-second waxing-crescent SVG phase morph, fixed tilt and 100ms update
 limit, offscreen / hidden-document pause and phase resume, CSS orbit periods,
 satellite positions on their ellipse paths, the decorative fixed-seed SVG

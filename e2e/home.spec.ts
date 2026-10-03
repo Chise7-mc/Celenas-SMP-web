@@ -1,5 +1,76 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
+
+async function expectFixedNodesVisible(page: Page) {
+  const orbital = page.getByRole("navigation", { name: "ページ内セクション" });
+  await expect(orbital.locator(".orbital-fixed-node")).toHaveCount(7);
+  await expect(orbital.locator(".orbital-active-satellite")).toHaveCount(1);
+  await expect
+    .poll(() =>
+      page.locator(".orbital-fixed-node").evaluateAll((nodes) =>
+        nodes.every((node) => {
+          const style = getComputedStyle(node);
+          return (
+            Number(style.opacity) > 0 &&
+            style.visibility !== "hidden" &&
+            style.display !== "none"
+          );
+        }),
+      ),
+    )
+    .toBe(true);
+}
+
+async function expectMarkerAligned(page: Page, href: string) {
+  const orbital = page.getByRole("navigation", { name: "ページ内セクション" });
+  if (href === "#hero") {
+    await expect(
+      orbital.locator('.orbital-section-link[aria-current="location"]'),
+    ).toHaveCount(0);
+  } else {
+    await expect(orbital.locator('a[href="' + href + '"]')).toHaveAttribute(
+      "aria-current",
+      "location",
+    );
+  }
+  await expectFixedNodesVisible(page);
+  await expect
+    .poll(() =>
+      page.evaluate((targetHref) => {
+        const marker = document.querySelector<HTMLElement>(
+          ".orbital-active-satellite",
+        );
+        const node =
+          targetHref === "#hero"
+            ? document.querySelector<HTMLElement>(
+                ".orbital-hero-node .orbital-fixed-node",
+              )
+            : document
+                .querySelector<HTMLAnchorElement>(
+                  '.orbital-section-link[href="' + targetHref + '"]',
+                )
+                ?.querySelector<HTMLElement>(".orbital-fixed-node");
+        if (!marker || !node) throw new Error("Missing orbital marker");
+        const markerRect = marker.getBoundingClientRect();
+        const nodeRect = node.getBoundingClientRect();
+        return {
+          horizontal:
+            Math.abs(
+              markerRect.left +
+                markerRect.width / 2 -
+                (nodeRect.left + nodeRect.width / 2),
+            ) <= 1,
+          vertical:
+            Math.abs(
+              markerRect.top +
+                markerRect.height / 2 -
+                (nodeRect.top + nodeRect.height / 2),
+            ) <= 1,
+        };
+      }, href),
+    )
+    .toEqual({ horizontal: true, vertical: true });
+}
 
 test("home exposes honest connection details with no runtime errors", async ({
   page,
@@ -121,7 +192,7 @@ test("mobile navigation is keyboard-operable and reaches page sections", async (
   }
 });
 
-test("celestial journey tracks sections and orbital links navigate accessibly", async ({
+test("celestial journey navigation and browser history stay accessible", async ({
   page,
 }, testInfo) => {
   test.skip(
@@ -139,82 +210,6 @@ test("celestial journey tracks sections and orbital links navigate accessibly", 
     "d",
     /^M47 27 C50 43 58 66 67 82 /,
   );
-  await expect(orbital.locator(".orbital-fixed-node")).toHaveCount(7);
-  await expect(orbital.locator(".orbital-active-satellite")).toHaveCount(1);
-  await expect(
-    orbital.locator('.orbital-section-link[aria-current="location"]'),
-  ).toHaveCount(0);
-  await expectFixedNodesVisible();
-  await expectMarkerAligned("#hero");
-
-  async function expectFixedNodesVisible() {
-    await expect(orbital.locator(".orbital-fixed-node")).toHaveCount(7);
-    await expect(orbital.locator(".orbital-active-satellite")).toHaveCount(1);
-    await expect
-      .poll(() =>
-        page.locator(".orbital-fixed-node").evaluateAll((nodes) =>
-          nodes.every((node) => {
-            const style = getComputedStyle(node);
-            return (
-              Number(style.opacity) > 0 &&
-              style.visibility !== "hidden" &&
-              style.display !== "none"
-            );
-          }),
-        ),
-      )
-      .toBe(true);
-  }
-
-  async function expectMarkerAligned(href: string) {
-    if (href === "#hero") {
-      await expect(
-        orbital.locator('.orbital-section-link[aria-current="location"]'),
-      ).toHaveCount(0);
-    } else {
-      await expect(orbital.locator('a[href="' + href + '"]')).toHaveAttribute(
-        "aria-current",
-        "location",
-      );
-    }
-    await expectFixedNodesVisible();
-    await expect
-      .poll(() =>
-        page.evaluate((targetHref) => {
-          const marker = document.querySelector<HTMLElement>(
-            ".orbital-active-satellite",
-          );
-          const node =
-            targetHref === "#hero"
-              ? document.querySelector<HTMLElement>(
-                  ".orbital-hero-node .orbital-fixed-node",
-                )
-              : document
-                  .querySelector<HTMLAnchorElement>(
-                    '.orbital-section-link[href="' + targetHref + '"]',
-                  )
-                  ?.querySelector<HTMLElement>(".orbital-fixed-node");
-          if (!marker || !node) throw new Error("Missing orbital marker");
-          const markerRect = marker.getBoundingClientRect();
-          const nodeRect = node.getBoundingClientRect();
-          return {
-            horizontal:
-              Math.abs(
-                markerRect.left +
-                  markerRect.width / 2 -
-                  (nodeRect.left + nodeRect.width / 2),
-              ) <= 1,
-            vertical:
-              Math.abs(
-                markerRect.top +
-                  markerRect.height / 2 -
-                  (nodeRect.top + nodeRect.height / 2),
-              ) <= 1,
-          };
-        }, href),
-      )
-      .toEqual({ horizontal: true, vertical: true });
-  }
 
   const destinations = [
     ["01 About", "#about"],
@@ -232,7 +227,6 @@ test("celestial journey tracks sections and orbital links navigate accessibly", 
     await expect(page.locator(hash)).toBeFocused();
     await expect(link).toHaveAttribute("aria-current", "location");
     await expect(atmosphere).toHaveAttribute("data-stage", hash.slice(1));
-    await expectMarkerAligned(hash);
   }
 
   await page.goBack();
@@ -242,22 +236,34 @@ test("celestial journey tracks sections and orbital links navigate accessibly", 
   await page.goForward();
   await expect(page).toHaveURL(/#join$/);
   await expect(page.locator("#join")).toBeFocused();
-  await expectMarkerAligned("#join");
 
   await page.goto("/");
   await expect(atmosphere).toHaveAttribute("data-stage", "hero");
-  await expectMarkerAligned("#hero");
+});
 
+test("orbital marker stays aligned across desktop viewports", async ({
+  page,
+}, testInfo) => {
+  test.skip(
+    testInfo.project.name === "mobile-chromium",
+    "The orbital indicator is intentionally hidden on touch devices.",
+  );
   for (const [width, height] of [
     [1920, 1080],
     [1440, 900],
     [1366, 768],
   ] as const) {
     await page.setViewportSize({ width, height });
+    await page.goto("/");
+    const orbital = page.getByRole("navigation", {
+      name: "ページ内セクション",
+    });
     await expect(orbital).toBeVisible();
+    await expect(orbital.getByRole("link")).toHaveCount(6);
+    await expectMarkerAligned(page, "#hero");
     for (const href of ["#about", "#world", "#gallery", "#join"]) {
       await orbital.locator('a[href="' + href + '"]').click();
-      await expectMarkerAligned(href);
+      await expectMarkerAligned(page, href);
     }
   }
 });
@@ -621,10 +627,6 @@ test("throttles phase updates and pauses hero motion offscreen or in hidden tabs
     return metrics.phaseUpdates / (duration / 1000);
   });
   expect(rate).toBeLessThanOrEqual(15);
-  const phaseBeforeOffscreen = await page
-    .locator(".moon")
-    .getAttribute("data-cycle-position");
-
   await page.evaluate(() => {
     const about = document.querySelector<HTMLElement>("#about");
     if (about)
@@ -636,6 +638,9 @@ test("throttles phase updates and pauses hero motion offscreen or in hidden tabs
       orbits.evaluate((svg) => (svg as SVGSVGElement).animationsPaused()),
     )
     .toBe(true);
+  const phaseAtPause = await page
+    .locator(".moon")
+    .getAttribute("data-cycle-position");
   await expect(page.locator(".stardust-mid")).toHaveCSS(
     "animation-play-state",
     "paused",
@@ -687,7 +692,7 @@ test("throttles phase updates and pauses hero motion offscreen or in hidden tabs
   const phaseWhileOffscreen = await page
     .locator(".moon")
     .getAttribute("data-cycle-position");
-  expect(phaseWhileOffscreen).toBe(phaseBeforeOffscreen);
+  expect(phaseWhileOffscreen).toBe(phaseAtPause);
 
   await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
   await expect(hero).toHaveAttribute("data-motion-active", "true");
@@ -699,8 +704,7 @@ test("throttles phase updates and pauses hero motion offscreen or in hidden tabs
   const phaseAfterReturn = Number(
     await page.locator(".moon").getAttribute("data-cycle-position"),
   );
-  const phaseAdvance =
-    (phaseAfterReturn - Number(phaseBeforeOffscreen) + 1) % 1;
+  const phaseAdvance = (phaseAfterReturn - Number(phaseAtPause) + 1) % 1;
   expect(phaseAdvance).toBeGreaterThan(0.001);
   await page.evaluate(() => {
     (
