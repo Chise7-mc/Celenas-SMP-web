@@ -11,6 +11,10 @@ const pendingConnection: CommunityConnection = {
   minecraftVersion: null,
   discordUrl: null,
 };
+const discordConnection: CommunityConnection = {
+  ...pendingConnection,
+  discordUrl: "https://discord.gg/cuXPVNccYv",
+};
 
 describe("transmission panel", () => {
   it("derives PENDING, PARTIAL, and READY from configured public data", () => {
@@ -54,5 +58,27 @@ describe("transmission panel", () => {
     expect(screen.getByText("PUBLIC ACCESS / PENDING")).toBeVisible();
     expect(screen.queryByRole("link")).not.toBeInTheDocument();
     expect(screen.queryByText("サーバーアドレス")).not.toBeInTheDocument();
+  });
+
+  it("publishes Discord while retaining partial connection status", () => {
+    const { container } = render(
+      <TransmissionPanel connection={discordConnection} variant="join" />,
+    );
+
+    expect(container.firstElementChild).toHaveAttribute(
+      "data-state",
+      "partial",
+    );
+    expect(screen.getByText("PARTIAL")).toBeVisible();
+    expect(screen.getByText("参加案内をDiscordで確認できます。")).toBeVisible();
+    expect(
+      screen.getByRole("link", { name: /Discordに参加する/ }),
+    ).toHaveAttribute("href", discordConnection.discordUrl);
+    expect(
+      screen.getByRole("link", { name: /Discordに参加する/ }),
+    ).toHaveAttribute("target", "_blank");
+    expect(
+      screen.getByRole("link", { name: /Discordに参加する/ }),
+    ).toHaveAttribute("rel", "noreferrer");
   });
 });

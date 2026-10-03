@@ -56,7 +56,7 @@ export const homeContent = {
     title: "ゲームの中でも、Discordでも。",
     description:
       "Minecraftで遊ぶ時間も、Discordでの会話や情報共有も。ゲームの中と外のどちらでも、自分に合った距離感でつながれる場所を目指しています。",
-    note: "Discordの案内と接続情報は、確認できたものから掲載します。",
+    note: "Discordコミュニティを公開しています。Minecraftの接続情報は確認でき次第お知らせします。",
   },
   rules: {
     title: "世界を長く楽しむためのルール。",
@@ -74,6 +74,6 @@ export const homeContent = {
   join: {
     title: "Celenas SMPに参加する。",
     description:
-      "Minecraftの対応バージョンやサーバーアドレス、Discordなど、参加に必要な情報を確認でき次第ここに掲載します。",
+      "Discordの参加案内を公開しています。Minecraftの対応バージョンやサーバーアドレスは確認でき次第掲載します。",
   },
 } as const;

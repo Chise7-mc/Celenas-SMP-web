@@ -11,6 +11,6 @@ export const site = {
   connection: {
     serverAddress: null,
     minecraftVersion: null,
-    discordUrl: null,
+    discordUrl: "https://discord.gg/cuXPVNccYv",
   } satisfies CommunityConnection,
 } as const;

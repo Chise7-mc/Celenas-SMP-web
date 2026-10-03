@@ -1,6 +1,8 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
+const discordInviteUrl = "https://discord.gg/cuXPVNccYv";
+
 async function expectFixedNodesVisible(page: Page) {
   const orbital = page.getByRole("navigation", { name: "ページ内セクション" });
   await expect(orbital.locator(".orbital-fixed-node")).toHaveCount(7);
@@ -108,23 +110,53 @@ test("home exposes honest connection details with no runtime errors", async ({
   await expect(
     page.getByRole("heading", { level: 1, name: "Celenas SMP" }),
   ).toBeVisible();
-  await page.getByRole("link", { name: "参加方法を見る" }).click();
-  await expect(page).toHaveURL(/#join$/);
   await expect(
-    page.getByRole("heading", {
-      name: "Celenas SMPに参加する。",
-      exact: true,
-    }),
-  ).toBeInViewport();
-  await expect(
-    page
-      .locator("#join")
-      .getByText(
-        "Minecraftの接続情報とDiscordの案内は、確認できたものから公開します。",
-      ),
-  ).toBeVisible();
-  await expect(page.getByRole("link", { name: "Discord へ" })).toHaveCount(0);
+    page.getByRole("link", { name: "Discord に参加する" }),
+  ).toHaveAttribute("href", discordInviteUrl);
   expect(errors).toEqual([]);
+});
+
+test("publishes Discord access while Minecraft connection details remain pending", async ({
+  page,
+}, testInfo) => {
+  const isMobile = testInfo.project.name === "mobile-chromium";
+  await page.setViewportSize({
+    width: isMobile ? 390 : 1440,
+    height: isMobile ? 844 : 900,
+  });
+  await page.goto("/");
+
+  const links = [
+    page.getByRole("link", { name: "Discord に参加する" }),
+    page.getByRole("link", { name: "Discord コミュニティへ参加 ↗" }),
+    page.getByRole("link", { name: "Discordに参加する" }),
+  ];
+  for (const link of links) {
+    await expect(link).toBeVisible();
+    await expect(link).toBeEnabled();
+    await expect(link).toHaveAttribute("href", discordInviteUrl);
+    await expect(link).toHaveAttribute("target", "_blank");
+    await expect(link).toHaveAttribute("rel", "noreferrer");
+  }
+
+  const community = page.locator(".transmission-panel-community");
+  await expect(community).toHaveAttribute("data-state", "partial");
+  await expect(community.getByText("PARTIAL", { exact: true })).toBeVisible();
+  await expect(community).toContainText("接続先は公開準備中です。");
+  await expect(community).toContainText("対応バージョンは確認中です。");
+  await expect(community).not.toContainText("Discordの案内は準備中です。");
+
+  const join = page.locator(".transmission-panel-join");
+  await expect(join).toHaveAttribute("data-state", "partial");
+  await expect(join).toContainText("参加案内をDiscordで確認できます。");
+  await expect(page.locator(".community-note")).toContainText(
+    "Minecraftの接続情報は確認でき次第お知らせします。",
+  );
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
 });
 
 test("serves the official Celenas site icon", async ({ page }) => {
@@ -315,20 +347,20 @@ test("celestial journey supports direct hashes and keeps mobile navigation", asy
   ).toBeVisible();
 });
 
-test("transmission uses truthful pending state and distinguishes Join access", async ({
+test("transmission shows partial public information and distinguishes Join access", async ({
   page,
 }) => {
   await page.goto("/");
   const community = page.locator(".transmission-panel-community");
-  await expect(community).toHaveAttribute("data-state", "pending");
-  await expect(community.getByText("PENDING", { exact: true })).toBeVisible();
-  await expect(community.getByText(/PUBLIC LINK \/ PENDING/)).toBeVisible();
+  await expect(community).toHaveAttribute("data-state", "partial");
+  await expect(community.getByText("PARTIAL", { exact: true })).toBeVisible();
+  await expect(community.getByText(/PUBLIC LINK \/ PARTIAL/)).toBeVisible();
   await expect(page.locator(".transmission-panel-join")).toContainText(
-    "PUBLIC ACCESS / PENDING",
+    "参加案内をDiscordで確認できます。",
   );
   await expect(
     page.locator(".transmission-panel-join").getByRole("link"),
-  ).toHaveCount(0);
+  ).toHaveAttribute("href", discordInviteUrl);
   await expect(
     page.getByText(/PING|LATENCY|UPTIME|PLAYER\s+\d|SIGNAL\s+\d/i),
   ).toHaveCount(0);
@@ -1026,7 +1058,7 @@ test("supports narrow screens and enlarged text without horizontal overflow", as
     ).toBe(true);
   }
   await expect(
-    page.getByRole("link", { name: "参加方法を見る" }),
+    page.getByRole("link", { name: "Discord に参加する" }),
   ).toBeVisible();
 });
 
@@ -1052,7 +1084,7 @@ test("keeps the planetary scene framed on target desktop and mobile sizes", asyn
       `expected no horizontal overflow at ${width}x${height}`,
     ).toBe(true);
     await expect(
-      page.getByRole("link", { name: "参加方法を見る" }),
+      page.getByRole("link", { name: "Discord に参加する" }),
     ).toBeVisible();
 
     await expect(page.locator(".hero-space-background")).toBeAttached();
