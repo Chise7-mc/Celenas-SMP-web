@@ -47,7 +47,8 @@ limit, offscreen / hidden-document pause and phase resume, CSS orbit periods,
 satellite positions on their ellipse paths, the baked WebP nebula, absence of
 runtime SVG filters and blend modes, restrained desktop motion, mobile low-cost
 glass / nebula / Journey rendering, 200ms phase updates with orbit motion
-retained, static aurora color, keyboard-operable mobile menu navigation and
+retained, desktop aurora motion and mobile ambient-motion pause,
+keyboard-operable mobile menu navigation and
 close-on-selection, destination focus, keyboard skip navigation, runtime errors,
 layout overflow from 320px
 through wide desktop at 200% text scaling, reduced motion and axe WCAG A/AA

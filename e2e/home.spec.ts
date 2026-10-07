@@ -1173,14 +1173,8 @@ test("hero celestial scene is decorative and uses CSS motion", async ({
       return getComputedStyle(star).animationName;
     }),
   ).toBe(mobilePerformanceMode ? "none" : "star-breathe");
-  await expect(page.locator(".star-twinkle-two")).toHaveCSS(
-    "animation-name",
-    "none",
-  );
-  await expect(page.locator(".star-twinkle-three")).toHaveCSS(
-    "animation-name",
-    "none",
-  );
+  await expect(page.locator(".star-twinkle")).toHaveCount(1);
+  await expect(page.locator(".star-steady")).toHaveCount(1);
   const orbitBodies = [
     [".satellite-one animateMotion", "72s", "-5.76s"],
     [".satellite-two animateMotion", "103s", "-44.29s"],
@@ -1231,10 +1225,43 @@ test("hero celestial scene is decorative and uses CSS motion", async ({
     "animation-name",
     "none",
   );
-  await expect(page.locator(".aurora-wave")).toHaveCSS(
+  const aurora = page.locator(".aurora-wave");
+  await expect(aurora).toHaveCSS(
     "animation-name",
-    "none",
+    mobilePerformanceMode ? "none" : "aurora-drift",
   );
+  for (const selector of [
+    ".aurora-ribbon-one",
+    ".aurora-ribbon-two",
+    ".aurora-ribbon-three",
+  ]) {
+    await expect(page.locator(selector)).toHaveCSS(
+      "animation-name",
+      mobilePerformanceMode
+        ? "none"
+        : selector === ".aurora-ribbon-one"
+          ? "aurora-breathe-one"
+          : selector === ".aurora-ribbon-two"
+            ? "aurora-breathe-two"
+            : "aurora-breathe-three",
+    );
+  }
+  if (!mobilePerformanceMode) {
+    expect(
+      await aurora.evaluate((element) => {
+        const animation = element.getAnimations()[0];
+        const duration = animation?.effect?.getTiming().duration;
+        if (!animation || typeof duration !== "number") return false;
+        animation.pause();
+        animation.currentTime = 0;
+        const initial = getComputedStyle(element).transform;
+        animation.currentTime = duration / 2;
+        const drift = getComputedStyle(element).transform;
+        animation.play();
+        return initial !== drift;
+      }),
+    ).toBe(true);
+  }
   await expect(page.locator(".aurora-curtains")).toHaveCSS(
     "animation-name",
     "none",
@@ -1250,7 +1277,7 @@ test("hero celestial scene is decorative and uses CSS motion", async ({
   );
   await expect(page.locator(".aurora-wave")).toHaveCSS(
     "animation-duration",
-    "0s",
+    mobilePerformanceMode ? "0s" : "84s",
   );
   await expect(page.locator(".stardust-mid")).toHaveCSS(
     "animation-duration",
@@ -1342,6 +1369,7 @@ test("mobile low-cost rendering keeps the nebula and essential motion", async ({
     ".deep-space-nebula-baked",
     ".aurora-curtains",
     ".aurora-wave",
+    ".aurora-ribbon",
     ".stardust-layer",
     ".star-twinkle",
   ]) {
@@ -1490,6 +1518,7 @@ test("throttles phase updates and pauses hero motion offscreen or in hidden tabs
       ".deep-space-nebula-baked",
       ".aurora-curtains",
       ".aurora-wave",
+      ".aurora-ribbon",
       ".stardust-layer",
       ".star-twinkle",
       ".celestial-stage",
@@ -1506,7 +1535,7 @@ test("throttles phase updates and pauses hero motion offscreen or in hidden tabs
         .animationPlayState,
     ];
   });
-  expect(pausedHeroAnimations).toEqual(Array(8).fill("paused"));
+  expect(pausedHeroAnimations).toEqual(Array(9).fill("paused"));
   await page.evaluate(() => {
     (
       window as unknown as Window & { __resetHeroMotionMetrics: () => void }
@@ -1842,6 +1871,9 @@ test("respects reduced motion", async ({ page }) => {
     ".moon",
     ".aurora-curtains",
     ".aurora-wave",
+    ".aurora-ribbon-one",
+    ".aurora-ribbon-two",
+    ".aurora-ribbon-three",
     ".deep-space-nebula-baked",
     ".star-twinkle-one",
     ".stardust-far",

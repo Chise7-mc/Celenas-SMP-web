@@ -52,16 +52,14 @@ The page uses a floating desktop glass header and an accessible expandable
 mobile menu. The Hero combines a large official mark with a fictional gas
 giant: a banded cloud texture masked by fixed-tilt SVG terminator geometry,
 deterministic, non-tiled far/mid star layers, one softly twinkling white star,
-three deterministic radial-gradient stardust depth layers, and a fixed-seed
-blue-indigo nebula baked into a transparent WebP. The baked image preserves the
-irregular cloud, dust lanes, filaments and soft planetary separation without
-runtime turbulence, displacement or blur filters. The 1920 × 1920 image is
-272,404 bytes. Its single layer drifts very slowly; only mid stardust and one
-star twinkle animate on desktop. Mobile keeps the nebula, planet, 200ms lunar
-phase updates and three animated satellites while ambient effects remain
-static. Aurora stays visible without movement, and Journey layers change
-opacity without transform motion. Hero motion pauses when the Hero is offscreen
-or the document is hidden.
+three sparse deterministic radial-gradient stardust depth layers, and a quiet
+black-blue deep-space image baked into WebP. The 1600 × 1600 image is 14,020
+bytes and has no baked stars, keeping the faint indigo haze and controlled CSS
+stars quiet. It drifts very slowly; a single white star twinkles. Three thin periwinkle aurora ribbons
+move and breathe subtly on desktop without blur filters. Mobile keeps the
+background and planet but stops ambient motion; lunar phase updates and three
+satellites remain. Journey layers change opacity without transform motion. Hero
+motion pauses when the Hero is offscreen or the document is hidden.
 Stardust opacity responds subtly to the animated phase;
 its layers drift with transforms rather than animating individual particles or
 background positions. Motion is intentionally low-key and is disabled when the

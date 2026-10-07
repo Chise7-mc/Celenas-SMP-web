@@ -88,9 +88,6 @@ export function LunarPhaseBackground() {
   return (
     <div className="hero-space-background" aria-hidden="true">
       <div className="deep-space-backdrop" />
-      <div className="star-field star-field-far" />
-      <div className="stardust-layer stardust-far" />
-      <div className="star-field star-field-mid" />
       <div
         className="deep-space-nebula-baked"
         style={{
@@ -98,13 +95,13 @@ export function LunarPhaseBackground() {
         }}
         aria-hidden="true"
       />
+      <div className="star-field star-field-far" />
+      <div className="stardust-layer stardust-far" />
+      <div className="star-field star-field-mid" />
       <div className="stardust-layer stardust-mid" />
       <div className="star-accents">
         <span className="star-twinkle star-twinkle-one" />
-        <span className="star-twinkle star-twinkle-two" />
-        <span className="star-twinkle star-twinkle-three" />
         <span className="star-steady star-steady-one" />
-        <span className="star-steady star-steady-two" />
       </div>
       <svg
         className="aurora-curtains"
@@ -115,21 +112,12 @@ export function LunarPhaseBackground() {
         <defs>
           <linearGradient id="aurora-ribbon-color" x1="0" y1="0" x2="1" y2="0">
             <stop offset="0%" stopColor="#a7b5ff" stopOpacity="0" />
-            <stop offset="35%" stopColor="#a7b5ff" stopOpacity="0.4" />
-            <stop offset="62%" stopColor="#dce2ff" stopOpacity="0.65" />
+            <stop offset="35%" stopColor="#a7b5ff" stopOpacity="0.58" />
+            <stop offset="62%" stopColor="#dce2ff" stopOpacity="0.82" />
             <stop offset="100%" stopColor="#a7b5ff" stopOpacity="0" />
           </linearGradient>
-          <filter
-            id="aurora-soft-edge"
-            x="-18%"
-            y="-18%"
-            width="136%"
-            height="136%"
-          >
-            <feGaussianBlur stdDeviation="1.25" />
-          </filter>
         </defs>
-        <g className="aurora-wave" filter="url(#aurora-soft-edge)">
+        <g className="aurora-wave">
           <path
             className="aurora-ribbon aurora-ribbon-one"
             d="M 5 54 C 17 39, 17 20, 38 15 C 57 10, 66 24, 77 26 C 86 28, 92 22, 98 14"
