@@ -137,7 +137,7 @@ describe("lunar phase visual", () => {
     expect(container.querySelector(".planet-shadow-morph")).toBeInTheDocument();
   });
 
-  it("renders decorative deep-space layers and procedural nebula texture", () => {
+  it("renders decorative deep-space layers and three nebula gas layers", () => {
     const { container } = render(
       <>
         <LunarPhaseBackground />
@@ -152,7 +152,13 @@ describe("lunar phase visual", () => {
     expect(
       container.querySelector(".celestial-scene .deep-space-backdrop"),
     ).toBeNull();
-    expect(container.querySelector(".aurora-curtains")).toBeInTheDocument();
+    expect(container.querySelector(".aurora-curtains")).toBeNull();
+    expect(container.querySelector(".aurora-ribbon")).toBeNull();
+    expect(container.querySelector(".nebula-atmosphere")).toHaveAttribute(
+      "aria-hidden",
+      "true",
+    );
+    expect(container.querySelectorAll(".nebula-cloud")).toHaveLength(3);
     const nebula = container.querySelector(".deep-space-nebula-baked");
     expect(nebula).toHaveAttribute("aria-hidden", "true");
     expect(nebula).toHaveStyle({

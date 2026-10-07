@@ -57,10 +57,11 @@ state updates. On narrow or coarse-pointer devices it uses a 200ms interval;
 ambient CSS effects are static while the lunar phase and three SVG orbit paths
 remain animated. Its animation frame loop, SVG orbits and Hero CSS motion pause
 when the Hero is offscreen, the document is hidden, or reduced motion is
-requested. A fixed-seed nebula is baked into a transparent WebP and displayed
-as one slowly drifting background layer; no procedural SVG filters run in the
-page. Desktop keeps just the mid stardust and one small star twinkle moving,
-while aurora and Journey layers change opacity without transform motion. The
+requested. A quiet black-blue space texture is displayed as a WebP background;
+three CSS radial-gradient gas layers add depth without runtime SVG filters.
+Desktop keeps just the mid stardust and one small star twinkle moving, while
+nebula cloud layers drift subtly and Journey layers change opacity without
+transform motion. The
 Hero does not use date-based lunar data, an API or geolocation.
 
 ## GitHub Pages deployment

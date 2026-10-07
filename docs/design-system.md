@@ -24,7 +24,7 @@ phase mask, and three enlarged SVG ellipse paths with one satellite each. The
 satellites follow their matching ellipse at distinct 72-, 103-, and 137-second
 periods. A local SVG path morphs the planetary shadow through a 120-second
 cycle from waxing crescent, with a fixed 12-degree tilt and no texture motion.
-An irregular blue-indigo nebula and a restrained periwinkle aurora add depth
+An irregular blue-indigo nebula and a soft gas-like atmosphere add depth
 behind the planet while keeping the copy side dark. The page uses black, white,
 and one periwinkle accent.
 The planet's restrained amber cloud bands stay within the illustration. The
@@ -55,11 +55,12 @@ deterministic, non-tiled far/mid star layers, one softly twinkling white star,
 three sparse deterministic radial-gradient stardust depth layers, and a quiet
 black-blue deep-space image baked into WebP. The 1600 × 1600 image is 14,020
 bytes and has no baked stars, keeping the faint indigo haze and controlled CSS
-stars quiet. It drifts very slowly; a single white star twinkles. Three thin periwinkle aurora ribbons
-move and breathe subtly on desktop without blur filters. Mobile keeps the
-background and planet but stops ambient motion; lunar phase updates and three
-satellites remain. Journey layers change opacity without transform motion. Hero
-motion pauses when the Hero is offscreen or the document is hidden.
+stars quiet. It drifts very slowly; a single white star twinkles. Three layered
+blue-indigo radial-gradient gas clouds drift gently on desktop using transforms
+and opacity, without blur filters. Mobile keeps the background and planet but
+stops ambient motion; lunar phase updates and three satellites remain. Journey
+layers change opacity without transform motion. Hero motion pauses when the
+Hero is offscreen or the document is hidden.
 Stardust opacity responds subtly to the animated phase;
 its layers drift with transforms rather than animating individual particles or
 background positions. Motion is intentionally low-key and is disabled when the

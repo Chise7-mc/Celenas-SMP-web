@@ -95,6 +95,11 @@ export function LunarPhaseBackground() {
         }}
         aria-hidden="true"
       />
+      <div className="nebula-atmosphere" aria-hidden="true">
+        <div className="nebula-cloud nebula-cloud-one" />
+        <div className="nebula-cloud nebula-cloud-two" />
+        <div className="nebula-cloud nebula-cloud-three" />
+      </div>
       <div className="star-field star-field-far" />
       <div className="stardust-layer stardust-far" />
       <div className="star-field star-field-mid" />
@@ -103,35 +108,6 @@ export function LunarPhaseBackground() {
         <span className="star-twinkle star-twinkle-one" />
         <span className="star-steady star-steady-one" />
       </div>
-      <svg
-        className="aurora-curtains"
-        viewBox="0 0 100 100"
-        aria-hidden="true"
-        focusable="false"
-      >
-        <defs>
-          <linearGradient id="aurora-ribbon-color" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#a7b5ff" stopOpacity="0" />
-            <stop offset="35%" stopColor="#a7b5ff" stopOpacity="0.58" />
-            <stop offset="62%" stopColor="#dce2ff" stopOpacity="0.82" />
-            <stop offset="100%" stopColor="#a7b5ff" stopOpacity="0" />
-          </linearGradient>
-        </defs>
-        <g className="aurora-wave">
-          <path
-            className="aurora-ribbon aurora-ribbon-one"
-            d="M 5 54 C 17 39, 17 20, 38 15 C 57 10, 66 24, 77 26 C 86 28, 92 22, 98 14"
-          />
-          <path
-            className="aurora-ribbon aurora-ribbon-two"
-            d="M 2 66 C 19 54, 24 34, 43 29 C 62 24, 70 39, 82 42 C 90 44, 95 38, 100 29"
-          />
-          <path
-            className="aurora-ribbon aurora-ribbon-three"
-            d="M 1 76 C 17 64, 28 62, 43 67 C 58 72, 67 85, 81 84 C 90 83, 95 77, 100 69"
-          />
-        </g>
-      </svg>
       <div className="stardust-layer stardust-near" />
     </div>
   );

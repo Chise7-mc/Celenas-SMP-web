@@ -546,9 +546,9 @@ h3 {
 
 .hero[data-motion-active="false"]::after,
 .hero[data-motion-active="false"] .deep-space-nebula-baked,
-.hero[data-motion-active="false"] .aurora-curtains,
-.hero[data-motion-active="false"] .aurora-wave,
-.hero[data-motion-active="false"] .aurora-ribbon,
+.hero[data-motion-active="false"] .nebula-cloud-one,
+.hero[data-motion-active="false"] .nebula-cloud-two,
+.hero[data-motion-active="false"] .nebula-cloud-three,
 .hero[data-motion-active="false"] .stardust-layer,
 .hero[data-motion-active="false"] .star-twinkle,
 .hero[data-motion-active="false"] .celestial-stage,
@@ -594,88 +594,113 @@ h3 {
   );
 }
 
-.aurora-curtains {
+.nebula-atmosphere {
   position: absolute;
   z-index: 2;
   inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-  opacity: calc(var(--moonlight-opacity) * 2.4);
+  mask-image: radial-gradient(
+    ellipse 70% 60% at 68% 45%,
+    #000 22%,
+    rgba(0, 0, 0, 0.68) 61%,
+    transparent 100%
+  );
+  -webkit-mask-image: radial-gradient(
+    ellipse 70% 60% at 68% 45%,
+    #000 22%,
+    rgba(0, 0, 0, 0.68) 61%,
+    transparent 100%
+  );
   pointer-events: none;
 }
 
-.aurora-wave {
-  transform-box: fill-box;
+.nebula-cloud {
+  position: absolute;
+  inset: 0;
   transform-origin: center;
-  animation: aurora-drift 84s ease-in-out infinite alternate;
 }
 
-.aurora-ribbon {
-  fill: none;
-  stroke: url("#aurora-ribbon-color");
-  stroke-linecap: round;
+.nebula-cloud-one {
+  opacity: 0.52;
+  background-image:
+    radial-gradient(
+      ellipse 28% 20% at 70% 27%,
+      rgba(190, 201, 255, 0.18) 0%,
+      rgba(138, 153, 218, 0.11) 43%,
+      transparent 78%
+    ),
+    radial-gradient(
+      ellipse 23% 27% at 59% 54%,
+      rgba(174, 187, 245, 0.12) 0%,
+      rgba(119, 136, 205, 0.065) 48%,
+      transparent 79%
+    );
+  animation: nebula-cloud-drift-one 108s ease-in-out infinite alternate;
 }
 
-.aurora-ribbon-one {
-  stroke-width: 2.4;
-  opacity: 0.56;
-  animation: aurora-breathe-one 58s ease-in-out infinite alternate;
+.nebula-cloud-two {
+  opacity: 0.42;
+  background-image:
+    radial-gradient(
+      ellipse 32% 17% at 78% 44%,
+      rgba(157, 171, 239, 0.14) 0%,
+      rgba(113, 129, 202, 0.075) 46%,
+      transparent 80%
+    ),
+    radial-gradient(
+      ellipse 20% 24% at 68% 65%,
+      rgba(192, 199, 238, 0.1) 0%,
+      transparent 78%
+    );
+  animation: nebula-cloud-drift-two 132s ease-in-out -31s infinite alternate;
 }
 
-.aurora-ribbon-two {
-  stroke-width: 1.4;
-  opacity: 0.4;
-  animation: aurora-breathe-two 73s ease-in-out -19s infinite alternate;
+.nebula-cloud-three {
+  opacity: 0.34;
+  background-image:
+    radial-gradient(
+      ellipse 24% 28% at 84% 33%,
+      rgba(178, 190, 248, 0.11) 0%,
+      rgba(127, 141, 205, 0.055) 44%,
+      transparent 78%
+    ),
+    radial-gradient(
+      ellipse 31% 15% at 56% 39%,
+      rgba(182, 193, 242, 0.09) 0%,
+      transparent 80%
+    );
+  animation: nebula-cloud-drift-three 154s ease-in-out -57s infinite alternate;
 }
 
-.aurora-ribbon-three {
-  stroke-width: 3.2;
-  opacity: 0.26;
-  animation: aurora-breathe-three 91s ease-in-out -37s infinite alternate;
-}
-
-@keyframes aurora-drift {
+@keyframes nebula-cloud-drift-one {
   from {
-    opacity: 0.76;
-    transform: translate3d(-0.7%, 0.15%, 0) scale(1);
+    opacity: 0.48;
+    transform: translate3d(-0.35%, 0.2%, 0) scale(0.998);
   }
   to {
-    opacity: 1;
-    transform: translate3d(0.7%, -0.2%, 0) scale(1.008);
+    opacity: 0.68;
+    transform: translate3d(0.4%, -0.25%, 0) scale(1.006);
   }
 }
 
-@keyframes aurora-breathe-one {
+@keyframes nebula-cloud-drift-two {
   from {
-    opacity: 0.44;
-    transform: translateY(0);
+    opacity: 0.38;
+    transform: translate3d(0.25%, -0.2%, 0) scale(1.002);
   }
   to {
-    opacity: 0.64;
-    transform: translateY(-0.65px);
+    opacity: 0.56;
+    transform: translate3d(-0.3%, 0.22%, 0) scale(0.996);
   }
 }
 
-@keyframes aurora-breathe-two {
+@keyframes nebula-cloud-drift-three {
   from {
     opacity: 0.3;
-    transform: translateY(0.3px);
+    transform: translate3d(-0.2%, 0.18%, 0) scale(0.997);
   }
   to {
-    opacity: 0.48;
-    transform: translateY(-0.45px);
-  }
-}
-
-@keyframes aurora-breathe-three {
-  from {
-    opacity: 0.2;
-    transform: translateY(0.4px);
-  }
-  to {
-    opacity: 0.32;
-    transform: translateY(-0.35px);
+    opacity: 0.43;
+    transform: translate3d(0.25%, -0.22%, 0) scale(1.004);
   }
 }
 
@@ -2345,9 +2370,9 @@ h3 {
 
   .hero::after,
   .deep-space-nebula-baked,
-  .aurora-curtains,
-  .aurora-wave,
-  .aurora-ribbon,
+  .nebula-cloud-one,
+  .nebula-cloud-two,
+  .nebula-cloud-three,
   .stardust-layer,
   .star-twinkle,
   .celestial-stage,
@@ -2355,8 +2380,7 @@ h3 {
     animation: none;
   }
 
-  .hero::after,
-  .aurora-wave {
+  .hero::after {
     filter: none;
   }
 
