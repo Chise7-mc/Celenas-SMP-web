@@ -1238,6 +1238,26 @@ test("hero celestial scene is decorative and uses CSS motion", async ({
   );
   await expect(page.locator(".nebula-cloud")).toHaveCount(3);
   await expect(page.locator(".nebula-atmosphere")).toHaveCSS("filter", "none");
+  const scrollFog = page.locator(".hero-scroll-fog");
+  await expect(scrollFog).toHaveAttribute("aria-hidden", "true");
+  await expect(scrollFog).toHaveCSS("pointer-events", "none");
+  await expect(scrollFog).toHaveCSS("opacity", "0.44");
+  await expect(page.locator(".hero-scroll-fog-plane")).toHaveCount(2);
+  const fogLayers = [
+    [".hero-scroll-fog-cloud-far", "/space/hero-fog-far.webp"],
+    [".hero-scroll-fog-cloud-near", "/space/hero-fog-near.webp"],
+  ] as const;
+  for (const [selector, assetPath] of fogLayers) {
+    const cloud = page.locator(selector);
+    await expect(cloud).toHaveCSS("background-image", new RegExp(assetPath));
+    await expect(cloud).toHaveCSS(
+      "animation-name",
+      mobilePerformanceMode ? "none" : /hero-fog-drift/,
+    );
+    const asset = await page.request.get(assetPath);
+    expect(asset.ok()).toBe(true);
+    expect(asset.headers()["content-type"]).toContain("image/webp");
+  }
   await expect(page.locator(".stardust-near")).toHaveCSS(
     "animation-name",
     "none",
@@ -1297,6 +1317,83 @@ test("hero celestial scene is decorative and uses CSS motion", async ({
       return getComputedStyle(hero, "::after").animationDuration;
     }),
   ).toBe(mobilePerformanceMode ? "0s" : "72s");
+});
+
+test("hero fog follows local scroll progress and returns on reverse scroll", async ({
+  page,
+}, testInfo) => {
+  await page.goto("/");
+  const hero = page.locator(".hero");
+  const fog = page.locator(".hero-scroll-fog");
+  const geometry = await hero.evaluate((element) => {
+    const bounds = element.getBoundingClientRect();
+    return { top: bounds.top + window.scrollY, height: bounds.height };
+  });
+
+  const scrollHeroTo = async (fraction: number) => {
+    await page.evaluate(
+      ({ top, height, fraction }) => {
+        document.documentElement.style.scrollBehavior = "auto";
+        window.scrollTo(0, top + height * fraction);
+      },
+      { ...geometry, fraction },
+    );
+  };
+
+  await expect(fog).toHaveCSS("opacity", "0.44");
+  await page.screenshot({ path: testInfo.outputPath("fog-0.png") });
+  await scrollHeroTo(0.25);
+  await expect
+    .poll(async () =>
+      Number(
+        await page
+          .locator(".hero-space-background")
+          .evaluate((element) =>
+            element.style.getPropertyValue("--hero-fog-progress"),
+          ),
+      ),
+    )
+    .toBeCloseTo(0.25 / 0.7, 2);
+  const quarterOpacity = Number(
+    await fog.evaluate((element) => getComputedStyle(element).opacity),
+  );
+  expect(quarterOpacity).toBeLessThan(0.3);
+  expect(quarterOpacity).toBeGreaterThan(0.2);
+  await page.screenshot({ path: testInfo.outputPath("fog-25.png") });
+  const quarterParallax = await page.evaluate(() => ({
+    far: new DOMMatrixReadOnly(
+      getComputedStyle(document.querySelector(".hero-scroll-fog-plane-far")!)
+        .transform,
+    ).m41,
+    near: new DOMMatrixReadOnly(
+      getComputedStyle(document.querySelector(".hero-scroll-fog-plane-near")!)
+        .transform,
+    ).m41,
+  }));
+  expect(quarterParallax.far).toBeLessThan(0);
+  expect(quarterParallax.near).toBeGreaterThan(0);
+
+  await scrollHeroTo(0.5);
+  await expect
+    .poll(async () =>
+      Number(
+        await fog.evaluate((element) => getComputedStyle(element).opacity),
+      ),
+    )
+    .toBeLessThan(0.14);
+  await page.screenshot({ path: testInfo.outputPath("fog-50.png") });
+
+  await scrollHeroTo(1);
+  await expect(fog).toHaveCSS("opacity", "0");
+  await page.screenshot({ path: testInfo.outputPath("fog-100.png") });
+  await scrollHeroTo(0);
+  await expect
+    .poll(async () =>
+      Number(
+        await fog.evaluate((element) => getComputedStyle(element).opacity),
+      ),
+    )
+    .toBeCloseTo(0.44, 3);
 });
 
 test("mobile low-cost rendering keeps the nebula and essential motion", async ({
@@ -1387,6 +1484,10 @@ test("mobile low-cost rendering keeps the nebula and essential motion", async ({
       await expect(element).toHaveCSS("animation-name", "none");
     }
   }
+  await expect(page.locator(".hero-scroll-fog-cloud").first()).toHaveCSS(
+    "animation-name",
+    "none",
+  );
   expect(
     await page.locator(".hero").evaluate((element) => ({
       animation: getComputedStyle(element, "::after").animationName,
@@ -1529,6 +1630,8 @@ test("throttles phase updates and pauses hero motion offscreen or in hidden tabs
       ".nebula-cloud-three",
       ".stardust-layer",
       ".star-twinkle",
+      ".hero-scroll-fog-cloud-far",
+      ".hero-scroll-fog-cloud-near",
       ".celestial-stage",
     ];
     return [
@@ -1543,7 +1646,7 @@ test("throttles phase updates and pauses hero motion offscreen or in hidden tabs
         .animationPlayState,
     ];
   });
-  expect(pausedHeroAnimations).toEqual(Array(9).fill("paused"));
+  expect(pausedHeroAnimations).toEqual(Array(11).fill("paused"));
   await page.evaluate(() => {
     (
       window as unknown as Window & { __resetHeroMotionMetrics: () => void }
@@ -1856,7 +1959,17 @@ test("keeps the planetary scene framed on target desktop and mobile sizes", asyn
 test("respects reduced motion", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
+  await expect(page.locator(".hero-scroll-fog")).toHaveCSS("opacity", "0.28");
+  await expect(page.locator(".hero-scroll-fog-plane").first()).toHaveCSS(
+    "transform",
+    "none",
+  );
+  await expect(page.locator(".hero-scroll-fog-cloud").first()).toHaveCSS(
+    "animation-name",
+    "none",
+  );
   await page.locator("#about").scrollIntoViewIfNeeded();
+  await expect(page.locator(".hero-scroll-fog")).toHaveCSS("opacity", "0.28");
   await expect(page.locator(".orbital-active-satellite")).toHaveCSS(
     "transition-duration",
     "0s",

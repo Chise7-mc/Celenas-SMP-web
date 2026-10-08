@@ -48,7 +48,8 @@ satellite positions on their ellipse paths, the baked WebP nebula and black edge
 fades on every target desktop/mobile viewport, absence of
 runtime SVG filters and blend modes, restrained desktop motion, mobile low-cost
 glass / nebula / Journey rendering, a localized star cluster and two subtle
-desktop star twinkles, 200ms phase updates with orbit motion
+desktop star twinkles, the Hero-local fog progress, fade, parallax and reverse
+scroll behavior, both transparent fog assets, 200ms phase updates with orbit motion
 retained, desktop nebula drift and mobile ambient-motion pause,
 keyboard-operable mobile menu navigation and
 close-on-selection, destination focus, keyboard skip navigation, runtime errors,

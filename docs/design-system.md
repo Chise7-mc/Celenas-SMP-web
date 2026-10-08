@@ -63,7 +63,10 @@ blue-indigo radial-gradient gas clouds drift gently on desktop using transforms
 and opacity, without blur filters. Mobile keeps the background and planet but
 stops ambient motion; lunar phase updates and three satellites remain. Journey
 layers change opacity without transform motion. Hero motion pauses when the
-Hero is offscreen or the document is hidden.
+Hero is offscreen or the document is hidden. Two transparent gas-fog WebP layers
+sit in front of the stars and behind the planet; their opacity and small opposing
+parallax follow only the Hero's scroll position. Their slow drift pauses on
+mobile, offscreen, hidden-document and reduced-motion states.
 Stardust opacity responds subtly to the animated phase;
 its layers drift with transforms rather than animating individual particles or
 background positions. Motion is intentionally low-key and is disabled when the

@@ -566,6 +566,7 @@ h3 {
 .hero[data-motion-active="false"] .nebula-cloud-three,
 .hero[data-motion-active="false"] .stardust-layer,
 .hero[data-motion-active="false"] .star-twinkle,
+.hero[data-motion-active="false"] .hero-scroll-fog-cloud,
 .hero[data-motion-active="false"] .celestial-stage,
 .hero[data-motion-active="false"] .moon::after {
   animation-play-state: paused;
@@ -740,6 +741,80 @@ h3 {
   }
   to {
     transform: translate3d(0.35%, -0.15%, 0) scale(1.006);
+  }
+}
+
+.hero-scroll-fog {
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  overflow: hidden;
+  opacity: var(--hero-fog-opacity, 0.44);
+  mask-image: radial-gradient(
+    ellipse 70% 72% at 68% 44%,
+    #000 28%,
+    rgba(0, 0, 0, 0.88) 62%,
+    rgba(0, 0, 0, 0.4) 84%,
+    transparent 100%
+  );
+  -webkit-mask-image: radial-gradient(
+    ellipse 70% 72% at 68% 44%,
+    #000 28%,
+    rgba(0, 0, 0, 0.88) 62%,
+    rgba(0, 0, 0, 0.4) 84%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+.hero-scroll-fog-plane {
+  position: absolute;
+  inset: -12% -8%;
+  pointer-events: none;
+}
+
+.hero-scroll-fog-plane-far {
+  opacity: 0.78;
+  transform: translate3d(var(--hero-fog-far-x, 0px), 0, 0);
+}
+
+.hero-scroll-fog-plane-near {
+  opacity: 0.62;
+  transform: translate3d(var(--hero-fog-near-x, 0px), 0, 0);
+}
+
+.hero-scroll-fog-cloud {
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  pointer-events: none;
+}
+
+.hero-scroll-fog-cloud-far {
+  animation: hero-fog-drift-far 84s ease-in-out infinite alternate;
+}
+
+.hero-scroll-fog-cloud-near {
+  animation: hero-fog-drift-near 68s ease-in-out -22s infinite alternate;
+}
+
+@keyframes hero-fog-drift-far {
+  from {
+    transform: translate3d(-4px, 1px, 0) scale(1.005);
+  }
+  to {
+    transform: translate3d(4px, -2px, 0) scale(1.015);
+  }
+}
+
+@keyframes hero-fog-drift-near {
+  from {
+    transform: translate3d(5px, -2px, 0) scale(1.01);
+  }
+  to {
+    transform: translate3d(-5px, 2px, 0) scale(1.02);
   }
 }
 
@@ -2479,6 +2554,7 @@ h3 {
   .nebula-cloud-three,
   .stardust-layer,
   .star-twinkle,
+  .hero-scroll-fog-cloud,
   .celestial-stage,
   .moon::after {
     animation: none;
@@ -2551,6 +2627,18 @@ h3 {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .hero-scroll-fog {
+    opacity: 0.28 !important;
+  }
+
+  .hero-scroll-fog-plane {
+    transform: none !important;
+  }
+
+  .hero-scroll-fog-cloud {
+    transform: none !important;
+  }
+
   *,
   *::before,
   *::after {

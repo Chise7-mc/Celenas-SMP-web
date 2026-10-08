@@ -85,8 +85,158 @@ function getIllumination(phaseFraction: number): number {
 }
 
 export function LunarPhaseBackground() {
+  const fogRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const fog = fogRef.current;
+    const hero = fog?.closest<HTMLElement>(".hero");
+    if (!fog || !hero) return;
+
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let frame: number | null = null;
+    let heroIsNearViewport = false;
+    let heroTop = 0;
+    let heroHeight = 1;
+    let scrollListenerAttached = false;
+    const isDocumentVisible = () => document.visibilityState === "visible";
+
+    const measureHero = () => {
+      const bounds = hero.getBoundingClientRect();
+      heroTop = bounds.top + window.scrollY;
+      heroHeight = Math.max(bounds.height, 1);
+    };
+
+    const setFogProgress = (progress: number) => {
+      fog.style.setProperty("--hero-fog-progress", progress.toFixed(4));
+      fog.style.setProperty(
+        "--hero-fog-opacity",
+        (0.44 * (1 - progress)).toFixed(4),
+      );
+      fog.style.setProperty(
+        "--hero-fog-far-x",
+        `${(-12 * progress).toFixed(2)}px`,
+      );
+      fog.style.setProperty(
+        "--hero-fog-near-x",
+        `${(18 * progress).toFixed(2)}px`,
+      );
+    };
+
+    const updateFog = () => {
+      frame = null;
+      if (!heroIsNearViewport || !isDocumentVisible()) return;
+
+      const progress = Math.min(
+        Math.max((window.scrollY - heroTop) / (heroHeight * 0.7), 0),
+        1,
+      );
+      setFogProgress(progress);
+    };
+
+    const scheduleFogUpdate = () => {
+      if (
+        frame === null &&
+        heroIsNearViewport &&
+        isDocumentVisible() &&
+        !reducedMotion.matches
+      ) {
+        frame = window.requestAnimationFrame(updateFog);
+      }
+    };
+
+    const onScroll = () => scheduleFogUpdate();
+    const onResize = () => {
+      measureHero();
+      scheduleFogUpdate();
+    };
+    const onVisibilityChange = () => {
+      if (!isDocumentVisible() && frame !== null) {
+        window.cancelAnimationFrame(frame);
+        frame = null;
+      } else {
+        scheduleFogUpdate();
+      }
+    };
+
+    const attachScrollListener = () => {
+      if (scrollListenerAttached) return;
+      window.addEventListener("scroll", onScroll, { passive: true });
+      scrollListenerAttached = true;
+    };
+
+    const detachScrollListener = () => {
+      if (!scrollListenerAttached) return;
+      window.removeEventListener("scroll", onScroll);
+      scrollListenerAttached = false;
+    };
+
+    const syncMotionPreference = () => {
+      if (reducedMotion.matches) {
+        detachScrollListener();
+        if (frame !== null) {
+          window.cancelAnimationFrame(frame);
+          frame = null;
+        }
+        return;
+      }
+
+      if (heroIsNearViewport) {
+        measureHero();
+        attachScrollListener();
+        scheduleFogUpdate();
+      }
+    };
+
+    const visibilityObserver =
+      typeof IntersectionObserver === "undefined"
+        ? null
+        : new IntersectionObserver(
+            (entries) => {
+              const entry = entries.find(({ target }) => target === hero);
+              if (!entry) return;
+
+              heroIsNearViewport = entry.isIntersecting;
+              if (!heroIsNearViewport) {
+                detachScrollListener();
+                if (frame !== null) {
+                  window.cancelAnimationFrame(frame);
+                  frame = null;
+                }
+                setFogProgress(1);
+                return;
+              }
+
+              measureHero();
+              syncMotionPreference();
+            },
+            { rootMargin: "120px 0px", threshold: 0 },
+          );
+
+    const onReducedMotionChange = () => syncMotionPreference();
+    window.addEventListener("resize", onResize, { passive: true });
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    reducedMotion.addEventListener("change", onReducedMotionChange);
+
+    if (visibilityObserver) {
+      visibilityObserver.observe(hero);
+    } else {
+      heroIsNearViewport = true;
+      measureHero();
+      syncMotionPreference();
+    }
+
+    return () => {
+      if (frame !== null) window.cancelAnimationFrame(frame);
+      detachScrollListener();
+      window.removeEventListener("resize", onResize);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      reducedMotion.removeEventListener("change", onReducedMotionChange);
+      visibilityObserver?.disconnect();
+    };
+  }, []);
+
   return (
-    <div className="hero-space-background" aria-hidden="true">
+    <div ref={fogRef} className="hero-space-background" aria-hidden="true">
       <div className="deep-space-backdrop" />
       <div
         className="deep-space-nebula-baked"
@@ -111,6 +261,24 @@ export function LunarPhaseBackground() {
         <span className="star-steady star-steady-one" />
       </div>
       <div className="stardust-layer stardust-near" />
+      <div className="hero-scroll-fog" aria-hidden="true">
+        <div className="hero-scroll-fog-plane hero-scroll-fog-plane-far">
+          <div
+            className="hero-scroll-fog-cloud hero-scroll-fog-cloud-far"
+            style={{
+              backgroundImage: `url("${withBasePath("/space/hero-fog-far.webp")}")`,
+            }}
+          />
+        </div>
+        <div className="hero-scroll-fog-plane hero-scroll-fog-plane-near">
+          <div
+            className="hero-scroll-fog-cloud hero-scroll-fog-cloud-near"
+            style={{
+              backgroundImage: `url("${withBasePath("/space/hero-fog-near.webp")}")`,
+            }}
+          />
+        </div>
+      </div>
     </div>
   );
 }
