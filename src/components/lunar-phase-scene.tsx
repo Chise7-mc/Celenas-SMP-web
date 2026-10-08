@@ -103,9 +103,11 @@ export function LunarPhaseBackground() {
       <div className="star-field star-field-far" />
       <div className="stardust-layer stardust-far" />
       <div className="star-field star-field-mid" />
+      <div className="star-field star-field-cluster" />
       <div className="stardust-layer stardust-mid" />
       <div className="star-accents">
         <span className="star-twinkle star-twinkle-one" />
+        <span className="star-twinkle star-twinkle-two" />
         <span className="star-steady star-steady-one" />
       </div>
       <div className="stardust-layer stardust-near" />

@@ -51,11 +51,12 @@ Use system sans-serif for copy and monospace for compact status and index labels
 The page uses a floating desktop glass header and an accessible expandable
 mobile menu. The Hero combines a large official mark with a fictional gas
 giant: a banded cloud texture masked by fixed-tilt SVG terminator geometry,
-deterministic, non-tiled far/mid star layers, one softly twinkling white star,
-three sparse deterministic radial-gradient stardust depth layers, and a quiet
-black-blue deep-space image baked into WebP. The 1600 × 1600 image is 14,020
-bytes and has no baked stars, keeping the faint indigo haze and controlled CSS
-stars quiet. It drifts very slowly; a single white star twinkles. Three layered
+deterministic, non-tiled far/mid star layers, one localized star cluster, two
+softly twinkling white stars, three sparse deterministic radial-gradient
+stardust depth layers, and a black-blue deep-space WebP with a translucent blue
+nebula and unevenly distributed stars. The 1600 × 1600 image is about 107 KB;
+controlled CSS stars add modest density without uniform sparkle. It drifts very
+slowly; only two white stars twinkle subtly. Three layered
 blue-indigo radial-gradient gas clouds drift gently on desktop using transforms
 and opacity, without blur filters. Mobile keeps the background and planet but
 stops ambient motion; lunar phase updates and three satellites remain. Journey

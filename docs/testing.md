@@ -46,7 +46,8 @@ the 120-second waxing-crescent SVG phase morph, fixed tilt and 100ms update
 limit, offscreen / hidden-document pause and phase resume, CSS orbit periods,
 satellite positions on their ellipse paths, the baked WebP nebula, absence of
 runtime SVG filters and blend modes, restrained desktop motion, mobile low-cost
-glass / nebula / Journey rendering, 200ms phase updates with orbit motion
+glass / nebula / Journey rendering, a localized star cluster and two subtle
+desktop star twinkles, 200ms phase updates with orbit motion
 retained, desktop nebula drift and mobile ambient-motion pause,
 keyboard-operable mobile menu navigation and
 close-on-selection, destination focus, keyboard skip navigation, runtime errors,

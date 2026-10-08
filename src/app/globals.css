@@ -312,9 +312,9 @@ h3 {
   isolation: isolate;
   --moon-glow-opacity: 0.078;
   --moonlight-opacity: 0.244;
-  --star-field-far-opacity: 0.3;
-  --star-field-mid-opacity: 0.4;
-  --stardust-opacity: 0.16;
+  --star-field-far-opacity: 0.38;
+  --star-field-mid-opacity: 0.48;
+  --stardust-opacity: 0.18;
 }
 
 .hero::before {
@@ -713,7 +713,7 @@ h3 {
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
-  opacity: 0.58;
+  opacity: 0.22;
   overflow: hidden;
   pointer-events: none;
   animation: nebula-baked-drift 120s ease-in-out infinite alternate;
@@ -763,6 +763,21 @@ h3 {
       0.55px 0.55px at 73% 42%,
       rgba(255, 255, 255, 0.34) 45%,
       transparent 100%
+    ),
+    radial-gradient(
+      0.65px 0.65px at 35% 11%,
+      rgba(236, 242, 255, 0.48) 45%,
+      transparent 100%
+    ),
+    radial-gradient(
+      0.7px 0.7px at 52% 83%,
+      rgba(255, 255, 255, 0.44) 45%,
+      transparent 100%
+    ),
+    radial-gradient(
+      0.55px 0.55px at 92% 19%,
+      rgba(233, 239, 255, 0.42) 45%,
+      transparent 100%
     );
   background-repeat: no-repeat;
   background-size: 100% 100%;
@@ -787,10 +802,59 @@ h3 {
       0.8px 0.8px at 32% 14%,
       rgba(255, 255, 255, 0.48) 45%,
       transparent 100%
+    ),
+    radial-gradient(
+      0.95px 0.95px at 82% 76%,
+      rgba(238, 243, 255, 0.62) 45%,
+      transparent 100%
+    ),
+    radial-gradient(
+      0.75px 0.75px at 49% 58%,
+      rgba(255, 255, 255, 0.48) 45%,
+      transparent 100%
     );
   background-repeat: no-repeat;
   background-size: 100% 100%;
   transform: translateZ(0);
+}
+
+.star-field-cluster {
+  inset: 11% 8% 32% 52%;
+  z-index: 2;
+  opacity: 0.3;
+  background-image:
+    radial-gradient(
+      0.75px 0.75px at 17% 25%,
+      rgba(244, 247, 255, 0.72) 45%,
+      transparent 100%
+    ),
+    radial-gradient(
+      1px 1px at 33% 42%,
+      rgba(224, 234, 255, 0.78) 45%,
+      transparent 100%
+    ),
+    radial-gradient(
+      0.7px 0.7px at 49% 18%,
+      rgba(255, 255, 255, 0.62) 45%,
+      transparent 100%
+    ),
+    radial-gradient(
+      0.85px 0.85px at 64% 56%,
+      rgba(236, 242, 255, 0.7) 45%,
+      transparent 100%
+    ),
+    radial-gradient(
+      0.75px 0.75px at 79% 33%,
+      rgba(255, 255, 255, 0.68) 45%,
+      transparent 100%
+    ),
+    radial-gradient(
+      0.7px 0.7px at 91% 69%,
+      rgba(226, 235, 255, 0.58) 45%,
+      transparent 100%
+    );
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
 }
 
 .stardust-layer {
@@ -864,6 +928,16 @@ h3 {
   top: 18%;
   left: 24%;
   animation: star-breathe 13s 2s ease-in-out infinite;
+}
+
+.star-twinkle-two {
+  top: 28%;
+  left: 82%;
+  width: 0.1rem;
+  height: 0.1rem;
+  opacity: 0.54;
+  box-shadow: 0 0 0.55rem rgba(216, 229, 255, 0.48);
+  animation: star-breathe 19s -7s ease-in-out infinite;
 }
 
 .star-steady-one {
@@ -2044,10 +2118,10 @@ h3 {
 @keyframes star-breathe {
   0%,
   100% {
-    opacity: 0.44;
+    opacity: 0.52;
   }
   50% {
-    opacity: 0.95;
+    opacity: 0.82;
   }
 }
 
@@ -2197,7 +2271,7 @@ h3 {
   }
 
   .deep-space-nebula-baked {
-    opacity: 0.76;
+    opacity: 0.36;
   }
 
   .celestial-stage {

@@ -1132,6 +1132,7 @@ test("hero celestial scene is decorative and uses CSS motion", async ({
     /^\d\.\d{3}$/,
   );
   await expect(page.locator(".stardust-layer")).toHaveCount(3);
+  await expect(page.locator(".star-field-cluster")).toHaveCount(1);
   const movingDust = page.locator(".stardust-mid");
   await expect(movingDust).toHaveCSS(
     "animation-name",
@@ -1173,7 +1174,12 @@ test("hero celestial scene is decorative and uses CSS motion", async ({
       return getComputedStyle(star).animationName;
     }),
   ).toBe(mobilePerformanceMode ? "none" : "star-breathe");
-  await expect(page.locator(".star-twinkle")).toHaveCount(1);
+  await expect(page.locator(".star-twinkle")).toHaveCount(2);
+  expect(
+    await page.locator(".star-twinkle-two").evaluate((star) => {
+      return getComputedStyle(star).animationName;
+    }),
+  ).toBe(mobilePerformanceMode ? "none" : "star-breathe");
   await expect(page.locator(".star-steady")).toHaveCount(1);
   const orbitBodies = [
     [".satellite-one animateMotion", "72s", "-5.76s"],
@@ -1215,6 +1221,10 @@ test("hero celestial scene is decorative and uses CSS motion", async ({
   await expect(nebula).toHaveCSS(
     "animation-name",
     mobilePerformanceMode ? "none" : "nebula-baked-drift",
+  );
+  await expect(nebula).toHaveCSS(
+    "opacity",
+    mobilePerformanceMode ? "0.36" : "0.22",
   );
   await expect(nebula).toHaveCSS("filter", "none");
   const nebulaResponse = await page.request.get("/space/hero-nebula.webp");
@@ -1325,6 +1335,10 @@ test("mobile low-cost rendering keeps the nebula and essential motion", async ({
   await expect(page.locator(".deep-space-nebula-baked")).toHaveCSS(
     "filter",
     "none",
+  );
+  await expect(page.locator(".deep-space-nebula-baked")).toHaveCSS(
+    "opacity",
+    "0.36",
   );
   await expect(page.locator(".nebula-atmosphere")).toHaveCSS("filter", "none");
   await expect(page.locator(".hero-space-background")).not.toHaveCSS(
@@ -1868,6 +1882,7 @@ test("respects reduced motion", async ({ page }) => {
     ".nebula-cloud-three",
     ".deep-space-nebula-baked",
     ".star-twinkle-one",
+    ".star-twinkle-two",
     ".stardust-far",
     ".stardust-mid",
     ".stardust-near",
