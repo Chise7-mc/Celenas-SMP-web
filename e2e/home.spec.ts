@@ -124,7 +124,7 @@ test("home exposes the current edition and Discord action with no runtime errors
   const response = await page.goto("/");
 
   expect(response?.status()).toBe(200);
-  await expect(page).toHaveTitle("Celenas SMP");
+  await expect(page).toHaveTitle("Celenas SMP | Minecraftサバイバルサーバー");
   await expect(
     page.getByRole("heading", { level: 1, name: "Celenas SMP" }),
   ).toBeVisible();
@@ -142,6 +142,36 @@ test("home exposes the current edition and Discord action with no runtime errors
     page.getByRole("link", { name: "Discordに参加する" }),
   ).toHaveAttribute("href", discordInviteUrl);
   expect(errors).toEqual([]);
+});
+
+test("publishes canonical SEO metadata and a single-page sitemap", async ({
+  page,
+}) => {
+  await page.goto("/");
+
+  const canonicalUrl = "https://chise7-mc.github.io/Celenas-SMP-web/";
+  await expect(page.locator('meta[name="description"]')).toHaveAttribute(
+    "content",
+    "Celenas SMPは、Minecraft Java Edition 26.3で建築・探索・装置づくりを楽しめるサバイバルサーバーです。参加申請はDiscordから受け付けています。",
+  );
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    "href",
+    canonicalUrl,
+  );
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
+    "content",
+    "index, follow",
+  );
+
+  const sitemapResponse = await page.request.get("/sitemap.xml");
+  expect(sitemapResponse.status()).toBe(200);
+  expect(sitemapResponse.headers()["content-type"]).toContain("xml");
+  const sitemap = await sitemapResponse.text();
+  expect(sitemap).toContain(
+    "<loc>https://chise7-mc.github.io/Celenas-SMP-web/</loc>",
+  );
+  expect(sitemap.match(/<loc>/g)).toHaveLength(1);
+  expect(sitemap).not.toContain("#about");
 });
 
 test("publishes the configured Open Graph and large Twitter image metadata", async ({

@@ -5,17 +5,28 @@ import "./globals.css";
 
 const ogImageUrl =
   "https://chise7-mc.github.io/Celenas-SMP-web/og/celenas-og.png";
+const siteUrl = "https://chise7-mc.github.io/Celenas-SMP-web/";
+const searchDescription =
+  "Celenas SMPは、Minecraft Java Edition 26.3で建築・探索・装置づくりを楽しめるサバイバルサーバーです。参加申請はDiscordから受け付けています。";
 
 export const metadata: Metadata = {
-  title: "Celenas SMP",
-  description: "Minecraftサバイバルコミュニティ",
+  metadataBase: new URL(siteUrl),
+  title: "Celenas SMP | Minecraftサバイバルサーバー",
+  description: searchDescription,
+  alternates: {
+    canonical: siteUrl,
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
   openGraph: {
     title: "Celenas SMP",
     description: "Minecraftサバイバルコミュニティ",
     siteName: site.name,
     locale: "ja_JP",
     type: "website",
-    url: "https://chise7-mc.github.io/Celenas-SMP-web/",
+    url: siteUrl,
     images: [
       {
         url: ogImageUrl,
