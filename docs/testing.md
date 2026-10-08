@@ -7,18 +7,19 @@ Install Chromium once with `pnpm exec playwright install chromium` (Linux CI use
 `--with-deps`). If a Windows shell cannot resolve the pnpm-exec shim, use
 `.\node_modules\.bin\playwright.cmd install chromium`.
 
-| Command                 | Evidence                                                 |
-| ----------------------- | -------------------------------------------------------- |
-| `pnpm format:check`     | Formatting consistency                                   |
-| `pnpm lint`             | Next.js, React and TypeScript lint; warnings fail        |
-| `pnpm typecheck`        | Next route types and strict TypeScript, including tests  |
-| `pnpm test`             | Component behavior with Vitest and React Testing Library |
-| `pnpm gallery:validate` | Gallery manifest and published image integrity           |
-| `pnpm test:watch`       | Focused local feedback                                   |
-| `pnpm build`            | Production compilation and static generation             |
-| `pnpm test:e2e`         | Fresh production server, desktop/mobile Chromium         |
-| `pnpm check`            | All gates, ending in production browser checks           |
-| `pnpm verify:pages`     | Verify the Pages static export after its build           |
+| Command                      | Evidence                                                 |
+| ---------------------------- | -------------------------------------------------------- |
+| `pnpm format:check`          | Formatting consistency                                   |
+| `pnpm lint`                  | Next.js, React and TypeScript lint; warnings fail        |
+| `pnpm typecheck`             | Next route types and strict TypeScript, including tests  |
+| `pnpm test`                  | Component behavior with Vitest and React Testing Library |
+| `pnpm gallery:validate`      | Gallery manifest and published image integrity           |
+| `pnpm test:watch`            | Focused local feedback                                   |
+| `pnpm build`                 | Production compilation and static generation             |
+| `pnpm test:e2e`              | Fresh production server, desktop/mobile Chromium         |
+| `pnpm check`                 | All gates, ending in production browser checks           |
+| `pnpm verify:pages`          | Verify the Pages static export after its build           |
+| `pnpm verify:pages-redirect` | Verify the Pages-only redirect artifact                  |
 
 Run `pnpm build` before standalone `pnpm test:e2e`; `pnpm check` does this for
 you. Playwright starts its own server on loopback port 3100 and refuses to reuse

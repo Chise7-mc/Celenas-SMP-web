@@ -10,7 +10,9 @@
   "scripts": {
     "dev": "node scripts/next.mjs dev --hostname 127.0.0.1",
     "build": "node scripts/next.mjs build",
+    "prepare:pages": "node scripts/prepare-pages-redirect.mjs",
     "verify:pages": "node scripts/verify-pages-export.mjs",
+    "verify:pages-redirect": "node scripts/verify-pages-redirect.mjs",
     "verify:cloudflare": "node scripts/verify-cloudflare-export.mjs",
     "start": "node scripts/next.mjs start --hostname 127.0.0.1",
     "gallery:add": "node scripts/gallery-add.mjs",

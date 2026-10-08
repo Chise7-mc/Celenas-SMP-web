@@ -11,9 +11,11 @@ Redundant runs for the same ref are cancelled.
 
 The independent `.github/workflows/pages.yml` workflow deploys only pushes to
 `main` (or an explicit manual dispatch). It builds Next.js Static Export with
-the `/Celenas-SMP-web` Project Site base path, verifies `out/`, then uploads and
-deploys that artifact. It does not run for pull requests and does not change the
-normal `pnpm check` workflow.
+the `/Celenas-SMP-web` Project Site base path and verifies the original `out/`.
+Only after verification, it replaces `index.html` and `404.html` in the Pages
+artifact with redirects to `https://celenas-smp.pages.dev/` and removes the old
+sitemap. The Cloudflare build remains untouched. It does not run for pull
+requests and does not change the normal `pnpm check` workflow.
 
 Cloudflare Pages can build the same static export at the domain root with
 `DEPLOY_TARGET=cloudflare` and a confirmed HTTPS origin in

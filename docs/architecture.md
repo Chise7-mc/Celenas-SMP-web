@@ -66,20 +66,24 @@ Hero does not use date-based lunar data, an API or geolocation.
 
 ## GitHub Pages deployment
 
-The public Project Site is
-[`https://chise7-mc.github.io/Celenas-SMP-web/`](https://chise7-mc.github.io/Celenas-SMP-web/).
-The separate `pages.yml` workflow runs only for pushes to `main` or manual
-dispatch; pull requests continue to run the read-only quality workflow without
-deploying. Only the Pages build sets `GITHUB_PAGES=true` and
+The official site is
+[`https://celenas-smp.pages.dev/`](https://celenas-smp.pages.dev/). The legacy
+Project Site at
+[`https://chise7-mc.github.io/Celenas-SMP-web/`](https://chise7-mc.github.io/Celenas-SMP-web/)
+remains deployed and redirects visitors to Cloudflare Pages. The separate
+`pages.yml` workflow runs only for pushes to `main` or manual dispatch; pull
+requests continue to run the read-only quality workflow without deploying. Only
+the Pages build sets `GITHUB_PAGES=true` and
 `NEXT_PUBLIC_BASE_PATH=/Celenas-SMP-web`, enabling Next.js static export, the
 project base path and unoptimized local images. `withBasePath` applies the same
-prefix to local logo and future gallery image paths. The generated `out/` is
-checked for the expected HTML, asset paths, icon and logo before it is uploaded
-as the Pages artifact. For Cloudflare Pages, set `DEPLOY_TARGET=cloudflare` and
-the confirmed root URL in `NEXT_PUBLIC_SITE_URL`; this enables static export
-without a base path. The same site URL resolver supplies canonical/Open Graph
-metadata and the generated sitemap. `pnpm verify:cloudflare` checks root asset
-paths and the export. The existing GitHub Pages workflow remains independent.
+prefix to local logo and gallery image paths. The original `out/` export is
+verified before a Pages-only step replaces its index and 404 pages with the
+Cloudflare redirect and removes the legacy sitemap. That transform runs only in
+`.github/workflows/pages.yml`; it does not alter Cloudflare builds. For
+Cloudflare Pages, set `DEPLOY_TARGET=cloudflare` and the confirmed root URL in
+`NEXT_PUBLIC_SITE_URL`; this enables static export without a base path. The
+same site URL resolver supplies canonical/Open Graph metadata and the generated
+sitemap. `pnpm verify:cloudflare` checks root asset paths and the export.
 Ordinary development, production builds and Playwright continue to use Next.js
 defaults without a base path.
 

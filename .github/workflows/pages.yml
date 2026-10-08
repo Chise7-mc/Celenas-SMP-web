@@ -38,11 +38,13 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Configure GitHub Pages
         uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
-      - name: Build and verify static export
+      - name: Build and verify original static export
         run: pnpm build && pnpm verify:pages
         env:
           GITHUB_PAGES: "true"
           NEXT_PUBLIC_BASE_PATH: /Celenas-SMP-web
+      - name: Prepare GitHub Pages redirect artifact
+        run: pnpm prepare:pages && pnpm verify:pages-redirect
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
