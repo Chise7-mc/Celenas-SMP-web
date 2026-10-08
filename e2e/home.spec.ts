@@ -180,21 +180,21 @@ test("publishes edition and Discord information without a server address", async
     "サーバーアドレス",
   );
   await expect(page.locator(".community-note")).toContainText(
-    "Minecraftへの参加手順はDiscordで案内しています。サーバーアドレスはWebでは公開していません。",
+    "申請後の接続手順はDiscordで案内しています。サーバーアドレスはWebでは公開していません。",
   );
   await expect(page.locator(".transmission-panel-community")).toHaveAttribute(
     "data-state",
-    "ready",
+    "info",
   );
   await expect(page.locator(".transmission-panel-community")).toContainText(
-    "PUBLIC INFO / READY",
+    "PUBLIC INFO / COMMUNITY",
   );
   await expect(page.locator(".transmission-panel-join")).toHaveAttribute(
     "data-state",
-    "ready",
+    "info",
   );
   await expect(page.locator(".transmission-panel-join")).toContainText(
-    "参加申請と接続方法はDiscordで案内しています。",
+    "参加申請と承認後の接続案内はDiscordで確認できます。",
   );
   const discordLogo = page.locator("#join .discord-mark");
   await expect(discordLogo).toBeVisible();
@@ -311,6 +311,12 @@ test("renders refreshed copy, six formal rules, and image-only gallery cards", a
   await expect(
     page.getByRole("heading", { name: "Celenas SMPに参加する" }),
   ).toBeVisible();
+  await expect(page.locator(".join-steps li")).toHaveCount(3);
+  await expect(page.locator(".join-steps h3")).toHaveText([
+    "Discordに参加する",
+    "Minecraft IDで参加申請",
+    "運営の承認後に接続",
+  ]);
   await expect(page.locator(".hero-description")).toHaveCSS(
     "line-break",
     "strict",
@@ -324,7 +330,7 @@ test("renders refreshed copy, six formal rules, and image-only gallery cards", a
     "balance",
   );
   await expect(page.locator("#about .section-description")).toHaveText(
-    "Celenas SMPは、Minecraft Java Edition 26.3で遊ぶサバイバルサーバーです。建築や探索、装置づくりなど、それぞれ好きなことを楽しんでいます。",
+    "Celenas SMPは、自分のペースを大切にしながら遊べるコミュニティです。",
   );
   await expect(page.locator(".value-list li")).toHaveText([
     "01無理せず、自分のペースで",
@@ -332,13 +338,13 @@ test("renders refreshed copy, six formal rules, and image-only gallery cards", a
     "03ひとりでも、みんなでも",
   ]);
   await expect(page.locator("#world .section-description")).toHaveText(
-    "何をするかは自由です。やりたいことを見つけて、そのまま遊んでください。",
+    "建築・探索・装置づくり。それぞれの楽しみ方を、ワールドの中で形にできます。",
   );
   await expect(page.locator("#community .section-description")).toHaveText(
-    "参加申請、お知らせ、質問や情報共有はDiscordで行っています。まずはDiscordに参加してください。",
+    "Discordを参加の窓口として、お知らせや質問・相談、プレイヤー同士の情報共有を行っています。参加申請もこちらからどうぞ。",
   );
   await expect(page.locator(".join-copy .muted")).toHaveText(
-    "参加申請はDiscordで受け付けています。Minecraft Java Edition 26.3で参加できます。",
+    "Discordで申請し、承認後にMinecraftから参加できます。",
   );
   await expect(page.locator(".rules-list > li")).toHaveCount(6);
   await expect(
@@ -386,6 +392,19 @@ test("renders refreshed copy, six formal rules, and image-only gallery cards", a
   );
   const galleryCards = page.locator("#gallery .gallery-slide");
   await expect(galleryCards).toHaveCount(5);
+  expect(
+    await page
+      .locator("#gallery .gallery-slide img")
+      .evaluateAll((images) =>
+        images.map((image) => image.getAttribute("alt")),
+      ),
+  ).toEqual([
+    "広い掘削地に並ぶ装置群とビーコンの光",
+    "石造りの建物が並ぶ街の広場",
+    "星空の下にそびえる光る巨大建築",
+    "海上の小島に建つ塔のある建築",
+    "エンドに建設されたブラックホール型のサンドデューパー",
+  ]);
   const galleryImage = page.locator(
     '#gallery .gallery-slide img[alt="エンドに建設されたブラックホール型のサンドデューパー"]',
   );
@@ -439,14 +458,14 @@ test("renders refreshed copy, six formal rules, and image-only gallery cards", a
     JSON.stringify({ stageBox, imageFrame }),
   ).toBeLessThanOrEqual(1);
   await expect(page.locator(".join-copy")).toContainText(
-    "参加申請はDiscordで受け付けています。Minecraft Java Edition 26.3で参加できます。",
+    "Discordで申請し、承認後にMinecraftから参加できます。",
   );
   await expect(page.locator(".site-footer")).toContainText(
     "Celenas SMP · Minecraft Java 26.3",
   );
   await expect(page.locator(".about-copy p")).toHaveText([
-    "大きな建築にこもる人も、遠くまで探索する人も、装置を作り続ける人もいます。遊び方やログイン頻度を合わせる必要はありません。",
-    "ひとりで遊ぶのも、誰かと一緒に進めるのも自由です。作ったものがそのまま残っていく、長く遊べるワールドを目指しています。",
+    "人それぞれの建築や探索を尊重し、ひとりで過ごす時間も、誰かと一緒に遊ぶ時間も大切にしています。遊び方やログイン頻度を合わせる必要はありません。",
+    "それぞれが作ったものや過ごした時間がワールドに積み重なっていく。そんな場所を、みんなで長く育てていきます。",
   ]);
   await expect(page.locator(".world-themes h3")).toHaveText([
     "BUILD / 建築",
@@ -528,7 +547,7 @@ test("Gallery images open an accessible fullscreen viewer", async ({
 }, testInfo) => {
   await page.goto("/");
   const imageButton = page.getByRole("button", {
-    name: "画像を拡大: tree_farm",
+    name: "画像を拡大: 広い掘削地に並ぶ装置群とビーコンの光",
   });
   const viewer = page.getByRole("dialog", { name: "Gallery image viewer" });
   await expect(viewer.locator("img")).toHaveCount(0);
@@ -558,7 +577,9 @@ test("Gallery images open an accessible fullscreen viewer", async ({
   expect(backgroundChannels.slice(0, 3)).toEqual([3, 4, 7]);
   expect(backgroundChannels[3]).toBeCloseTo(0.985, 2);
   expect(viewerSurface.borderRadius).toBe("0px");
-  const viewerSemanticImage = viewer.getByRole("img", { name: "tree_farm" });
+  const viewerSemanticImage = viewer.getByRole("img", {
+    name: "広い掘削地に並ぶ装置群とビーコンの光",
+  });
   await expect(viewerSemanticImage).toBeVisible();
   await expect(viewerSemanticImage).toHaveCSS("object-fit", "contain");
   expect(
@@ -628,7 +649,9 @@ test("Gallery images open an accessible fullscreen viewer", async ({
   await expect(previous).toBeDisabled();
   await viewer.getByRole("button", { name: "次の画像を表示" }).click();
   await expect(viewer.locator(".gallery-counter")).toHaveText("02 / 05");
-  await expect(viewer.getByRole("img", { name: "yamako_town" })).toBeVisible();
+  await expect(
+    viewer.getByRole("img", { name: "石造りの建物が並ぶ街の広場" }),
+  ).toBeVisible();
   await next.click();
   await expect(viewer.locator(".gallery-counter")).toHaveText("03 / 05");
   if (testInfo.project.name === "desktop-chromium") {
@@ -686,7 +709,9 @@ test("fullscreen viewer stays aligned and edge controls stay clear on desktop", 
   for (const viewport of viewports) {
     await page.setViewportSize(viewport);
     await page.goto("/");
-    await page.getByRole("button", { name: "画像を拡大: yamako_town" }).click();
+    await page
+      .getByRole("button", { name: "画像を拡大: 石造りの建物が並ぶ街の広場" })
+      .click();
     const viewer = page.getByRole("dialog", { name: "Gallery image viewer" });
     await expect(viewer).toBeVisible();
     await expectViewerImageReady(
@@ -742,7 +767,9 @@ test("mobile fullscreen viewer anchors controls safely and keeps the image tappa
   for (const viewport of viewports) {
     await page.setViewportSize(viewport);
     await page.goto("/");
-    const opener = page.getByRole("button", { name: "画像を拡大: tree_farm" });
+    const opener = page.getByRole("button", {
+      name: "画像を拡大: 広い掘削地に並ぶ装置群とビーコンの光",
+    });
     await opener.click();
     const viewer = page.getByRole("dialog", { name: "Gallery image viewer" });
     await expect(viewer).toBeVisible();
@@ -1036,16 +1063,16 @@ test("celestial journey supports direct hashes and keeps mobile navigation", asy
   ).toBeVisible();
 });
 
-test("transmission shows READY public information and distinguishes Join access", async ({
+test("transmission labels static public information and distinguishes Join access", async ({
   page,
 }) => {
   await page.goto("/");
   const community = page.locator(".transmission-panel-community");
-  await expect(community).toHaveAttribute("data-state", "ready");
-  await expect(community.getByText("READY", { exact: true })).toBeVisible();
-  await expect(community.getByText(/PUBLIC INFO \/ READY/)).toBeVisible();
+  await expect(community).toHaveAttribute("data-state", "info");
+  await expect(community.getByText("INFO", { exact: true })).toBeVisible();
+  await expect(community.getByText("PUBLIC INFO / COMMUNITY")).toBeVisible();
   await expect(page.locator(".transmission-panel-join")).toContainText(
-    "参加申請と接続方法はDiscordで案内しています。",
+    "参加申請と承認後の接続案内はDiscordで確認できます。",
   );
   await expect(
     page.locator(".transmission-panel-join").getByRole("link"),

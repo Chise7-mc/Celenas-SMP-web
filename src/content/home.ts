@@ -22,10 +22,10 @@ export const homeContent = {
   about: {
     title: "気軽に遊べて、長く続けられるSMP。",
     description:
-      "Celenas SMPは、Minecraft Java Edition 26.3で遊ぶサバイバルサーバーです。建築や探索、装置づくりなど、それぞれ好きなことを楽しんでいます。",
+      "Celenas SMPは、自分のペースを大切にしながら遊べるコミュニティです。",
     paragraphs: [
-      "大きな建築にこもる人も、遠くまで探索する人も、装置を作り続ける人もいます。遊び方やログイン頻度を合わせる必要はありません。",
-      "ひとりで遊ぶのも、誰かと一緒に進めるのも自由です。作ったものがそのまま残っていく、長く遊べるワールドを目指しています。",
+      "人それぞれの建築や探索を尊重し、ひとりで過ごす時間も、誰かと一緒に遊ぶ時間も大切にしています。遊び方やログイン頻度を合わせる必要はありません。",
+      "それぞれが作ったものや過ごした時間がワールドに積み重なっていく。そんな場所を、みんなで長く育てていきます。",
     ],
     values: [
       "無理せず、自分のペースで",
@@ -36,7 +36,7 @@ export const homeContent = {
   world: {
     title: "建築も、探索も、装置も。",
     description:
-      "何をするかは自由です。やりたいことを見つけて、そのまま遊んでください。",
+      "建築・探索・装置づくり。それぞれの楽しみ方を、ワールドの中で形にできます。",
     themes: [
       {
         number: "01",
@@ -58,8 +58,8 @@ export const homeContent = {
   community: {
     title: "参加・連絡はDiscordから。",
     description:
-      "参加申請、お知らせ、質問や情報共有はDiscordで行っています。まずはDiscordに参加してください。",
-    note: "Minecraftへの参加手順はDiscordで案内しています。サーバーアドレスはWebでは公開していません。",
+      "Discordを参加の窓口として、お知らせや質問・相談、プレイヤー同士の情報共有を行っています。参加申請もこちらからどうぞ。",
+    note: "申請後の接続手順はDiscordで案内しています。サーバーアドレスはWebでは公開していません。",
   },
   rules: {
     title: "みんなで遊ぶためのルール。",
@@ -109,7 +109,23 @@ export const homeContent = {
   },
   join: {
     title: "Celenas SMPに参加する",
-    description:
-      "参加申請はDiscordで受け付けています。Minecraft Java Edition 26.3で参加できます。",
+    description: "Discordで申請し、承認後にMinecraftから参加できます。",
+    steps: [
+      {
+        number: "01",
+        title: "Discordに参加する",
+        body: "Celenas SMPのDiscordコミュニティに参加します。",
+      },
+      {
+        number: "02",
+        title: "Minecraft IDで参加申請",
+        body: "申請チャンネルでMinecraft IDを添えて申請します。",
+      },
+      {
+        number: "03",
+        title: "運営の承認後に接続",
+        body: "承認後、案内された手順を確認してMinecraftから接続します。",
+      },
+    ],
   },
 } as const;

@@ -10,7 +10,7 @@ export function TransmissionPanel({
   connection: CommunityConnection;
   variant: "community" | "join";
 }) {
-  const state = "READY";
+  const state = "INFO";
   const isJoin = variant === "join";
 
   return (
@@ -28,7 +28,7 @@ export function TransmissionPanel({
       />
       <div className="transmission-heading">
         <p className="transmission-label">
-          {isJoin ? "JOIN / ACCESS" : "TRANSMISSION / SERVER"}
+          {isJoin ? "JOIN / ACCESS" : "COMMUNITY / INFO"}
         </p>
         <span className="transmission-state">
           <span className="transmission-light" aria-hidden="true" />
@@ -46,7 +46,7 @@ export function TransmissionPanel({
               width={320}
               height={320}
             />
-            <p>参加申請と接続方法はDiscordで案内しています。</p>
+            <p>参加申請と承認後の接続案内はDiscordで確認できます。</p>
           </div>
           <a
             className="glass-button glass-button-primary"
@@ -60,7 +60,7 @@ export function TransmissionPanel({
       ) : (
         <>
           <CommunityDetails connection={connection} />
-          <p className="transmission-footnote">PUBLIC INFO / {state}</p>
+          <p className="transmission-footnote">PUBLIC INFO / COMMUNITY</p>
         </>
       )}
     </div>

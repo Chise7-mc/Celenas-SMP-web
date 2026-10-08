@@ -248,6 +248,17 @@ export default function Home() {
             <p className="eyebrow">Join</p>
             <h2 id="join-title">{homeContent.join.title}</h2>
             <p className="muted">{homeContent.join.description}</p>
+            <ol className="join-steps" aria-label="参加までの手順">
+              {homeContent.join.steps.map((step) => (
+                <li key={step.number}>
+                  <span aria-hidden="true">{step.number}</span>
+                  <div>
+                    <h3>{step.title}</h3>
+                    <p>{step.body}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
           </div>
           <TransmissionPanel connection={site.connection} variant="join" />
         </section>

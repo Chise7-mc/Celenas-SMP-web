@@ -27,7 +27,7 @@ an existing listener. Free that port instead of changing reuse behavior.
 ## Coverage
 
 Component tests verify the published edition, Minecraft version, Discord link
-and READY transmission state. Gallery core tests cover manifest shape,
+and static INFO transmission state. Gallery core tests cover manifest shape,
 duplicate IDs and paths, image metadata, path traversal and insertion order.
 Lunar phase unit tests use fixed UTC dates and
 verify phase sectors, waxing/waning, illumination bounds and deterministic
@@ -35,7 +35,7 @@ output. Visual component tests check decorative SVG output and phase-driven
 atmospheric CSS properties.
 
 Browser tests load the production page, check the published Discord actions,
-Java Edition details, READY state, all six rules and the intentionally omitted
+Java Edition details, static INFO state, all six rules and the intentionally omitted
 server address, plus the canonical logo and site icon and image-only Gallery cards.
 They also cover Gallery rail snapping, shared stage alignment, borderless rounded
 images, fullscreen viewer placement, edge controls, image advance, fade and

@@ -4,17 +4,17 @@ import { TransmissionPanel } from "@/components/transmission-panel";
 import { site } from "@/config/site";
 
 describe("transmission panel", () => {
-  it("reports READY with public version and Discord information", () => {
+  it("shows static community information without implying live server status", () => {
     const { container } = render(
       <TransmissionPanel connection={site.connection} variant="community" />,
     );
 
-    expect(container.firstElementChild).toHaveAttribute("data-state", "ready");
-    expect(screen.getByText("READY")).toBeVisible();
-    expect(screen.getByText("TRANSMISSION / SERVER")).toBeVisible();
+    expect(container.firstElementChild).toHaveAttribute("data-state", "info");
+    expect(screen.getByText("INFO")).toBeVisible();
+    expect(screen.getByText("COMMUNITY / INFO")).toBeVisible();
     expect(screen.getByText("Minecraft Java Edition")).toBeVisible();
     expect(screen.getByText("26.3")).toBeVisible();
-    expect(screen.getByText("PUBLIC INFO / READY")).toBeVisible();
+    expect(screen.getByText("PUBLIC INFO / COMMUNITY")).toBeVisible();
     expect(screen.queryByText("サーバーアドレス")).not.toBeInTheDocument();
   });
 
@@ -23,10 +23,10 @@ describe("transmission panel", () => {
       <TransmissionPanel connection={site.connection} variant="join" />,
     );
 
-    expect(container.firstElementChild).toHaveAttribute("data-state", "ready");
+    expect(container.firstElementChild).toHaveAttribute("data-state", "info");
     expect(screen.getByText("JOIN / ACCESS")).toBeVisible();
     expect(
-      screen.getByText("参加申請と接続方法はDiscordで案内しています。"),
+      screen.getByText("参加申請と承認後の接続案内はDiscordで確認できます。"),
     ).toBeVisible();
     const discordLogo = container.querySelector("img.discord-mark");
     expect(discordLogo).not.toBeNull();
