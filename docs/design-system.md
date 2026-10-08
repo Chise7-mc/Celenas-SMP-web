@@ -54,7 +54,8 @@ giant: a banded cloud texture masked by fixed-tilt SVG terminator geometry,
 deterministic, non-tiled far/mid star layers, one localized star cluster, two
 softly twinkling white stars, three sparse deterministic radial-gradient
 stardust depth layers, and a black-blue deep-space WebP with a translucent blue
-nebula and unevenly distributed stars. The 1600 × 1600 image is about 107 KB;
+nebula and unevenly distributed stars. The refined 1600 × 1600 WebP is about
+170 KB, with clearer nebula filaments and star detail;
 controlled CSS stars add modest density without uniform sparkle. It drifts very
 slowly; only two white stars twinkle subtly. A lightweight black gradient fades
 the background at its left, right and lower edges while preserving the center.
@@ -63,10 +64,7 @@ blue-indigo radial-gradient gas clouds drift gently on desktop using transforms
 and opacity, without blur filters. Mobile keeps the background and planet but
 stops ambient motion; lunar phase updates and three satellites remain. Journey
 layers change opacity without transform motion. Hero motion pauses when the
-Hero is offscreen or the document is hidden. Two transparent gas-fog WebP layers
-sit in front of the stars and behind the planet; their opacity and small opposing
-parallax follow only the Hero's scroll position. Their slow drift pauses on
-mobile, offscreen, hidden-document and reduced-motion states.
+Hero is offscreen or the document is hidden.
 Stardust opacity responds subtly to the animated phase;
 its layers drift with transforms rather than animating individual particles or
 background positions. Motion is intentionally low-key and is disabled when the

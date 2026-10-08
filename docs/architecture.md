@@ -14,7 +14,7 @@ Internal anchors provide navigation without a custom library.
 | `src/app/icon.png`                     | Canonical Celenas logo used as the site icon              |
 | `src/components/community-details.tsx` | Public Java edition, version and Discord entry details    |
 | `src/components/glass-surface.tsx`     | Shared glass interaction surface                          |
-| `src/components/lunar-phase-scene.tsx` | Hero phase, orbit and scroll-linked fog effects           |
+| `src/components/lunar-phase-scene.tsx` | Client boundary for the Hero's 120-second SVG phase morph |
 | `src/components/mobile-navigation.tsx` | Small client boundary for closing mobile navigation       |
 | `src/config/site.ts`                   | Reviewed, public product configuration                    |
 | `src/content/home.ts`                  | Editable editorial copy and typed gallery manifest import |
