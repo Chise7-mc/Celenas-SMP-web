@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { site } from "@/config/site";
+import { resolveSiteUrl } from "@/lib/site-url";
 import "./globals.css";
 
-const ogImageUrl =
-  "https://chise7-mc.github.io/Celenas-SMP-web/og/celenas-og.png";
-const siteUrl = "https://chise7-mc.github.io/Celenas-SMP-web/";
+const siteUrl = resolveSiteUrl();
+const ogImageUrl = new URL("og/celenas-og.png", siteUrl).toString();
 const searchDescription =
   "Celenas SMPは、Minecraft Java Edition 26.3で建築・探索・装置づくりを楽しめるサバイバルサーバーです。参加申請はDiscordから受け付けています。";
 

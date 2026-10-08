@@ -15,6 +15,13 @@ the `/Celenas-SMP-web` Project Site base path, verifies `out/`, then uploads and
 deploys that artifact. It does not run for pull requests and does not change the
 normal `pnpm check` workflow.
 
+Cloudflare Pages can build the same static export at the domain root with
+`DEPLOY_TARGET=cloudflare` and a confirmed HTTPS origin in
+`NEXT_PUBLIC_SITE_URL`. Run `pnpm build` followed by
+`pnpm verify:cloudflare`. Do not configure the Cloudflare production URL until
+the Pages project has been created and its actual public URL is known. The
+GitHub Pages workflow remains enabled independently.
+
 Use the same Node.js major, pnpm version and commands locally. CI uses Ubuntu;
 Windows development is also supported. Configure branch protection to require
 `quality` separately when repository policy is decided. A workflow alone does

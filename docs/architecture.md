@@ -75,8 +75,13 @@ deploying. Only the Pages build sets `GITHUB_PAGES=true` and
 project base path and unoptimized local images. `withBasePath` applies the same
 prefix to local logo and future gallery image paths. The generated `out/` is
 checked for the expected HTML, asset paths, icon and logo before it is uploaded
-as the Pages artifact. Ordinary development, production builds and Playwright
-continue to use Next.js defaults without a base path.
+as the Pages artifact. For Cloudflare Pages, set `DEPLOY_TARGET=cloudflare` and
+the confirmed root URL in `NEXT_PUBLIC_SITE_URL`; this enables static export
+without a base path. The same site URL resolver supplies canonical/Open Graph
+metadata and the generated sitemap. `pnpm verify:cloudflare` checks root asset
+paths and the export. The existing GitHub Pages workflow remains independent.
+Ordinary development, production builds and Playwright continue to use Next.js
+defaults without a base path.
 
 ## Public configuration
 
