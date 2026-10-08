@@ -124,7 +124,7 @@ test("home exposes the current edition and Discord action with no runtime errors
   const response = await page.goto("/");
 
   expect(response?.status()).toBe(200);
-  await expect(page).toHaveTitle("Celenas SMP | Minecraft Java Edition 26.3");
+  await expect(page).toHaveTitle("Celenas SMP");
   await expect(
     page.getByRole("heading", { level: 1, name: "Celenas SMP" }),
   ).toBeVisible();
@@ -142,6 +142,65 @@ test("home exposes the current edition and Discord action with no runtime errors
     page.getByRole("link", { name: "Discordに参加する" }),
   ).toHaveAttribute("href", discordInviteUrl);
   expect(errors).toEqual([]);
+});
+
+test("publishes the configured Open Graph and large Twitter image metadata", async ({
+  page,
+}) => {
+  await page.goto("/");
+
+  const imageUrl =
+    "https://chise7-mc.github.io/Celenas-SMP-web/og/celenas-og.png";
+  await expect(page.locator('meta[property="og:title"]')).toHaveAttribute(
+    "content",
+    "Celenas SMP",
+  );
+  await expect(page.locator('meta[property="og:description"]')).toHaveAttribute(
+    "content",
+    "Minecraftサバイバルコミュニティ",
+  );
+  await expect(page.locator('meta[property="og:url"]')).toHaveAttribute(
+    "content",
+    "https://chise7-mc.github.io/Celenas-SMP-web/",
+  );
+  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
+    "content",
+    imageUrl,
+  );
+  await expect(page.locator('meta[property="og:image:alt"]')).toHaveAttribute(
+    "content",
+    "Celenas SMP OG image",
+  );
+  await expect(page.locator('meta[property="og:image:width"]')).toHaveAttribute(
+    "content",
+    "1200",
+  );
+  await expect(
+    page.locator('meta[property="og:image:height"]'),
+  ).toHaveAttribute("content", "630");
+  await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute(
+    "content",
+    "summary_large_image",
+  );
+  await expect(page.locator('meta[name="twitter:title"]')).toHaveAttribute(
+    "content",
+    "Celenas SMP",
+  );
+  await expect(
+    page.locator('meta[name="twitter:description"]'),
+  ).toHaveAttribute("content", "Minecraftサバイバルコミュニティ");
+  await expect(page.locator('meta[name="twitter:image"]')).toHaveAttribute(
+    "content",
+    imageUrl,
+  );
+  await expect(page.locator('meta[name="twitter:image:alt"]')).toHaveAttribute(
+    "content",
+    "Celenas SMP OG image",
+  );
+
+  const imageResponse = await page.request.get("/og/celenas-og.png");
+  expect(imageResponse.status()).toBe(200);
+  expect(imageResponse.headers()["content-type"]).toContain("image/png");
 });
 
 test("publishes edition and Discord information without a server address", async ({
