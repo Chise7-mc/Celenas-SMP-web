@@ -44,7 +44,8 @@ image peek and responsive overflow; accessible orbital navigation and browser hi
 alignment at three desktop viewport sizes,
 the 120-second waxing-crescent SVG phase morph, fixed tilt and 100ms update
 limit, offscreen / hidden-document pause and phase resume, CSS orbit periods,
-satellite positions on their ellipse paths, the baked WebP nebula, absence of
+satellite positions on their ellipse paths, the baked WebP nebula and black edge
+fades on every target desktop/mobile viewport, absence of
 runtime SVG filters and blend modes, restrained desktop motion, mobile low-cost
 glass / nebula / Journey rendering, a localized star cluster and two subtle
 desktop star twinkles, 200ms phase updates with orbit motion

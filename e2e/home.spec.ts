@@ -1659,8 +1659,11 @@ test("contains the full-hero deep-space background with a faded mask", async ({
   for (const [width, height] of [
     [1920, 1080],
     [1440, 900],
+    [1366, 768],
+    [430, 932],
     [390, 844],
     [375, 812],
+    [320, 700],
   ] as const) {
     await page.setViewportSize({ width, height });
     const geometry = await page.evaluate(() => {
@@ -1676,6 +1679,7 @@ test("contains the full-hero deep-space background with a faded mask", async ({
         bakedOverflow: getComputedStyle(baked).overflow,
         backgroundOverflow: getComputedStyle(background).overflow,
         backgroundMask: getComputedStyle(background).maskImage,
+        edgeFades: getComputedStyle(background, "::after").backgroundImage,
         visualOverflow: getComputedStyle(visual).overflowX,
         pageWidth: document.documentElement.scrollWidth,
       };
@@ -1687,6 +1691,7 @@ test("contains the full-hero deep-space background with a faded mask", async ({
     expect(geometry.bakedOverflow).toBe("hidden");
     expect(geometry.backgroundOverflow).toBe("hidden");
     expect(geometry.backgroundMask).toContain("radial-gradient");
+    expect(geometry.edgeFades.match(/linear-gradient/g)).toHaveLength(3);
     expect(geometry.visualOverflow).toBe("visible");
     expect(geometry.pageWidth).toBe(width);
   }

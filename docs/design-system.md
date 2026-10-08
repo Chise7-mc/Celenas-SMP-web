@@ -56,7 +56,9 @@ softly twinkling white stars, three sparse deterministic radial-gradient
 stardust depth layers, and a black-blue deep-space WebP with a translucent blue
 nebula and unevenly distributed stars. The 1600 × 1600 image is about 107 KB;
 controlled CSS stars add modest density without uniform sparkle. It drifts very
-slowly; only two white stars twinkle subtly. Three layered
+slowly; only two white stars twinkle subtly. A lightweight black gradient fades
+the background at its left, right and lower edges while preserving the center.
+Three layered
 blue-indigo radial-gradient gas clouds drift gently on desktop using transforms
 and opacity, without blur filters. Mobile keeps the background and planet but
 stops ambient motion; lunar phase updates and three satellites remain. Journey
