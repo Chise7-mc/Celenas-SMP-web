@@ -3,8 +3,10 @@
 ## Boundaries
 
 Celenas Web v1 is a marketing landing page rendered by Next.js App Router.
-It has no API routes, data collection, authentication or external runtime
-requests; small client boundaries handle the mobile menu and lunar scene.
+The static landing page has no account storage or player-data collection.
+An opt-in participation flow uses Google reCAPTCHA v2 and a Cloudflare Pages
+Function at POST /api/join, which verifies tokens before returning invitations.
+Small client boundaries also handle the mobile menu and lunar scene.
 Internal anchors provide navigation without a custom library.
 
 | Location                               | Responsibility                                            |
@@ -37,8 +39,8 @@ animation engines, 3D libraries or data-query clients speculatively.
 `src/content/home.ts` owns brand/editorial language and the six public community
 rules. `src/content/gallery.json` is the single source of Gallery metadata and
 is imported with the `GalleryImage` type. Confirmed public facts remain in
-`src/config/site.ts`. Minecraft Java Edition 26.3 and the Discord invitation are
-public; the server address is intentionally not part of the site data model.
+`src/config/site.ts`. Minecraft Java Edition 26.3 is public; the Discord invitation lives in Functions
+settings and the server address is intentionally not part of the site data model.
 When no images are registered, the Gallery renders its intentional pending
 state. Registered screenshots appear in a client-side horizontal rail with
 scroll snapping, a compact position/progress display and keyboard/arrow
@@ -90,12 +92,12 @@ defaults without a base path.
 ## Public configuration
 
 `site.connection` contains the published Minecraft Java Edition version and
-Discord URL. The server address is intentionally excluded and is never
-published on the website. Update public facts only after confirmation, then
-rebuild. No environment file or secret is necessary.
+on-page participation target. The server address is intentionally excluded.
+The Discord invitation and CAPTCHA secret are Functions settings, not public
+configuration. See [participation security](join-security.md) for setup.
 
 The configuration is trusted, reviewed source code, not a user input boundary.
-`CommunityConnection` requires an HTTPS URL at compile time. If a CMS, API or
+`CommunityConnection` restricts participation to `#join`. If a CMS, API or
 user input later feeds these values, add runtime validation at that boundary.
 Do not put private service addresses or credentials in this public object.
 
@@ -115,7 +117,8 @@ peer errors to force an upgrade. `strictPeerDependencies` makes mismatches fail.
 Only the native resolver's required install hook is allowed. Script commands do
 not auto-install dependencies (`verifyDepsBeforeRun: false`); run an explicit
 `pnpm install --frozen-lockfile` first. Dependencies and browser installation need
-network access; the product does not use remote services.
+network access. Google is contacted only after a visitor starts participation
+verification; the Function contacts Google for server-side verification.
 
 Plain CSS serves the small initial UI. Tailwind may be added when it improves
 implemented work. System fonts avoid build-time font downloads.

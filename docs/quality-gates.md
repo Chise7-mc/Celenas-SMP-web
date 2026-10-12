@@ -42,6 +42,11 @@ not configure protection.
 
 ## Before public release
 
+Participation protection requires Google keys, Cloudflare Functions settings
+and a deployed `/api/join`. Follow [participation security](join-security.md).
+Local tests mock external services and do not prove live Google verification.
+A static-only deployment does not execute the participation API.
+
 Confirm server details, community links, official logo, imagery rights, content
 and domain. Review dependency advisories and the documented lint compatibility
 exception. Choose hosting and its security/privacy policy. Add browser coverage

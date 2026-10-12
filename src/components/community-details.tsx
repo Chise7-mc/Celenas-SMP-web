@@ -18,9 +18,7 @@ export function CommunityDetails({
       <div>
         <dt>参加窓口</dt>
         <dd>
-          <a href={connection.discordUrl} target="_blank" rel="noreferrer">
-            Discord コミュニティへ参加 ↗
-          </a>
+          <a href={connection.joinHref}>Discord コミュニティへ参加 ↗</a>
         </dd>
       </div>
     </dl>

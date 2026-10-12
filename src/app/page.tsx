@@ -70,9 +70,7 @@ export default function Home() {
             <div className="hero-actions">
               <a
                 className="glass-button glass-button-primary"
-                href={site.connection.discordUrl}
-                target="_blank"
-                rel="noreferrer"
+                href={site.connection.joinHref}
               >
                 {homeContent.hero.primaryAction}
                 <span aria-hidden="true">↗</span>

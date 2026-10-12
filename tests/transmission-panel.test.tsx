@@ -31,9 +31,11 @@ describe("transmission panel", () => {
     const discordLogo = container.querySelector("img.discord-mark");
     expect(discordLogo).not.toBeNull();
     expect(discordLogo).toHaveAttribute("alt", "");
-    const invite = screen.getByRole("link", { name: "Discordで参加申請" });
-    expect(invite).toHaveAttribute("href", site.connection.discordUrl);
-    expect(invite).toHaveAttribute("target", "_blank");
-    expect(invite).toHaveAttribute("rel", "noreferrer");
+    expect(
+      screen.getByRole("button", { name: "Discordで参加申請" }),
+    ).toBeDisabled();
+    expect(
+      screen.queryByRole("link", { name: "Discordで参加申請" }),
+    ).not.toBeInTheDocument();
   });
 });
