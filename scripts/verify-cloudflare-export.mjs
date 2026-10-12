@@ -1,4 +1,4 @@
-import { access, readFile } from "node:fs/promises";
+import { access, readFile, readdir } from "node:fs/promises";
 import { extname, resolve, sep } from "node:path";
 
 const outputDirectory = resolve("out");
@@ -93,6 +93,7 @@ async function verifyExport() {
     "og/celenas-og.png",
     "icon.png",
     "sitemap.xml",
+    "_routes.json",
   ];
   for (const file of requiredFiles) {
     try {
@@ -115,13 +116,32 @@ async function verifyExport() {
     if (error?.code !== "ENOENT") throw error;
   }
 
-  if (!html.includes("https://discord.gg/cuXPVNccYv")) {
-    fail("The published Discord invite link is missing from the home page.");
+  if (!html.includes('href="#join"') || !html.includes("join-verification")) {
+    fail("The protected participation flow is missing from the home page.");
   }
+  // Includes server-component payloads and source maps published with the site.
+  async function verifyNoInvitations(directory) {
+    for (const entry of await readdir(directory, { withFileTypes: true })) {
+      const filePath = resolve(directory, entry.name);
+      if (entry.isSymbolicLink()) {
+        fail("Symbolic links must not be published in the export.");
+      } else if (entry.isDirectory()) {
+        await verifyNoInvitations(filePath);
+      } else if (/\.(?:html|txt|json|js|map)$/i.test(entry.name)) {
+        const source = await readFile(filePath, "utf8");
+        if (
+          /https?:\/\/(?:discord\.gg\/|discord\.com\/invite\/)/i.test(source)
+        ) {
+          fail("A Discord invitation URL was found in public output.");
+        }
+      }
+    }
+  }
+  await verifyNoInvitations(outputDirectory);
 
   if (process.exitCode !== 1) {
     console.log(
-      `Verified Cloudflare root export at ${siteUrl.toString()}, ${assetPaths.size} referenced assets, SEO metadata, Discord invite and sitemap.`,
+      `Verified Cloudflare root export at ${siteUrl.toString()}, ${assetPaths.size} referenced assets, SEO metadata, protected participation and sitemap.`,
     );
   }
 }

@@ -33,3 +33,12 @@ jobs:
         run: pnpm exec playwright install --with-deps chromium
       - name: Verify frontend
         run: pnpm check
+      - name: Verify configured participation
+        run: pnpm build && pnpm exec playwright test e2e/join.spec.ts
+        env:
+          NEXT_PUBLIC_RECAPTCHA_SITE_KEY: synthetic-key
+      - name: Verify Cloudflare static export
+        run: pnpm build && pnpm verify:cloudflare
+        env:
+          DEPLOY_TARGET: cloudflare
+          NEXT_PUBLIC_SITE_URL: https://celenas-smp.pages.dev/

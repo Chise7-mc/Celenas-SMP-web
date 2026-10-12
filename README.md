@@ -11,7 +11,7 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-ローカル画面は [localhost:3000](http://localhost:3000) で開きます。環境変数や認証情報は不要です。Next.jsのテレメトリはプロジェクトの実行スクリプトで無効化しています。
+ローカル画面は [localhost:3000](http://localhost:3000) で開きます。閲覧に認証情報は不要です。参加導線にはreCAPTCHAとCloudflare Pages Functionsの設定が必要です。キー未設定時は参加認証を準備中として表示します。Next.jsのテレメトリはプロジェクトの実行スクリプトで無効化しています。
 
 ## Gallery画像を追加する
 
@@ -33,7 +33,9 @@ pnpm gallery:validate
 
 ## デプロイ
 
-本番サイトは [GitHub Pages](https://chise7-mc.github.io/Celenas-SMP-web/) で公開します。`Deploy GitHub Pages` workflowが`main`へのpush時に静的エクスポートを作成・検証し、GitHub Pagesへデプロイします。Project Siteの`/Celenas-SMP-web` base pathはPages build時だけ有効です。
+本番サイトは [Cloudflare Pages](https://celenas-smp.pages.dev/) です。`DEPLOY_TARGET=cloudflare`と公開URLを指定し、`pnpm build && pnpm verify:cloudflare`で静的出力を作成・検証します。出力先は`out`、認証APIはルートの`functions/`です。設定と公開手順は[参加認証の設定](docs/join-security.md)を参照してください。
+
+既存のGitHub Pages workflowは静的出力を公開しますが、そこでは参加認証APIは動作しません。本番の参加導線はCloudflare側で確認してください。
 
 ## 検証
 
@@ -51,7 +53,7 @@ pnpm check
 - Minecraft Java Edition 26.3、Discord招待、6項目の公開ルール
 - サーバーアドレスはWeb非公開
 - Galleryは画像のみを横スライド表示し、5枚の画像を登録済み
-- GitHub Pages用の静的エクスポートと品質CI
+- Cloudflare Pages用の静的エクスポート、参加導線のreCAPTCHA検証APIと品質CI
 
 ## ドキュメント
 
@@ -61,4 +63,5 @@ pnpm check
 - [月相の計算と表示](docs/lunar-phase.md)
 - [テスト](docs/testing.md)
 - [品質ゲート](docs/quality-gates.md)
+- [参加認証の設定と確認](docs/join-security.md)
 - [エージェント向け作業ルール](AGENTS.md)

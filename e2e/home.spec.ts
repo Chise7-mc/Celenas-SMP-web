@@ -1,8 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Locator, type Page } from "@playwright/test";
 
-const discordInviteUrl = "https://discord.gg/cuXPVNccYv";
-
 async function expectViewerImageReady(image: Locator) {
   await expect(image).toBeVisible();
   await expect
@@ -140,7 +138,7 @@ test("home exposes the current edition and Discord action with no runtime errors
   );
   await expect(
     page.getByRole("link", { name: "Discordに参加する" }),
-  ).toHaveAttribute("href", discordInviteUrl);
+  ).toHaveAttribute("href", "#join");
   expect(errors).toEqual([]);
 });
 
@@ -246,14 +244,12 @@ test("publishes edition and Discord information without a server address", async
   const links = [
     page.getByRole("link", { name: "Discordに参加する" }),
     page.getByRole("link", { name: "Discord コミュニティへ参加 ↗" }),
-    page.getByRole("link", { name: "Discordで参加申請" }),
   ];
   for (const link of links) {
     await expect(link).toBeVisible();
     await expect(link).toBeEnabled();
-    await expect(link).toHaveAttribute("href", discordInviteUrl);
-    await expect(link).toHaveAttribute("target", "_blank");
-    await expect(link).toHaveAttribute("rel", "noreferrer");
+    await expect(link).toHaveAttribute("href", "#join");
+    await expect(link).not.toHaveAttribute("target");
   }
 
   await expect(page.locator(".community-details dt")).toHaveText([
@@ -302,18 +298,12 @@ test("publishes edition and Discord information without a server address", async
   );
   expect(discordLogoResponse.status()).toBe(200);
   expect(discordLogoResponse.headers()["content-type"]).toContain("image/png");
-  const joinDiscordLink = page.getByRole("link", {
-    name: "Discordで参加申請",
-  });
-  await expect(joinDiscordLink).toHaveAttribute("href", discordInviteUrl);
-  await expect(joinDiscordLink).toHaveAttribute("target", "_blank");
-  await expect(joinDiscordLink).toHaveAttribute("rel", "noreferrer");
   await expect(
-    page.locator(".transmission-panel-join .glass-button-primary"),
-  ).toHaveAttribute("target", "_blank");
+    page.getByRole("button", { name: "Discordで参加申請" }),
+  ).toBeDisabled();
   await expect(
-    page.locator(".transmission-panel-join .glass-button-primary"),
-  ).toHaveAttribute("rel", "noreferrer");
+    page.locator('a[href*="discord.gg"], a[href*="discord.com/invite"]'),
+  ).toHaveCount(0);
   const transmissionTreatment = await page
     .locator(".transmission-panel-community")
     .evaluate((panel) => {
@@ -1164,8 +1154,10 @@ test("transmission labels static public information and distinguishes Join acces
     "参加申請と承認後の接続案内はDiscordで確認できます。",
   );
   await expect(
-    page.locator(".transmission-panel-join").getByRole("link"),
-  ).toHaveAttribute("href", discordInviteUrl);
+    page
+      .locator(".transmission-panel-join")
+      .getByRole("button", { name: "Discordで参加申請" }),
+  ).toBeDisabled();
   await expect(
     page.getByText(/PING|LATENCY|UPTIME|PLAYER\s+\d|SIGNAL\s+\d/i),
   ).toHaveCount(0);

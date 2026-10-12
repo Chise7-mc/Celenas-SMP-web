@@ -27,15 +27,18 @@ an existing listener. Free that port instead of changing reuse behavior.
 
 ## Coverage
 
-Component tests verify the published edition, Minecraft version, Discord link
-and static INFO transmission state. Gallery core tests cover manifest shape,
+Component tests verify the published edition, Minecraft version, protected
+participation target and static INFO transmission state. Participation tests
+cover opt-in loading, missing settings, expiry, duplicate submission, retry
+and stale-response rejection. API tests exercise input/origin bounds, Google
+response validation, single-use failures and timeout. Gallery core tests cover manifest shape,
 duplicate IDs and paths, image metadata, path traversal and insertion order.
 Lunar phase unit tests use fixed UTC dates and
 verify phase sectors, waxing/waning, illumination bounds and deterministic
 output. Visual component tests check decorative SVG output and phase-driven
 atmospheric CSS properties.
 
-Browser tests load the production page, check the published Discord actions,
+Browser tests load the production page, check the protected Discord actions,
 Java Edition details, static INFO state, all six rules and the intentionally omitted
 server address, plus the canonical logo and site icon and image-only Gallery cards.
 They also cover Gallery rail snapping, shared stage alignment, borderless rounded
@@ -76,6 +79,15 @@ exist. The deployment workflow runs it before uploading `out/`.
 Prefer role/name queries and visible outcomes over implementation details or
 broad snapshots. Test public behavior at the smallest useful layer. Use browser
 tests for App Router integration and asynchronous server components.
+
+## Configured participation tests
+
+Set `NEXT_PUBLIC_RECAPTCHA_SITE_KEY=synthetic-key`, run `pnpm build`, then
+`pnpm exec playwright test e2e/join.spec.ts`. Playwright intercepts Google and
+the verification API; no real key or external authentication is used. Remove
+that variable afterward. Ordinary builds verify the missing-key state.
+Real Google/Cloudflare behavior requires the preview checks documented in
+[participation security](join-security.md).
 
 ## Privacy and limits
 
