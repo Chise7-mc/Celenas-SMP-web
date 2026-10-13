@@ -1,0 +1,10 @@
+{
+  "name": "celenas-join-rate-limiter",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-01",
+  "durable_objects": {
+    "bindings": [{ "name": "JOIN_LIMITER", "class_name": "JoinRateLimiter" }],
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["JoinRateLimiter"] }],
+  "observability": { "enabled": false },
+}

@@ -1,4 +1,4 @@
-import { access, readFile } from "node:fs/promises";
+import { access, readdir, readFile } from "node:fs/promises";
 import { extname, resolve, sep } from "node:path";
 
 const outputDirectory = resolve("out");
@@ -87,11 +87,14 @@ async function verifyExport() {
   }
 
   const requiredFiles = [
+    "_headers",
+    "_routes.json",
     "brand/celenas-logo-white.png",
     "space/hero-nebula.webp",
     "space/lunar-surface.webp",
     "og/celenas-og.png",
     "icon.png",
+    "robots.txt",
     "sitemap.xml",
   ];
   for (const file of requiredFiles) {
@@ -100,6 +103,48 @@ async function verifyExport() {
     } catch {
       fail(`Required Cloudflare root asset is missing: ${file}`);
     }
+  }
+
+  const headersPath = resolve(outputDirectory, "_headers");
+  try {
+    const headers = await readFile(headersPath, "utf8");
+    const requiredHeaders = [
+      "Content-Security-Policy:",
+      "Strict-Transport-Security: max-age=31536000",
+      "X-Content-Type-Options: nosniff",
+      "X-Frame-Options: DENY",
+      "Referrer-Policy: strict-origin-when-cross-origin",
+      "Permissions-Policy:",
+      "frame-ancestors 'none'",
+      "upgrade-insecure-requests",
+      "https://challenges.cloudflare.com",
+    ];
+    for (const header of requiredHeaders) {
+      if (!headers.includes(header)) {
+        fail(`Cloudflare security headers are missing: ${header}`);
+      }
+    }
+  } catch (error) {
+    if (error?.code !== "ENOENT") throw error;
+  }
+
+  const routesPath = resolve(outputDirectory, "_routes.json");
+  try {
+    const routes = JSON.parse(await readFile(routesPath, "utf8"));
+    if (
+      routes.version !== 1 ||
+      !Array.isArray(routes.include) ||
+      routes.include.length !== 1 ||
+      routes.include[0] !== "/api/join" ||
+      !Array.isArray(routes.exclude) ||
+      routes.exclude.length !== 0
+    ) {
+      fail(
+        "Cloudflare Pages Function routing must include only the join API route.",
+      );
+    }
+  } catch (error) {
+    if (error?.code !== "ENOENT") throw error;
   }
 
   const sitemapPath = resolve(outputDirectory, "sitemap.xml");
@@ -115,13 +160,61 @@ async function verifyExport() {
     if (error?.code !== "ENOENT") throw error;
   }
 
-  if (!html.includes("https://discord.gg/cuXPVNccYv")) {
-    fail("The published Discord invite link is missing from the home page.");
+  const robotsPath = resolve(outputDirectory, "robots.txt");
+  try {
+    const robots = await readFile(robotsPath, "utf8");
+    if (
+      !robots.includes("User-Agent: *") ||
+      !robots.includes("Allow: /") ||
+      !robots.includes(`${siteUrl.toString()}sitemap.xml`)
+    ) {
+      fail(
+        "robots.txt must allow public pages and identify the canonical sitemap.",
+      );
+    }
+  } catch (error) {
+    if (error?.code !== "ENOENT") throw error;
+  }
+
+  if (html.includes("discord.gg/")) {
+    fail("The Discord invite must not be included in static page HTML.");
+  }
+
+  async function javascriptFiles(directory) {
+    const entries = await readdir(directory, { withFileTypes: true });
+    const paths = await Promise.all(
+      entries.map(async (entry) => {
+        const path = resolve(directory, entry.name);
+        return entry.isDirectory()
+          ? javascriptFiles(path)
+          : extname(entry.name) === ".js"
+            ? [path]
+            : [];
+      }),
+    );
+    return paths.flat();
+  }
+
+  try {
+    const files = await javascriptFiles(
+      resolve(outputDirectory, "_next/static"),
+    );
+    for (const file of files) {
+      if ((await readFile(file, "utf8")).includes("discord.gg/")) {
+        fail(
+          "The Discord invite must not be included in published JavaScript.",
+        );
+        break;
+      }
+    }
+  } catch (error) {
+    if (error?.code !== "ENOENT") throw error;
+    fail("Cloudflare JavaScript assets are missing from out/_next/static.");
   }
 
   if (process.exitCode !== 1) {
     console.log(
-      `Verified Cloudflare root export at ${siteUrl.toString()}, ${assetPaths.size} referenced assets, SEO metadata, Discord invite and sitemap.`,
+      `Verified Cloudflare root export at ${siteUrl.toString()}, ${assetPaths.size} referenced assets, security headers, API routing, SEO metadata and sitemap.`,
     );
   }
 }

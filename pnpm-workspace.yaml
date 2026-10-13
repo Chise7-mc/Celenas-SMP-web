@@ -1,5 +1,7 @@
 minimumReleaseAge: 1440
 strictPeerDependencies: true
 verifyDepsBeforeRun: false
+overrides:
+  source-map-js: 1.2.2
 allowBuilds:
   unrs-resolver: true

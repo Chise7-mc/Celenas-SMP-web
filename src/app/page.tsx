@@ -68,14 +68,9 @@ export default function Home() {
             <p className="hero-description">{homeContent.hero.description}</p>
             <p className="hero-supporting">{homeContent.hero.supportingText}</p>
             <div className="hero-actions">
-              <a
-                className="glass-button glass-button-primary"
-                href={site.connection.discordUrl}
-                target="_blank"
-                rel="noreferrer"
-              >
+              <a className="glass-button glass-button-primary" href="#join">
                 {homeContent.hero.primaryAction}
-                <span aria-hidden="true">↗</span>
+                <span aria-hidden="true">↓</span>
               </a>
               <a className="glass-button glass-button-secondary" href="#about">
                 {homeContent.hero.secondaryAction}

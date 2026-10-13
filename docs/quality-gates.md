@@ -20,7 +20,9 @@ requests and does not change the normal `pnpm check` workflow.
 Cloudflare Pages can build the same static export at the domain root with
 `DEPLOY_TARGET=cloudflare` and a confirmed HTTPS origin in
 `NEXT_PUBLIC_SITE_URL`. Run `pnpm build` followed by
-`pnpm verify:cloudflare`. Do not configure the Cloudflare production URL until
+`pnpm verify:cloudflare`. The Pages Function and Durable Object Worker can be
+bundled with Wrangler's `pages functions build` and `deploy --dry-run` commands;
+these checks do not publish them. Do not configure the Cloudflare production URL until
 the Pages project has been created and its actual public URL is known. The
 GitHub Pages workflow remains enabled independently.
 
