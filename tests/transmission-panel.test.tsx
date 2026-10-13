@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { TransmissionPanel } from "@/components/transmission-panel";
 import { site } from "@/config/site";
@@ -18,7 +18,7 @@ describe("transmission panel", () => {
     expect(screen.queryByText("サーバーアドレス")).not.toBeInTheDocument();
   });
 
-  it("provides the Discord participation action in Join", () => {
+  it("does not expose a Discord invite before server verification", () => {
     const { container } = render(
       <TransmissionPanel connection={site.connection} variant="join" />,
     );
@@ -31,9 +31,17 @@ describe("transmission panel", () => {
     const discordLogo = container.querySelector("img.discord-mark");
     expect(discordLogo).not.toBeNull();
     expect(discordLogo).toHaveAttribute("alt", "");
-    const invite = screen.getByRole("link", { name: "Discordで参加申請" });
-    expect(invite).toHaveAttribute("href", site.connection.discordUrl);
-    expect(invite).toHaveAttribute("target", "_blank");
-    expect(invite).toHaveAttribute("rel", "noreferrer");
+    expect(
+      screen.queryByRole("link", { name: "Discordで参加申請" }),
+    ).not.toBeInTheDocument();
+    fireEvent.click(
+      screen.getByRole("button", { name: "Discord参加の認証を開始" }),
+    );
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "現在、参加認証を準備中です。",
+    );
+    expect(
+      screen.queryByRole("link", { name: "Discordで参加申請" }),
+    ).not.toBeInTheDocument();
   });
 });

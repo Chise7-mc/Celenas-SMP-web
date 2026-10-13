@@ -1,6 +1,7 @@
 import Image from "next/image";
 import type { CommunityConnection } from "@/config/site";
 import { CommunityDetails } from "@/components/community-details";
+import { TurnstileJoin } from "@/components/turnstile-join";
 import { withBasePath } from "@/lib/asset-path";
 
 export function TransmissionPanel({
@@ -48,14 +49,7 @@ export function TransmissionPanel({
             />
             <p>参加申請と承認後の接続案内はDiscordで確認できます。</p>
           </div>
-          <a
-            className="glass-button glass-button-primary"
-            href={connection.discordUrl}
-            target="_blank"
-            rel="noreferrer"
-          >
-            Discordで参加申請 <span aria-hidden="true">↗</span>
-          </a>
+          <TurnstileJoin />
         </div>
       ) : (
         <>

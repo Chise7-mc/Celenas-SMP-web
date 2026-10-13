@@ -27,8 +27,12 @@ an existing listener. Free that port instead of changing reuse behavior.
 
 ## Coverage
 
-Component tests verify the published edition, Minecraft version, Discord link
-and static INFO transmission state. Gallery core tests cover manifest shape,
+Component tests verify the published edition, Minecraft version, absence of a
+static Discord invitation, and the Turnstile gated Join state. Pages Function
+tests cover method/origin/body checks, fail-closed bindings, Siteverify
+hostname validation, safe invite destinations, cache/security headers and 429
+responses. Durable Object tests cover burst/sustained limits and expiry.
+Gallery core tests cover manifest shape,
 duplicate IDs and paths, image metadata, path traversal and insertion order.
 Lunar phase unit tests use fixed UTC dates and
 verify phase sectors, waxing/waning, illumination bounds and deterministic
