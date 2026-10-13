@@ -6,5 +6,10 @@
     "bindings": [{ "name": "JOIN_LIMITER", "class_name": "JoinRateLimiter" }],
   },
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["JoinRateLimiter"] }],
+  "previews": {
+    "durable_objects": {
+      "bindings": [{ "name": "JOIN_LIMITER", "class_name": "JoinRateLimiter" }],
+    },
+  },
   "observability": { "enabled": false },
 }
