@@ -128,15 +128,16 @@ to the Production namespace.
 
 The Worker has `workers_dev: false` and `preview_urls: false` so it does not
 publish a public `workers.dev` or version Preview URL. Pages accesses the
-namespace only through its binding. The production Worker/namespace do not
-exist yet; the current Preview namespace remains the only deployed rate
-limiter namespace.
+namespace only through its binding. On 2026-10-13 the separate Production
+Worker and SQLite `v1` namespace were deployed. Its namespace ID differs from
+Preview; neither Preview storage nor HMAC key is reused. The Pages Production
+binding points only to this Production namespace.
 
 A dedicated `celenas-join-rate-limiter-preview` Worker and its own SQLite DO
 namespace have been deployed with administrator authorization. Only Pages
-Preview has the `JOIN_RATE_LIMITER` binding. Production currently has no DO
-binding or join Secrets. Do not reuse the Preview Worker, namespace, HMAC
-secret, Turnstile widget, or test Discord invite in Production.
+Preview has a separate `JOIN_RATE_LIMITER` binding. Production has its own
+Worker, namespace, widget, and join Secrets. Do not reuse the Preview Worker,
+namespace, HMAC secret, Turnstile widget, or test Discord invite in Production.
 
 ## Preview evidence and limits
 
@@ -149,9 +150,10 @@ an untested deployment.
 
 - Explicit `wrangler pages secret list --project-name celenas-smp --env preview`
   confirms `DISCORD_INVITE_URL`, `TURNSTILE_SECRET_KEY`, and
-  `RATE_LIMIT_HMAC_SECRET`. The Production secret list is empty. Record names
-  and existence only; never export values, HAR files, request payloads, or
-  invitation-bearing response bodies.
+  `RATE_LIMIT_HMAC_SECRET`. Production now has distinct Secrets with these
+  names, confirmed from Pages config metadata. Record names and existence
+  only; never export values, HAR files, request payloads, or invitation-bearing
+  response bodies.
 - The managed Preview widget allows only the verified branch hostname. The
   configured public key matches the built bundle; `JOIN_ALLOWED_ORIGIN` matches
   the exact branch origin.
@@ -223,31 +225,33 @@ References: [routing and Fail open/closed](https://developers.cloudflare.com/pag
 
 ## Production preparation gate
 
-Production remains **NO_GO** while required real Preview tests or release
-configuration are incomplete. Prepare independent resources only after the
-Preview acceptance decision and explicit approval for Production changes.
-Workers Free is the approved plan; stop if any operation requires a paid plan.
-Cloudflare supports SQLite Durable Objects on Free; usage above the Free
-allowance must cause refusal, not a plan upgrade. Preserve disabled
-observability and do not enable paid services as part of this preparation.
+Production remains **NO_GO** while the latest Preview replay test, final
+release checks, and approval for the shared Fail closed change remain
+incomplete. The Cloudflare Dashboard showed Workers Free as the current plan
+($0). Cloudflare documents SQLite Durable Objects on Free; when free limits
+are exceeded, operations fail and the plan does not auto-upgrade. No paid
+service was enabled. Preserve disabled observability.
 
-| Item             | Production plan                                                                                              | Current state                                            |
-| ---------------- | ------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------- |
-| Turnstile        | New managed widget restricted to `celenas-smp.pages.dev`                                                     | Not created                                              |
-| Public build key | New widget's `NEXT_PUBLIC_TURNSTILE_SITE_KEY`                                                                | Absent                                                   |
-| Turnstile Secret | New widget's `TURNSTILE_SECRET_KEY`, entered privately                                                       | Absent                                                   |
-| Discord invite   | Operator-provided `DISCORD_INVITE_URL` Secret                                                                | Absent                                                   |
-| HMAC             | Independently generated secret of at least 32 bytes                                                          | Absent                                                   |
-| Rate limiter     | `celenas-join-rate-limiter`, `JoinRateLimiter`, SQLite `v1`                                                  | Config dry-run only                                      |
-| Pages DO binding | Production `JOIN_RATE_LIMITER` to the new Production namespace                                               | Absent                                                   |
-| Origin           | `JOIN_ALLOWED_ORIGIN=https://celenas-smp.pages.dev`                                                          | Absent                                                   |
-| Build            | `/`, `pnpm build`, `out`, `DEPLOY_TARGET=cloudflare`, confirmed site URL; Node 24.19.0 / pnpm 11.25.0 parity | Existing build settings; version parity recheck required |
-| Platform policy  | Approved shared Fail closed change                                                                           | Pending approval                                         |
+| Item             | Production plan                                                                                              | Current state                                                     |
+| ---------------- | ------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------- |
+| Turnstile        | New managed widget restricted to `celenas-smp.pages.dev`                                                     | Created; distinct Site Key and Secret stored in Production config |
+| Public build key | New widget's `NEXT_PUBLIC_TURNSTILE_SITE_KEY`                                                                | Set for the next Production build                                 |
+| Turnstile Secret | New widget's `TURNSTILE_SECRET_KEY`                                                                          | Set; value not read back                                          |
+| Discord invite   | Existing Production site's public invite moved into `DISCORD_INVITE_URL` Secret                              | Set; value not read back                                          |
+| HMAC             | Independently generated 32-byte secret                                                                       | Set; value not read back                                          |
+| Rate limiter     | `celenas-join-rate-limiter`, `JoinRateLimiter`, SQLite `v1`                                                  | Deployed without public URLs or routes                            |
+| Pages DO binding | Production `JOIN_RATE_LIMITER` to the new Production namespace                                               | Set; confirmed distinct from Preview                              |
+| Origin           | `JOIN_ALLOWED_ORIGIN=https://celenas-smp.pages.dev`                                                          | Set                                                               |
+| Build            | `/`, `pnpm build`, `out`, `DEPLOY_TARGET=cloudflare`, confirmed site URL; Node 24.19.0 / pnpm 11.25.0 parity | Settings ready for next Production build                          |
+| Platform policy  | Approved shared Fail closed change                                                                           | Pending approval; both environments remain `true`                 |
 
-After approval, prepare the isolated Worker/binding and private Secrets before
-switching the site artifact. Supply the public widget key before its build.
-Keep the existing successful deployment available until all prerequisites and
-CI are accepted. PR merge and Production deployment require final approval.
+The current Production site still serves its previous static deployment:
+home is 200, `/api/join` is 404, and the static Discord invite remains present
+until a later authorized build. That deployment did not return CSP, HSTS, or
+`nosniff` headers when checked. The Pages project configuration update did not
+change the canonical Production deployment. The next artifact must pass CI and
+Preview checks before an explicitly approved merge/deployment. Validate the new
+Production headers and join API immediately after that deployment.
 
 ## Rollback
 
@@ -265,7 +269,9 @@ deployment if a rollout fails, then verify `/`, assets, and the legacy GitHub
 Pages redirect. Restore shared fail policy or bindings separately if changed:
 an artifact rollback must not be assumed to restore project-level settings.
 The old website has a static invitation, so restoring it also restores the
-previous access policy. No rollback or Production change was performed here.
+previous access policy. Production Cloudflare settings and isolated resources
+were prepared here, but no Production Pages artifact was deployed; Fail closed
+and rollout rollback were not performed.
 
 Reference: [Cloudflare Pages rollbacks](https://developers.cloudflare.com/pages/configuration/rollbacks/).
 
