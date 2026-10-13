@@ -126,6 +126,12 @@ dedicated `celenas-join-rate-limiter-preview` Worker with its own DO namespace
 and bind only the Pages Preview environment to it. Never bind Pages Preview
 to the Production namespace.
 
+The Worker has `workers_dev: false` and `preview_urls: false` so it does not
+publish a public `workers.dev` or version Preview URL. Pages accesses the
+namespace only through its binding. The production Worker/namespace do not
+exist yet; the current Preview namespace remains the only deployed rate
+limiter namespace.
+
 A dedicated `celenas-join-rate-limiter-preview` Worker and its own SQLite DO
 namespace have been deployed with administrator authorization. Only Pages
 Preview has the `JOIN_RATE_LIMITER` binding. Production currently has no DO
